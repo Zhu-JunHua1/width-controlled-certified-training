@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the associated paper and this repository."
+title: "Width-Controlled Certified Training"
+type: software
+version: 0.1.0
+authors:
+  - family-names: Zhu
+    given-names: Junhua
+    email: zjh_2516125@nuaa.edu.cn
+    affiliation: Nanjing University of Aeronautics and Astronautics
+repository-code: "https://github.com/Zhu-JunHua1/width-controlled-certified-training"
+license: BSD-3-Clause

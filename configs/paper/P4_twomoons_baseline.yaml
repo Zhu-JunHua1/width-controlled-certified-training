@@ -1,0 +1,23 @@
+name: P4_twomoons_baseline
+output_dir: results/P4_twomoons_baseline
+data:
+  dataset: twomoons
+  train_size: 100
+  test_size: 200
+  seed: 0
+  per_training_seed: true
+  strategy: combined_split
+model:
+  hidden_layers: 1
+  hidden_width: 20
+pretraining:
+  enabled: false
+training:
+  horizon: 20
+  base_step: 2.0
+  retention: 0.8
+evaluation:
+  input_domain: clean
+radii: [0.0001, 0.001, 0.01]
+seed_selection: {start: 0, stop: 10, count: 10}
+methods: [IC, IC+IWAU]

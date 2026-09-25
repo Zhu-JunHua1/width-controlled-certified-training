@@ -1,0 +1,21 @@
+base:
+  name: P7_twomoons_stability
+  output_dir: results/P7_twomoons_L2_stability/base
+  data: {dataset: twomoons, train_size: 100, test_size: 500, seed: 10123310}
+  model: {hidden_layers: 2, hidden_width: 20}
+  pretraining:
+    enabled: true
+    target_accuracy: 0.50
+    maximum_initial_accuracy: 0.505
+    step_size: 0.02
+    optimizer: sgd
+  training: {horizon: 40, base_step: 0.1, retention: 0.8}
+  evaluation: {input_domain: same_as_training}
+  radii: [0.001]
+  seed_selection: {start: 0, stop: 25, count: 10}
+  methods: [IC, IC+IWAU]
+variants:
+  - overrides: {name: P7_T20, output_dir: results/P7_twomoons_L2_stability/T20, training: {horizon: 20}}
+  - overrides: {name: P7_T40, output_dir: results/P7_twomoons_L2_stability/T40, training: {horizon: 40}}
+  - overrides: {name: P7_T60, output_dir: results/P7_twomoons_L2_stability/T60, training: {horizon: 60}}
+  - overrides: {name: P7_T80, output_dir: results/P7_twomoons_L2_stability/T80, training: {horizon: 80}}

@@ -1,0 +1,25 @@
+name: P2_mnist17_ablation
+output_dir: results/P2_mnist17_ablation
+data:
+  dataset: mnist:1,7
+  train_size: 100
+  test_size: 500
+  seed: 10123310
+model:
+  hidden_layers: 1
+  hidden_width: 10
+pretraining:
+  enabled: true
+  target_accuracy: 0.50
+  maximum_initial_accuracy: 0.50
+  step_size: 0.0002
+  optimizer: adam
+training:
+  horizon: 30
+  base_step: 0.1
+  retention: 0.8
+evaluation:
+  input_domain: same_as_training
+radii: [0.001, 0.002]
+seed_selection: {start: 0, stop: 15, count: 10}
+methods: [IBP, IC, IBP+IWAU, IC+IWAU]

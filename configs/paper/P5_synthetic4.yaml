@@ -1,0 +1,21 @@
+name: P5_synthetic4
+output_dir: results/P5_synthetic4
+data:
+  dataset: synthetic:4
+  train_size: 100
+  test_size: 300
+  seed: 10123310
+model:
+  hidden_layers: 1
+  hidden_width: 20
+pretraining:
+  enabled: false
+training:
+  horizon: 30
+  base_step: 0.1
+  retention: 0.8
+evaluation:
+  input_domain: same_as_training
+radii: [0.005, 0.01, 0.02, 0.05]
+seed_selection: {start: 0, stop: 10, count: 10}
+methods: [IBP, IC, IC+IWAU]

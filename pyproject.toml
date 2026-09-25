@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "width-controlled-certified-training"
+version = "0.1.0"
+description = "IBP-CROWN gradient-bound intersection and interval-width-adaptive updates for certified training"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+authors = [
+  {name = "Junhua Zhu", email = "zjh_2516125@nuaa.edu.cn"},
+]
+dependencies = [
+  "numpy>=1.24",
+  "torch>=2.0,<2.9",
+  "torchvision>=0.12,<0.24",
+  "scikit-learn>=1.3",
+  "matplotlib>=3.7",
+  "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "openpyxl>=3.1"]
+
+[project.urls]
+Repository = "https://github.com/Zhu-JunHua1/width-controlled-certified-training"
+
+[project.scripts]
+width-cert = "width_cert.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+width_cert = ["configs/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

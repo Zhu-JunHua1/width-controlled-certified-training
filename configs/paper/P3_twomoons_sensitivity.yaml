@@ -1,0 +1,45 @@
+base:
+  name: P3_base
+  output_dir: results/P3_pre50_eps1e-3/base
+  data:
+    dataset: twomoons
+    train_size: 100
+    test_size: 500
+    seed: 10123310
+  model:
+    hidden_layers: 2
+    hidden_width: 20
+  pretraining:
+    enabled: true
+    target_accuracy: 0.50
+    maximum_initial_accuracy: 0.50
+    maximum_final_accuracy: 0.52
+    # Deep binary networks often predict one class at initialization and land
+    # exactly at 50%; require one test-example (0.2 pp) of actual improvement.
+    minimum_accuracy_gain: 0.002
+    step_size: 0.02
+    optimizer: sgd
+  training:
+    horizon: 40
+    base_step: 0.1
+    retention: 0.8
+  evaluation:
+    input_domain: same_as_training
+  radii: [0.001]
+  seed_selection: {start: 0, stop: 100, count: 10}
+  methods: [IBP, IC, IC+IWAU]
+
+variants:
+  - overrides: {name: P3_depth_L1, output_dir: results/P3_pre50_eps1e-3/depth_L1, model: {hidden_layers: 1}}
+  - overrides: {name: P3_depth_L2, output_dir: results/P3_pre50_eps1e-3/depth_L2, model: {hidden_layers: 2}}
+  - overrides: {name: P3_depth_L3, output_dir: results/P3_pre50_eps1e-3/depth_L3, model: {hidden_layers: 3}}
+  - overrides: {name: P3_depth_L4, output_dir: results/P3_pre50_eps1e-3/depth_L4, model: {hidden_layers: 4}}
+  - overrides: {name: P3_width_10, output_dir: results/P3_pre50_eps1e-3/width_10, model: {hidden_layers: 1, hidden_width: 10}}
+  - overrides: {name: P3_width_20, output_dir: results/P3_pre50_eps1e-3/width_20, model: {hidden_layers: 1, hidden_width: 20}}
+  - overrides: {name: P3_width_40, output_dir: results/P3_pre50_eps1e-3/width_40, model: {hidden_layers: 1, hidden_width: 40}}
+  - overrides: {name: P3_width_80, output_dir: results/P3_pre50_eps1e-3/width_80, model: {hidden_layers: 1, hidden_width: 80}}
+  - overrides: {name: P3_step_005, output_dir: results/P3_pre50_eps1e-3/step_005, training: {base_step: 0.05}}
+  - overrides: {name: P3_step_01, output_dir: results/P3_pre50_eps1e-3/step_01, training: {base_step: 0.1}}
+  - overrides: {name: P3_step_02, output_dir: results/P3_pre50_eps1e-3/step_02, training: {base_step: 0.2}}
+  - overrides: {name: P3_step_05, output_dir: results/P3_pre50_eps1e-3/step_05, training: {base_step: 0.5}}
+  - overrides: {name: P3_step_10, output_dir: results/P3_pre50_eps1e-3/step_10, training: {base_step: 1.0}}

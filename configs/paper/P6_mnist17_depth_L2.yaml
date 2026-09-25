@@ -1,0 +1,25 @@
+name: P6_mnist17_depth_L2
+output_dir: results/P6_mnist17_depth_L2
+data:
+  dataset: mnist:1,7
+  train_size: 100
+  test_size: 500
+  seed: 10123310
+model:
+  hidden_layers: 2
+  hidden_width: 10
+pretraining:
+  enabled: true
+  target_accuracy: 0.50
+  maximum_initial_accuracy: 0.50
+  step_size: 0.0002
+  optimizer: adam
+training:
+  horizon: 40
+  base_step: 0.1
+  retention: 0.8
+evaluation:
+  input_domain: same_as_training
+radii: [0.0001, 0.001]
+seed_selection: {start: 0, stop: 25, count: 10}
+methods: [IBP, IC, IC+IWAU]

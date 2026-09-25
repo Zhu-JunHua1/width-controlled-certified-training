@@ -1,0 +1,25 @@
+name: P1_twomoons_ablation
+output_dir: results/P1_twomoons_ablation
+data:
+  dataset: twomoons
+  train_size: 100
+  test_size: 500
+  seed: 10123310
+model:
+  hidden_layers: 2
+  hidden_width: 20
+pretraining:
+  enabled: true
+  target_accuracy: 0.50
+  maximum_initial_accuracy: 0.505
+  step_size: 0.02
+  optimizer: sgd
+training:
+  horizon: 40
+  base_step: 0.1
+  retention: 0.8
+evaluation:
+  input_domain: same_as_training
+radii: [0.001, 0.01]
+seed_selection: {start: 0, stop: 25, count: 10}
+methods: [IBP, IC, IBP+IWAU, IC+IWAU]
