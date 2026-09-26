@@ -92,7 +92,7 @@ def main(argv=None) -> int:
                 f"test@selected={row['test_selected_mean']:.3f}"
                 f"+/-{row['test_selected_std']:.3f} "
                 f"test@T={row['test_at_T_mean']} endpoint-n={row['endpoint_seeds']} "
-                f"IWAU-active={row['iwau_active_seeds']}"
+                f"update-active={row['update_active_seeds']}"
             )
         return 0
     if args.command == "export-report":

@@ -7,7 +7,7 @@ from enum import Enum
 from typing import Any
 
 
-SCHEMA_VERSION = "2.0"
+SCHEMA_VERSION = "2.1"
 
 
 class RunStatus(str, Enum):
@@ -37,6 +37,7 @@ class UpdateRecord:
     gradient_width: float
     effective_step_mean: float
     iwau_active: bool
+    update_rule: str = "fixed"
 
 
 @dataclass

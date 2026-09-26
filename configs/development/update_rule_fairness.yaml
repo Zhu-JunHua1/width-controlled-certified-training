@@ -1,0 +1,37 @@
+name: development_update_rule_fairness
+output_dir: results/development_update_rule_fairness_matched_seed0
+data:
+  dataset: twomoons
+  train_size: 100
+  calibration_size: 200
+  test_size: 200
+  seed: 10123310
+  calibration_seed: 314159
+  test_seed: 42
+model: {hidden_layers: 2, hidden_width: 20}
+pretraining:
+  enabled: true
+  target_accuracy: 0.50
+  maximum_initial_accuracy: 0.505
+  maximum_final_accuracy: 0.52
+  step_size: 0.02
+  maximum_epochs: 4000
+  optimizer: sgd
+training:
+  horizon: 40
+  base_step: 0.1
+  retention: 0.8
+  gradient_batch_size: 10
+  max_gradient_width: 50.0
+  # Development-only value measured from seed 0's calibration-only IWAU run.
+  # A final study must freeze one aggregate target from development seeds.
+  schedule_target_final_step: 0.05670302361249924
+  step_decay_milestone_fraction: 0.5
+evaluation:
+  input_domain: same_as_training
+  selection_bound_method: IC
+  bound_methods: [IBP, IC]
+radii: [0.01]
+seed_selection: {start: 0, stop: 10, count: 1}
+methods: [IC, IC+InverseTime, IC+Cosine, IC+StepDecay, IC+GlobalIWAU, IC+IWAU]
+echo_epochs: false

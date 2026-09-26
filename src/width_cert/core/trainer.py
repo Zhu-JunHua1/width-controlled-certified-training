@@ -103,6 +103,7 @@ class CertifiedTrainer:
                 gradient_width=width_mean,
                 effective_step_mean=decision.effective_step_mean,
                 iwau_active=decision.iwau_active,
+                update_rule=decision.rule_name,
             )
             current = self._state_record(epoch + 1, state)
             updates.append(update)
@@ -124,4 +125,3 @@ class CertifiedTrainer:
             final_state=clone_state(state),
             snapshots=snapshots,
         )
-

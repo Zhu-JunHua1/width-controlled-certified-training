@@ -143,24 +143,32 @@ class ConsoleReporter:
 
         if not self.enabled or not rows:
             return
+        method_width = max(10, *(len(str(row["method"])) for row in rows))
         print()
         print(f"[SEED SUMMARY] seed={seed}")
         print(
-            " train_eps | method     | eval | test@selected | test@T | clean@selected | clean@T | status      | IWAU_status"
+            f" train_eps | {'method':{method_width}s} | eval | test@selected | test@T | "
+            "clean@selected | clean@T | status      | update_status"
         )
         print(
-            "-----------+------------+------+---------------+--------+----------------+---------+-------------+---------------"
+            "-----------+-" + "-" * method_width
+            + "-+------+---------------+--------+----------------+---------+-------------+---------------"
         )
         for row in rows:
-            iwau_status = str(row.get("iwau_status", "active" if row["iwau_effective"] else "n/a"))
+            update_status = str(
+                row.get(
+                    "update_status",
+                    row.get("iwau_status", "active" if row["iwau_effective"] else "n/a"),
+                )
+            )
             print(
-                f" {float(row['radius']):9g} | {str(row['method']):10s} | "
+                f" {float(row['radius']):9g} | {str(row['method']):{method_width}s} | "
                 f"{str(row['evaluation_method']):4s} | "
                 f"{_percentage(row['test_cert_at_selected'])} | "
                 f"{_percentage(row['test_cert_at_T'])} | "
                 f"{_percentage(row['test_clean_at_selected'])} | "
                 f"{_percentage(row['test_clean_at_T'])} | "
-                f"{str(row['status']):11s} | {iwau_status:13s}"
+                f"{str(row['status']):11s} | {update_status:13s}"
             )
 
     def experiment_summary(self, *, rows: list[dict[str, Any]]) -> None:
@@ -176,13 +184,16 @@ class ConsoleReporter:
                 str(row["evaluation_method"]),
             )
             groups.setdefault(key, []).append(row)
+        method_width = max(10, *(len(method) for _, method, _ in groups))
         print()
         print("[EXPERIMENT SUMMARY] frozen-checkpoint test results; mean +/- population std")
         print(
-            " train_eps | method     | eval | seeds |    test@selected |          test@T | endpoint_n | completed | IWAU_active"
+            f" train_eps | {'method':{method_width}s} | eval | seeds |    test@selected | "
+            "         test@T | endpoint_n | completed | update_active"
         )
         print(
-            "-----------+------------+------+-------+------------------+-----------------+------------+-----------+------------"
+            "-----------+-" + "-" * method_width
+            + "-+------+-------+------------------+-----------------+------------+-----------+--------------"
         )
         for (radius, method, evaluation_method), group in groups.items():
             selected = [
@@ -204,9 +215,12 @@ class ConsoleReporter:
             else:
                 endpoint_text = "n/a"
             completed = sum(row["status"] == "completed" for row in group)
-            active = sum(bool(row["iwau_effective"]) for row in group)
+            active = sum(
+                bool(row.get("update_effective", row["iwau_effective"]))
+                for row in group
+            )
             print(
-                f" {radius:9g} | {method:10s} | {evaluation_method:4s} | "
+                f" {radius:9g} | {method:{method_width}s} | {evaluation_method:4s} | "
                 f"{len(group):5d} | {selected_mean:6.2f}+/-{selected_std:5.2f}% | "
                 f"{endpoint_text:>15s} | "
                 f"{len(endpoints):10d} | {completed:9d} | {active:11d}"
@@ -263,12 +277,14 @@ class RunLogger:
         peak_epoch: int,
         reference_epoch: int | None,
         coefficient: float,
+        update_rule: str = "IWAU",
     ) -> None:
         if not self.echo:
             return
         reference = "n/a" if reference_epoch is None else str(reference_epoch)
         print(
-            f"[IWAU CALIBRATION] source={source_method} | status={status} | "
+            f"[SHARED-PREFIX CALIBRATION] source={source_method} | "
+            f"reported_update={update_rule} | status={status} | "
             f"peak_epoch={peak_epoch} | reference_epoch={reference} | "
             f"coefficient={coefficient:.6e}"
         )
@@ -313,7 +329,7 @@ class RunLogger:
         self._echo_epoch_header()
         gradient_width = None if update is None else update.gradient_width
         mean_step = None if update is None else update.effective_step_mean
-        update_name = "initial" if update is None else ("IWAU" if update.iwau_active else "fixed")
+        update_name = "initial" if update is None else update.update_rule
         print(
             f"{state.epoch:7d} | {_percentage(state.certified_accuracy)} | "
             f"{_percentage(state.clean_accuracy)} | {_scientific(state.weight_width)} | "

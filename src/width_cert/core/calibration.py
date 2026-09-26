@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 
+from .fairness import continue_from_fixed_prefix
 from .trainer import CertifiedTrainer
 from .update_rules import IntervalWidthAdaptiveUpdate
 from ..logging.records import RunStatus, TrainingRun
@@ -115,33 +116,13 @@ def continue_with_iwau(
             "fixed run must capture the peak snapshot before IWAU continuation"
         )
 
-    continuation = trainer.run(
-        fixed_run.snapshots[calibration.peak_epoch],
-        IntervalWidthAdaptiveUpdate(
+    merged = continue_from_fixed_prefix(
+        trainer,
+        fixed_run,
+        start_epoch=calibration.peak_epoch,
+        update_rule=IntervalWidthAdaptiveUpdate(
             base_step=base_step,
             coefficient=calibration.coefficient * coefficient_scale,
         ),
-        start_epoch=calibration.peak_epoch,
-        peak_floor=calibration.peak_certified_accuracy,
-        capture_snapshots=True,
-    )
-    prefix_states = [s for s in fixed_run.states if s.epoch <= calibration.peak_epoch]
-    prefix_updates = [u for u in fixed_run.updates if u.epoch < calibration.peak_epoch]
-    merged = TrainingRun(
-        states=prefix_states + continuation.states[1:],
-        updates=prefix_updates + continuation.updates,
-        peak_certified_accuracy=continuation.peak_certified_accuracy,
-        cert_at_horizon=continuation.cert_at_horizon,
-        status=continuation.status,
-        status_reason=continuation.status_reason,
-        final_state=continuation.final_state,
-        snapshots={
-            **{
-                epoch: snapshot
-                for epoch, snapshot in fixed_run.snapshots.items()
-                if epoch <= calibration.peak_epoch
-            },
-            **continuation.snapshots,
-        },
     )
     return IWAUResult(merged, calibration)

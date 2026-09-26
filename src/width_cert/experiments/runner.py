@@ -28,7 +28,16 @@ from ..bounds.lirpa import (
     initialize_interval_state,
 )
 from ..certification import evaluate_center_accuracy, evaluate_certification
-from ..core import CertifiedTrainer, FixedUpdate, continue_with_iwau
+from ..core import (
+    CertifiedTrainer,
+    FixedUpdate,
+    GlobalWidthAdaptiveUpdate,
+    budget_record,
+    calibrate_iwau,
+    continue_from_fixed_prefix,
+    continue_with_iwau,
+    matched_final_step_rules,
+)
 from ..data import DatasetBundle, build_dataset
 from ..logging import ConsoleReporter, RunLogger, SCHEMA_VERSION
 from ..models import BinaryBCEGradientGraph, EvaluationGraph, PretrainingMLP, layer_dimensions
@@ -38,9 +47,9 @@ from .evaluation import evaluate_frozen_checkpoints
 from .pretrain import PretrainingRejected, PretrainingResult, pretrain_to_accuracy
 
 
-def _method_parts(name: str) -> tuple[BoundMethod, bool]:
-    adaptive = name.endswith("+IWAU")
-    base = name.removesuffix("+IWAU")
+def _method_parts(name: str) -> tuple[BoundMethod, str]:
+    base, separator, suffix = name.partition("+")
+    update_kind = suffix if separator else "Fixed"
     methods = {
         "IBP": BoundMethod.IBP,
         "AGT-Hybrid": BoundMethod.HYBRID,
@@ -48,7 +57,7 @@ def _method_parts(name: str) -> tuple[BoundMethod, bool]:
         "IC": BoundMethod.IC,
     }
     try:
-        return methods[base], adaptive
+        return methods[base], update_kind
     except KeyError as error:
         raise ValueError(f"unknown method: {name}") from error
 
@@ -67,6 +76,27 @@ def _write_index(path: Path, rows: list[dict[str, object]]) -> None:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
         writer.writeheader()
         writer.writerows(rows)
+
+
+def _synchronize(device: torch.device) -> None:
+    if device.type == "cuda":
+        torch.cuda.synchronize(device)
+
+
+def _reset_peak_memory(device: torch.device) -> None:
+    if device.type == "cuda":
+        torch.cuda.reset_peak_memory_stats(device)
+
+
+def _peak_memory(device: torch.device) -> int | None:
+    if device.type != "cuda":
+        return None
+    return int(torch.cuda.max_memory_allocated(device))
+
+
+def _maximum_memory(*values: int | None) -> int | None:
+    present = [value for value in values if value is not None]
+    return max(present) if present else None
 
 
 @dataclass
@@ -331,9 +361,11 @@ def run_experiment(config: ExperimentConfig) -> Path:
             )
             fixed_runs = {}
             fixed_timings = {}
+            fixed_peak_memory = {}
             fixed_diagnostics = {}
             for method_name in config.methods:
-                bound_method, adaptive = _method_parts(method_name)
+                bound_method, update_kind = _method_parts(method_name)
+                two_stage = update_kind != "Fixed"
                 fixed_name = bound_method.name
                 gradient_diagnostics = IntersectionDiagnostics()
                 calibration_diagnostics = IntersectionDiagnostics()
@@ -448,23 +480,27 @@ def run_experiment(config: ExperimentConfig) -> Path:
                     "environment": environment_metadata(),
                 }
                 logger.write_config(resolved_run_config)
-                start_time = time.perf_counter()
                 try:
-                    if adaptive:
+                    if two_stage:
                         if fixed_name not in fixed_runs:
                             logger.echo_internal_prerun_start(
                                 method=fixed_name,
                                 horizon=config.training.horizon,
                             )
+                            _reset_peak_memory(device)
+                            _synchronize(device)
                             dependency_start = time.perf_counter()
                             fixed_run = trainer.run(
                                 initial_state,
                                 FixedUpdate(config.training.base_step),
                                 capture_snapshots=True,
                             )
+                            _synchronize(device)
                             dependency_seconds = time.perf_counter() - dependency_start
+                            dependency_peak_memory = _peak_memory(device)
                             fixed_runs[fixed_name] = fixed_run
                             fixed_timings[fixed_name] = dependency_seconds
+                            fixed_peak_memory[fixed_name] = dependency_peak_memory
                             fixed_diagnostics[fixed_name] = {
                                 "gradient": gradient_diagnostics,
                                 "calibration": calibration_diagnostics,
@@ -477,7 +513,7 @@ def run_experiment(config: ExperimentConfig) -> Path:
                                 {
                                     **resolved_run_config,
                                     "method": fixed_name,
-                                    "role": "iwau_calibration_pre_run",
+                                    "role": "shared_prefix_calibration_pre_run",
                                     "requested_method": method_name,
                                 }
                             )
@@ -497,18 +533,76 @@ def run_experiment(config: ExperimentConfig) -> Path:
                         # the fixed pre-run remains separately auditable.
                         gradient_diagnostics = IntersectionDiagnostics()
                         calibration_diagnostics = IntersectionDiagnostics()
+                        _reset_peak_memory(device)
+                        _synchronize(device)
                         continuation_start = time.perf_counter()
-                        result = continue_with_iwau(
-                            trainer,
+                        calibration = calibrate_iwau(
                             fixed_runs[fixed_name],
-                            base_step=config.training.base_step,
+                            horizon=config.training.horizon,
                             retention=config.training.retention,
-                            coefficient_scale=config.training.coefficient_scale,
                         )
-                        run = result.run
-                        calibration = result.calibration
+                        if calibration.status.value == "invalid":
+                            raise RuntimeError(
+                                f"invalid shared-prefix calibration: {calibration.reason}"
+                            )
+                        if not calibration.iwau_effective:
+                            run = fixed_runs[fixed_name]
+                        elif update_kind == "IWAU":
+                            result = continue_with_iwau(
+                                trainer,
+                                fixed_runs[fixed_name],
+                                base_step=config.training.base_step,
+                                retention=config.training.retention,
+                                coefficient_scale=config.training.coefficient_scale,
+                            )
+                            run = result.run
+                            calibration = result.calibration
+                        else:
+                            total_steps = (
+                                config.training.horizon - calibration.peak_epoch
+                            )
+                            if update_kind == "GlobalIWAU":
+                                update_rule = GlobalWidthAdaptiveUpdate(
+                                    base_step=config.training.base_step,
+                                    coefficient=(
+                                        calibration.coefficient
+                                        * config.training.coefficient_scale
+                                    ),
+                                )
+                            else:
+                                target_step = (
+                                    config.training.schedule_target_final_step
+                                )
+                                if target_step is None:
+                                    raise RuntimeError(
+                                        "matched schedule requires schedule_target_final_step"
+                                    )
+                                rules = matched_final_step_rules(
+                                    base_step=config.training.base_step,
+                                    target_final_step=target_step,
+                                    start_epoch=calibration.peak_epoch,
+                                    total_steps=total_steps,
+                                    step_milestone_fraction=(
+                                        config.training.step_decay_milestone_fraction
+                                    ),
+                                )
+                                rule_names = {
+                                    "InverseTime": "inverse_time",
+                                    "Cosine": "cosine",
+                                    "StepDecay": "step_decay",
+                                }
+                                update_rule = rules[rule_names[update_kind]]
+                            run = continue_from_fixed_prefix(
+                                trainer,
+                                fixed_runs[fixed_name],
+                                start_epoch=calibration.peak_epoch,
+                                update_rule=update_rule,
+                            )
+                        _synchronize(device)
                         continuation_seconds = time.perf_counter() - continuation_start
+                        continuation_peak_memory = _peak_memory(device)
                         pre_run_seconds = fixed_timings[fixed_name]
+                        pre_run_peak_memory = fixed_peak_memory[fixed_name]
                         elapsed = pre_run_seconds + continuation_seconds
                         calibration_summary = {
                             "calibration_status": calibration.status.value,
@@ -522,7 +616,18 @@ def run_experiment(config: ExperimentConfig) -> Path:
                             ),
                             "peak_epoch": calibration.peak_epoch,
                             "reference_epoch": calibration.reference_epoch,
-                            "iwau_effective": calibration.iwau_effective,
+                            "iwau_effective": (
+                                calibration.iwau_effective
+                                and update_kind in {"IWAU", "GlobalIWAU"}
+                            ),
+                            "update_effective": calibration.iwau_effective,
+                            "update_rule": update_kind,
+                            "matched_final_mean_step": (
+                                config.training.schedule_target_final_step
+                                if update_kind
+                                in {"InverseTime", "Cosine", "StepDecay"}
+                                else None
+                            ),
                         }
                         logger.echo_calibration(
                             source_method=fixed_name,
@@ -530,6 +635,7 @@ def run_experiment(config: ExperimentConfig) -> Path:
                             peak_epoch=calibration.peak_epoch,
                             reference_epoch=calibration.reference_epoch,
                             coefficient=calibration.coefficient,
+                            update_rule=update_kind,
                         )
                     else:
                         if fixed_name in fixed_runs:
@@ -537,6 +643,9 @@ def run_experiment(config: ExperimentConfig) -> Path:
                             elapsed = fixed_timings[fixed_name]
                             logger.echo_run(run)
                         else:
+                            _reset_peak_memory(device)
+                            _synchronize(device)
+                            fixed_start = time.perf_counter()
                             run = trainer.run(
                                 initial_state,
                                 FixedUpdate(config.training.base_step),
@@ -544,19 +653,25 @@ def run_experiment(config: ExperimentConfig) -> Path:
                                 on_epoch=logger.epoch_callback,
                             )
                             fixed_runs[fixed_name] = run
-                            elapsed = time.perf_counter() - start_time
+                            _synchronize(device)
+                            elapsed = time.perf_counter() - fixed_start
                             fixed_timings[fixed_name] = elapsed
+                            fixed_peak_memory[fixed_name] = _peak_memory(device)
                             fixed_diagnostics[fixed_name] = {
                                 "gradient": gradient_diagnostics,
                                 "calibration": calibration_diagnostics,
                             }
                         pre_run_seconds = 0.0
+                        pre_run_peak_memory = None
                         continuation_seconds = elapsed
+                        continuation_peak_memory = fixed_peak_memory[fixed_name]
                         calibration_summary = {
                             "calibration_status": "not_applicable",
                             "iwau_effective": False,
+                            "update_effective": False,
+                            "update_rule": "Fixed",
                         }
-                    if adaptive and config.echo_epochs:
+                    if two_stage and config.echo_epochs:
                         logger.echo_run(run)
                     # Test data are materialized only after the complete
                     # calibration trajectory and selected epoch are frozen.
@@ -575,6 +690,9 @@ def run_experiment(config: ExperimentConfig) -> Path:
                         method.name: diagnostics
                         for method, diagnostics in test_diagnostics.items()
                     }
+                    _reset_peak_memory(device)
+                    _synchronize(device)
+                    test_start = time.perf_counter()
                     frozen_evaluations = evaluate_frozen_checkpoints(
                         run=run,
                         evaluation_graph=evaluation_graph,
@@ -583,6 +701,15 @@ def run_experiment(config: ExperimentConfig) -> Path:
                         methods=test_bound_methods,
                         dimensions=dimensions,
                         diagnostics=test_diagnostics,
+                    )
+                    _synchronize(device)
+                    test_seconds = time.perf_counter() - test_start
+                    test_peak_memory = _peak_memory(device)
+                    complete_elapsed_seconds = elapsed + test_seconds
+                    peak_device_memory = _maximum_memory(
+                        pre_run_peak_memory,
+                        continuation_peak_memory,
+                        test_peak_memory,
                     )
                     test_evaluations = [
                         evaluation.as_record() for evaluation in frozen_evaluations
@@ -608,10 +735,20 @@ def run_experiment(config: ExperimentConfig) -> Path:
                                 "iwau_status": calibration_summary[
                                     "calibration_status"
                                 ],
+                                "update_status": calibration_summary[
+                                    "calibration_status"
+                                ],
                                 "iwau_effective": calibration_summary[
                                     "iwau_effective"
                                 ],
+                                "update_effective": calibration_summary[
+                                    "update_effective"
+                                ],
+                                "update_rule": calibration_summary["update_rule"],
                                 "elapsed_seconds": elapsed,
+                                "test_evaluation_seconds": test_seconds,
+                                "complete_elapsed_seconds": complete_elapsed_seconds,
+                                "peak_device_memory_bytes": peak_device_memory,
                                 "intersection_fallbacks_test": (
                                     test_diagnostics_by_name[
                                         evaluation_record["evaluation_method"]
@@ -620,21 +757,31 @@ def run_experiment(config: ExperimentConfig) -> Path:
                             }
                         )
 
-                    executed_updates = (
-                        len(fixed_runs[fixed_name].updates)
-                        + len(run.updates)
-                        - calibration.peak_epoch
-                        if adaptive and calibration.iwau_effective
-                        else len(run.updates)
-                    )
+                    if two_stage and calibration.iwau_effective:
+                        budget = budget_record(
+                            fixed_runs[fixed_name],
+                            run,
+                            start_epoch=calibration.peak_epoch,
+                        )
+                        executed_updates = budget.total_bound_evaluations
+                    else:
+                        executed_updates = len(run.updates)
                     logger.write_run(
                         run,
                         extra_summary={
                             **calibration_summary,
                             "pretraining_accuracy": 100.0 * pretrain_accuracy,
                             "elapsed_seconds": elapsed,
+                            "test_evaluation_seconds": test_seconds,
+                            "complete_elapsed_seconds": complete_elapsed_seconds,
                             "pre_run_seconds": pre_run_seconds,
                             "continuation_seconds": continuation_seconds,
+                            "pre_run_peak_device_memory_bytes": pre_run_peak_memory,
+                            "continuation_peak_device_memory_bytes": (
+                                continuation_peak_memory
+                            ),
+                            "test_peak_device_memory_bytes": test_peak_memory,
+                            "peak_device_memory_bytes": peak_device_memory,
                             "executed_updates": executed_updates,
                             "seconds_per_executed_update": elapsed
                             / max(executed_updates, 1),
@@ -649,7 +796,7 @@ def run_experiment(config: ExperimentConfig) -> Path:
                                     key: value.as_dict()
                                     for key, value in (
                                         fixed_diagnostics.get(fixed_name, {})
-                                        if adaptive
+                                        if two_stage
                                         else {}
                                     ).items()
                                 },

@@ -80,6 +80,34 @@ def test_controlled_gradient_bound_ablation_methods_are_valid():
     ).validate()
 
 
+def test_matched_schedule_requires_a_predeclared_target_step():
+    config = load_config(ROOT / "configs" / "examples" / "example_twomoons.yaml")
+    candidate = replace(config, methods=("IC+InverseTime",))
+    try:
+        candidate.validate()
+    except ValueError as error:
+        assert "schedule_target_final_step" in str(error)
+    else:
+        raise AssertionError("matched scalar schedules require a frozen target step")
+
+
+def test_all_fairness_update_arms_are_valid_with_a_frozen_target():
+    config = load_config(ROOT / "configs" / "examples" / "example_twomoons.yaml")
+    candidate = replace(
+        config,
+        methods=(
+            "IC",
+            "IC+InverseTime",
+            "IC+Cosine",
+            "IC+StepDecay",
+            "IC+GlobalIWAU",
+            "IC+IWAU",
+        ),
+        training=replace(config.training, schedule_target_final_step=0.02),
+    )
+    candidate.validate()
+
+
 def test_default_protocol_uses_a_common_calibration_certifier_and_dual_test_evaluation():
     config = load_config(ROOT / "configs" / "examples" / "example_twomoons.yaml")
     assert config.evaluation.selection_bound_method == "IC"
@@ -157,4 +185,4 @@ def test_public_environment_metadata_omits_absolute_dependency_path():
 
 
 def test_log_schema_version_reflects_center_accuracy_semantics():
-    assert SCHEMA_VERSION == "2.0"
+    assert SCHEMA_VERSION == "2.1"

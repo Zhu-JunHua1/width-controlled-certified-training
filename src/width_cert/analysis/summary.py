@@ -65,6 +65,15 @@ def summarize_results(
                 "iwau_active_seeds": sum(
                     _truthy(row.get("iwau_effective", "false")) for row in group
                 ),
+                "update_active_seeds": sum(
+                    _truthy(
+                        row.get(
+                            "update_effective",
+                            row.get("iwau_effective", "false"),
+                        )
+                    )
+                    for row in group
+                ),
                 "endpoint_policy": "diverged_as_zero" if diverged_as_zero else "completed_only",
             }
         )

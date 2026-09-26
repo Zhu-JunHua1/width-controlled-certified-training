@@ -49,6 +49,8 @@ class TrainingConfig:
     coefficient_scale: float = 1.0
     gradient_batch_size: int = 4
     max_gradient_width: float = 50.0
+    schedule_target_final_step: float | None = None
+    step_decay_milestone_fraction: float = 0.5
 
 
 @dataclass(frozen=True)
@@ -115,7 +117,8 @@ class ExperimentConfig:
 
     def validate(self) -> None:
         bases = {"IBP", "AGT-Hybrid", "CROWN", "IC"}
-        allowed = bases | {f"{base}+IWAU" for base in bases}
+        suffixes = {"IWAU", "GlobalIWAU", "InverseTime", "Cosine", "StepDecay"}
+        allowed = bases | {f"{base}+{suffix}" for base in bases for suffix in suffixes}
         unknown = set(self.methods) - allowed
         if unknown:
             raise ValueError(f"unknown methods: {sorted(unknown)}")
@@ -130,6 +133,23 @@ class ExperimentConfig:
             )
         if self.training.max_gradient_width <= 0:
             raise ValueError("training.max_gradient_width must be positive")
+        matched_schedules = {"InverseTime", "Cosine", "StepDecay"}
+        requested_matched_schedule = any(
+            method.rsplit("+", 1)[-1] in matched_schedules for method in self.methods
+        )
+        target = self.training.schedule_target_final_step
+        if requested_matched_schedule and target is None:
+            raise ValueError(
+                "training.schedule_target_final_step is required for matched scalar schedules"
+            )
+        if target is not None and not 0.0 < target <= self.training.base_step:
+            raise ValueError(
+                "training.schedule_target_final_step must lie in (0, base_step]"
+            )
+        if not 0.0 < self.training.step_decay_milestone_fraction <= 1.0:
+            raise ValueError(
+                "training.step_decay_milestone_fraction must lie in (0, 1]"
+            )
         if min(
             self.data.train_size,
             self.data.calibration_size,

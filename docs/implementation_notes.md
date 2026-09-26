@@ -29,6 +29,24 @@ IWAU computes a tensor-valued effective step
 The mean effective step is logged for diagnostics, but the interval update uses the full coordinate-wise
 tensor. Therefore the implementation matches the coordinate-wise width cap used in the theory.
 
+## Update-rule fairness
+
+The fairness baselines do not begin at epoch zero with unrelated schedules.
+They all reuse the exact fixed trajectory through the same calibration-selected
+state `B_tp` and perform the same number of continuation updates.  Inverse-time,
+cosine, and step-decay receive one target final mean step frozen from
+development/calibration data.  `GlobalIWAU` instead evaluates
+`eta_t = eta_base / (1 + coefficient * mean(Omega_t))`, isolating the value of
+coordinate-wise control while retaining IWAU's functional form and coefficient.
+
+The reported update budget counts the complete fixed pre-run plus the
+continuation, not only the visible second stage.  GPU timing is synchronized;
+the output separately records pre-run, continuation, and frozen-test time and
+the maximum allocated device memory across those stages.  A calibration status
+of `not_required` means no reference decline occurred within the horizon, so
+all controlled update arms equal the fixed arm by definition and that cell is
+not informative about schedule differences.
+
 ## Step-node soundness
 
 The derivative of ReLU is represented by a step node. Stable-sign intervals are exact (`[0,0]` or

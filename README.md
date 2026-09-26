@@ -72,6 +72,17 @@ fixed counterpart, the runner performs the required same-bound fixed pre-run int
 stores it under that adaptive arm's `calibration_pre_run/` directory, and does not add it to `results.csv`,
 the progress-cell count, or the terminal result tables.
 
+For update-rule fairness studies the same entry point also accepts
+`+InverseTime`, `+Cosine`, `+StepDecay`, and `+GlobalIWAU`.  Every such arm
+reuses the same fixed prefix through the calibration-selected peak.  The three
+time-only schedules require a predeclared
+`training.schedule_target_final_step`; they reach that same final mean step and
+use the same number of continuation updates.  This target must be selected on
+development/calibration data and frozen in the study lock before final test
+evaluation.  `+GlobalIWAU` uses the same functional form and calibrated
+coefficient as IWAU, but replaces the coordinate-wise width tensor by its
+global mean.
+
 The configuration explicitly fixes disjoint train/calibration/test data, the architecture, shared-start pretraining, perturbation
 radii, training horizon, base step, methods, a candidate seed range, the number of accepted starts, and
 the evaluation input domain. Seeds are not hand-listed: the runner examines candidates in ascending order,
@@ -114,8 +125,8 @@ own directory containing:
 |---|---|
 | `config.json` | Resolved protocol, loss definitions, environment, and dependency provenance |
 | `states.csv` | State metrics: row `t` describes the interval state `B_t` |
-| `updates.csv` | Update metrics: row `t` describes `B_t -> B_{t+1}` and `Omega_t` |
-| `summary.json` | Calibration-selected epoch, calibration endpoint, frozen test metrics, timing, IWAU status, and intersection diagnostics |
+| `updates.csv` | Update metrics: row `t` describes `B_t -> B_{t+1}`, `Omega_t`, the mean step, and the active rule |
+| `summary.json` | Calibration-selected epoch, endpoints, frozen test metrics, two-stage timing/update budget, peak device memory, update status, and intersection diagnostics |
 | `status.json` | Terminal state, stop reason, and last observed certified accuracy |
 | `last_state.pt` | Last valid interval state and its epoch (also written for interrupted horizons) |
 | `selected_state.pt` | State selected by the calibration trajectory and used for direct continuation/final test evaluation |
