@@ -1,8 +1,9 @@
 # Experimental locking and final-test access
 
-The final study uses disjoint training, calibration, and test splits.  During
-development, no reported test result may be used to alter the method, retention
-ratio, schedule search space, task list, or reporting rule.
+The final study uses disjoint training, calibration, and test splits. During
+development, `evaluation.test_access` remains `disabled`; no reported test
+result may be used to alter the method, retention ratio, schedule search space,
+task list, or reporting rule.
 
 Before a final run:
 
@@ -10,14 +11,20 @@ Before a final run:
 2. Freeze the code commit, dependency lock, auto_LiRPA source hash, data-split
    manifest, protocols, endpoints, and statistical hypotheses.
 3. Set `status: frozen`, commit the lock, and record that commit identifier.
-4. Run calibration and checkpoint selection without materializing test loaders.
-5. Evaluate the frozen selected checkpoint and endpoint once with every declared
+4. Give the final configuration `test_access: frozen_final` and the committed
+   lock path. The runner rejects draft/incomplete locks and unlisted protocols.
+5. Run calibration and checkpoint selection without evaluating test tensors.
+6. Evaluate the frozen selected checkpoint and endpoint once with every declared
    test certifier on exactly the same test samples.
 
 If the protocol changes after test access, the affected result is development
 evidence only.  A new final evaluation requires a new lock and a genuinely
 unused test split.  Lock files are part of the public reproducibility record;
 they must not be edited retroactively.
+
+The legacy test seed used while developing protocol-v1 and the early
+protocol-v2 smoke runs is considered exposed. It must be listed under
+`data.retired_development_test_splits` and may not appear as a final test seed.
 
 The primary endpoint is `test_cert_at_calibration_selected_checkpoint`.
 `test_cert_at_T` is secondary.  Parameter widths, gradient-bound widths, and

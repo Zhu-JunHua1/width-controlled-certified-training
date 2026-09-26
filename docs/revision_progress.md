@@ -17,12 +17,16 @@ test values require a frozen study lock.
 - Added conservative IBP fallback for floating-point empty intersections and
   structured counters for training, calibration, and final test evaluation.
 - Added a versioned experiment-lock template and locking procedure.
+- Final-test access now fails closed: development runs do not evaluate test
+  tensors, while `frozen_final` runs require a complete lock that explicitly
+  authorizes the protocol.
 
 Verification at commit `6f6dce0`:
 
 - CPU tests: 38 passed.
-- End-to-end TwoMoons smoke run: completed.
-- Smoke run intersection fallbacks: 0 in training, calibration, and test.
+- End-to-end TwoMoons smoke run: completed before the fail-closed test gate.
+- Smoke run intersection fallbacks: 0 in training, calibration, and test. Its
+  exposed test split is retired and will not be used in the final study.
 - No final protocol-v2 paper claim is made from this smoke run.
 
 ## Stage A2 — controlled methods and fairness baselines (in progress)
@@ -60,12 +64,14 @@ Implemented fairness infrastructure:
 - Complete cost includes the fixed pre-run and continuation.  Synchronized
   wall-clock timing, frozen-test time, bound-evaluation count, and peak device
   memory are recorded separately.
-- On one development-only active-calibration seed, all two-stage arms used 66
+- On one development-only active-calibration seed (using an already exposed,
+  now-retired test split), all two-stage arms used 66
   gradient-bound evaluations and selected `t_p=14`.  At an exactly matched
   final mean step of 0.056703, inverse-time, cosine, and step-decay ended at 0%
   IC-certified test accuracy; global-width control ended at 52.0%, and
   coordinate-wise IWAU at 64.5%.  This is a development gate, not a paper
-  result or a statistical claim.
+  result or a statistical claim. Re-running the same development configuration
+  now leaves all test fields null by default.
 
 ## Stage B — development gates (not started)
 

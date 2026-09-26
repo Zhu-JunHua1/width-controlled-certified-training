@@ -13,7 +13,10 @@ code:
 data:
   split_policy: explicit_train_calibration_test
   split_hash_manifest: TO_BE_FROZEN
-  development_test_results_used_for_design: false
+  development_test_results_used_for_design: true
+  retired_development_test_splits:
+    - legacy_test_seed_42
+  final_test_seeds: TO_BE_FROZEN
 
 selection:
   split: calibration
@@ -41,10 +44,11 @@ evaluation:
   require_common_checkpoint_rule: true
 
 statistics:
-  hypotheses: TO_BE_FROZEN
+  hypotheses:
+    H1: TO_BE_FROZEN
+    H2: TO_BE_FROZEN
   sidedness: TO_BE_FROZEN
   multiple_comparison_family: TO_BE_FROZEN
   correction: TO_BE_FROZEN
 
 protocols: TO_BE_FROZEN
-

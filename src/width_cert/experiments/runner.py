@@ -45,6 +45,7 @@ from .config import ExperimentConfig
 from .environment import environment_metadata
 from .evaluation import evaluate_frozen_checkpoints
 from .pretrain import PretrainingRejected, PretrainingResult, pretrain_to_accuracy
+from .study_lock import verify_frozen_study_lock
 
 
 def _method_parts(name: str) -> tuple[BoundMethod, str]:
@@ -286,6 +287,12 @@ def run_experiment(config: ExperimentConfig) -> Path:
     """Run every radius/seed/method cell and return the result root."""
 
     config.validate()
+    final_test_enabled = config.evaluation.test_access == "frozen_final"
+    if final_test_enabled:
+        verify_frozen_study_lock(
+            config.evaluation.study_lock,
+            protocol_name=config.name,
+        )
     output_root = Path(config.output_dir).resolve()
     output_root.mkdir(parents=True, exist_ok=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -468,6 +475,7 @@ def run_experiment(config: ExperimentConfig) -> Path:
                         "selection_bound_method": selection_bound_method.name,
                         "test_bound_methods": [method.name for method in test_bound_methods],
                         "test_accessed_during_training": False,
+                        "final_test_evaluation_enabled": final_test_enabled,
                     },
                     "training_radius": radius,
                     "seed": seed,
@@ -673,47 +681,65 @@ def run_experiment(config: ExperimentConfig) -> Path:
                         }
                     if two_stage and config.echo_epochs:
                         logger.echo_run(run)
-                    # Test data are materialized only after the complete
-                    # calibration trajectory and selected epoch are frozen.
-                    test_loader = DataLoader(
-                        TensorDataset(
-                            bundle.test_inputs.to(device),
-                            bundle.test_targets.to(device),
-                        ),
-                        batch_size=config.data.test_size,
-                        shuffle=False,
-                    )
-                    test_diagnostics = {
-                        method: IntersectionDiagnostics() for method in test_bound_methods
-                    }
-                    test_diagnostics_by_name = {
-                        method.name: diagnostics
-                        for method, diagnostics in test_diagnostics.items()
-                    }
-                    _reset_peak_memory(device)
-                    _synchronize(device)
-                    test_start = time.perf_counter()
-                    frozen_evaluations = evaluate_frozen_checkpoints(
-                        run=run,
-                        evaluation_graph=evaluation_graph,
-                        test_loader=test_loader,
-                        input_radius=evaluation_radius,
-                        methods=test_bound_methods,
-                        dimensions=dimensions,
-                        diagnostics=test_diagnostics,
-                    )
-                    _synchronize(device)
-                    test_seconds = time.perf_counter() - test_start
-                    test_peak_memory = _peak_memory(device)
+                    # Development runs fail closed: test tensors are not passed
+                    # to any evaluator. Final test access requires a separately
+                    # validated frozen study lock.
+                    if final_test_enabled:
+                        test_loader = DataLoader(
+                            TensorDataset(
+                                bundle.test_inputs.to(device),
+                                bundle.test_targets.to(device),
+                            ),
+                            batch_size=config.data.test_size,
+                            shuffle=False,
+                        )
+                        test_diagnostics = {
+                            method: IntersectionDiagnostics()
+                            for method in test_bound_methods
+                        }
+                        test_diagnostics_by_name = {
+                            method.name: diagnostics
+                            for method, diagnostics in test_diagnostics.items()
+                        }
+                        _reset_peak_memory(device)
+                        _synchronize(device)
+                        test_start = time.perf_counter()
+                        frozen_evaluations = evaluate_frozen_checkpoints(
+                            run=run,
+                            evaluation_graph=evaluation_graph,
+                            test_loader=test_loader,
+                            input_radius=evaluation_radius,
+                            methods=test_bound_methods,
+                            dimensions=dimensions,
+                            diagnostics=test_diagnostics,
+                        )
+                        _synchronize(device)
+                        test_seconds = time.perf_counter() - test_start
+                        test_peak_memory = _peak_memory(device)
+                        test_evaluations = [
+                            evaluation.as_record()
+                            for evaluation in frozen_evaluations
+                        ]
+                    else:
+                        test_diagnostics = {}
+                        test_diagnostics_by_name = {}
+                        test_seconds = 0.0
+                        test_peak_memory = None
+                        test_evaluations = [
+                            {
+                                "evaluation_method": "not_evaluated",
+                                "test_cert_at_selected": None,
+                                "test_cert_at_T": None,
+                                "test_clean_at_selected": None,
+                                "test_clean_at_T": None,
+                            }
+                        ]
                     complete_elapsed_seconds = elapsed + test_seconds
                     peak_device_memory = _maximum_memory(
                         pre_run_peak_memory,
                         continuation_peak_memory,
                         test_peak_memory,
                     )
-                    test_evaluations = [
-                        evaluation.as_record() for evaluation in frozen_evaluations
-                    ]
                     result_rows = []
                     for evaluation_record in test_evaluations:
                         result_rows.append(
@@ -745,14 +771,16 @@ def run_experiment(config: ExperimentConfig) -> Path:
                                     "update_effective"
                                 ],
                                 "update_rule": calibration_summary["update_rule"],
+                                "test_access": config.evaluation.test_access,
                                 "elapsed_seconds": elapsed,
                                 "test_evaluation_seconds": test_seconds,
                                 "complete_elapsed_seconds": complete_elapsed_seconds,
                                 "peak_device_memory_bytes": peak_device_memory,
                                 "intersection_fallbacks_test": (
-                                    test_diagnostics_by_name[
-                                        evaluation_record["evaluation_method"]
-                                    ].fallback_coordinates
+                                    test_diagnostics_by_name.get(
+                                        evaluation_record["evaluation_method"],
+                                        IntersectionDiagnostics(),
+                                    ).fallback_coordinates
                                 ),
                             }
                         )
@@ -789,6 +817,8 @@ def run_experiment(config: ExperimentConfig) -> Path:
                             / max(config.training.horizon, 1),
                             "primary_endpoint": (
                                 "test_cert_at_calibration_selected_checkpoint"
+                                if final_test_enabled
+                                else "not_evaluated_in_development"
                             ),
                             "test_evaluations": test_evaluations,
                             "intersection_diagnostics": {

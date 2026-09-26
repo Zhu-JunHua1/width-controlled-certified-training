@@ -144,15 +144,18 @@ class ConsoleReporter:
         if not self.enabled or not rows:
             return
         method_width = max(10, *(len(str(row["method"])) for row in rows))
+        eval_width = max(4, *(len(str(row["evaluation_method"])) for row in rows))
         print()
         print(f"[SEED SUMMARY] seed={seed}")
         print(
-            f" train_eps | {'method':{method_width}s} | eval | test@selected | test@T | "
+            f" train_eps | {'method':{method_width}s} | {'eval':{eval_width}s} | "
+            "test@selected | test@T | "
             "clean@selected | clean@T | status      | update_status"
         )
         print(
             "-----------+-" + "-" * method_width
-            + "-+------+---------------+--------+----------------+---------+-------------+---------------"
+            + "-+-" + "-" * eval_width
+            + "-+---------------+--------+----------------+---------+-------------+---------------"
         )
         for row in rows:
             update_status = str(
@@ -163,7 +166,7 @@ class ConsoleReporter:
             )
             print(
                 f" {float(row['radius']):9g} | {str(row['method']):{method_width}s} | "
-                f"{str(row['evaluation_method']):4s} | "
+                f"{str(row['evaluation_method']):{eval_width}s} | "
                 f"{_percentage(row['test_cert_at_selected'])} | "
                 f"{_percentage(row['test_cert_at_T'])} | "
                 f"{_percentage(row['test_clean_at_selected'])} | "
@@ -185,29 +188,42 @@ class ConsoleReporter:
             )
             groups.setdefault(key, []).append(row)
         method_width = max(10, *(len(method) for _, method, _ in groups))
+        eval_width = max(4, *(len(method) for _, _, method in groups))
+        tests_present = any(
+            row.get("test_cert_at_selected") not in {None, ""} for row in rows
+        )
         print()
-        print("[EXPERIMENT SUMMARY] frozen-checkpoint test results; mean +/- population std")
+        if tests_present:
+            print("[EXPERIMENT SUMMARY] frozen-checkpoint test results; mean +/- population std")
+        else:
+            print("[EXPERIMENT SUMMARY] development calibration runs; final test disabled")
         print(
-            f" train_eps | {'method':{method_width}s} | eval | seeds |    test@selected | "
+            f" train_eps | {'method':{method_width}s} | {'eval':{eval_width}s} | seeds | "
+            "   test@selected | "
             "         test@T | endpoint_n | completed | update_active"
         )
         print(
             "-----------+-" + "-" * method_width
-            + "-+------+-------+------------------+-----------------+------------+-----------+--------------"
+            + "-+-" + "-" * eval_width
+            + "-+-------+------------------+-----------------+------------+-----------+--------------"
         )
         for (radius, method, evaluation_method), group in groups.items():
             selected = [
                 float(row["test_cert_at_selected"])
                 for row in group
-                if row["test_cert_at_selected"] is not None
+                if row["test_cert_at_selected"] not in {None, ""}
             ]
             endpoints = [
                 float(row["test_cert_at_T"])
                 for row in group
                 if row["test_cert_at_T"] is not None
             ]
-            selected_mean = fmean(selected)
-            selected_std = pstdev(selected) if len(selected) > 1 else 0.0
+            if selected:
+                selected_mean = fmean(selected)
+                selected_std = pstdev(selected) if len(selected) > 1 else 0.0
+                selected_text = f"{selected_mean:6.2f}+/-{selected_std:5.2f}%"
+            else:
+                selected_text = "n/a"
             if endpoints:
                 endpoint_mean = fmean(endpoints)
                 endpoint_std = pstdev(endpoints) if len(endpoints) > 1 else 0.0
@@ -220,8 +236,9 @@ class ConsoleReporter:
                 for row in group
             )
             print(
-                f" {radius:9g} | {method:{method_width}s} | {evaluation_method:4s} | "
-                f"{len(group):5d} | {selected_mean:6.2f}+/-{selected_std:5.2f}% | "
+                f" {radius:9g} | {method:{method_width}s} | "
+                f"{evaluation_method:{eval_width}s} | "
+                f"{len(group):5d} | {selected_text:>16s} | "
                 f"{endpoint_text:>15s} | "
                 f"{len(endpoints):10d} | {completed:9d} | {active:11d}"
             )

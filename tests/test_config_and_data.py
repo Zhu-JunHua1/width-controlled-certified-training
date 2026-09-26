@@ -4,6 +4,7 @@ from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
+import pytest
 from sklearn.datasets import make_moons
 from sklearn.model_selection import train_test_split
 
@@ -113,6 +114,17 @@ def test_default_protocol_uses_a_common_calibration_certifier_and_dual_test_eval
     assert config.evaluation.selection_bound_method == "IC"
     assert config.evaluation.bound_methods == ("IBP", "IC")
     assert config.data.calibration_size == 200
+    assert config.evaluation.test_access == "disabled"
+
+
+def test_final_test_access_requires_a_study_lock():
+    config = load_config(ROOT / "configs" / "examples" / "example_twomoons.yaml")
+    candidate = replace(
+        config,
+        evaluation=replace(config.evaluation, test_access="frozen_final"),
+    )
+    with pytest.raises(ValueError, match="study_lock"):
+        candidate.validate()
 
 
 def test_coefficient_scale_cannot_weaken_the_calibrated_guarantee():

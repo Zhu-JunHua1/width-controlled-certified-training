@@ -59,6 +59,8 @@ class EvaluationConfig:
     explicit_radius: float | None = None
     selection_bound_method: str = "IC"
     bound_methods: tuple[str, ...] = ("IBP", "IC")
+    test_access: str = "disabled"
+    study_lock: str | None = None
 
     def radius(self, training_radius: float) -> float:
         if self.input_domain == "same_as_training":
@@ -80,6 +82,12 @@ class EvaluationConfig:
             raise ValueError("evaluation.bound_methods must be a non-empty subset of [IBP, IC]")
         if len(set(self.bound_methods)) != len(self.bound_methods):
             raise ValueError("evaluation.bound_methods must not contain duplicates")
+        if self.test_access not in {"disabled", "frozen_final"}:
+            raise ValueError("evaluation.test_access must be disabled or frozen_final")
+        if self.test_access == "frozen_final" and not self.study_lock:
+            raise ValueError("frozen_final test access requires evaluation.study_lock")
+        if self.test_access == "disabled" and self.study_lock is not None:
+            raise ValueError("evaluation.study_lock is only valid for frozen_final access")
 
 
 @dataclass(frozen=True)

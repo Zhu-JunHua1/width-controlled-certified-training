@@ -91,6 +91,14 @@ before any certified method is run. In particular, protocol P4 sets `evaluation.
 other paper protocols use `same_as_training`.
 Sweep files use a shared `base` plus explicit `variants`; the same command executes every variant.
 
+Test access is fail-closed. `evaluation.test_access: disabled` is the default
+for examples, development gates, and calibration runs; their result rows carry
+`evaluation_method=not_evaluated` and null test fields. A final run must set
+`test_access: frozen_final` and name a complete, committed study lock. Draft
+locks, placeholder provenance, and protocols absent from the lock are rejected
+before training starts. Any test split exposed during earlier development must
+be retired and cannot be reused by the final lock.
+
 For chance-level starts, `pretraining.minimum_epochs` can require actual optimizer steps,
 `pretraining.minimum_accuracy_gain` can require measurable progress beyond the untrained accuracy, and
 `pretraining.maximum_final_accuracy` can reject a first-crossing overshoot. These criteria are applied
@@ -108,8 +116,9 @@ Set `echo_epochs: true` in a YAML configuration to print structured progress at 
    `mean_step`, and the active update rule (`fixed` or `IWAU`).
 
 After each seed, the terminal prints one table containing all requested method results. After the final
-seed, it prints an aggregate table with mean and population standard deviation. Endpoint statistics use
-only runs that reached the requested horizon; missing endpoints are never silently converted to zero.
+seed, it prints an aggregate table with mean and population standard deviation. Development runs state
+that final test evaluation is disabled. Endpoint statistics use only runs that reached the requested
+horizon; missing endpoints are never silently converted to zero.
 
 The terminal names match the CSV schema semantically: `weight_width` is the mean parameter-interval
 width, whereas `grad_width` is the mean gradient-bound width. Terminal output is for monitoring only;
@@ -131,7 +140,7 @@ own directory containing:
 | `last_state.pt` | Last valid interval state and its epoch (also written for interrupted horizons) |
 | `selected_state.pt` | State selected by the calibration trajectory and used for direct continuation/final test evaluation |
 
-`test_cert_at_T` is `null` when the requested horizon was not reached. A diverged run is never silently encoded
+Test fields are also `null` when `evaluation.test_access` is disabled. `test_cert_at_T` is `null` when the requested horizon was not reached. A diverged run is never silently encoded
 as a completed run with zero certification. The configurable `max_gradient_width` is a numerical safety
 stop, not the theoretical reference width used by the finite-horizon analysis.
 
@@ -215,8 +224,9 @@ datasets, print progress, or choose output paths.
 6. If no reference decline occurs within `T`, calibration returns `not_required` and the IWAU arm equals
    the fixed arm by definition.
 
-Only after this trajectory and checkpoint are frozen does the runner materialize the test loader.  The
-same checkpoint is then evaluated by every configured test certifier.  See
+Only a `frozen_final` run authorized by a complete study lock materializes the
+test loader. The same already-selected checkpoint is then evaluated by every
+configured test certifier. See
 [`docs/experimental_locking.md`](docs/experimental_locking.md) for the final-study lock procedure.
 
 The calibration result has one of three explicit states: `active`, `not_required`, or `invalid`.

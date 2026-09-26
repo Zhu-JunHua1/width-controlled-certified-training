@@ -86,11 +86,18 @@ def main(argv=None) -> int:
             args.results, args.output, diverged_as_zero=args.diverged_as_zero
         )
         for row in summary:
+            selected = (
+                "n/a"
+                if row["test_selected_mean"] is None
+                else (
+                    f"{row['test_selected_mean']:.3f}"
+                    f"+/-{row['test_selected_std']:.3f}"
+                )
+            )
             print(
                 f"radius={row['radius']:g} method={row['method']} n={row['seeds']} "
                 f"eval={row['evaluation_method']} "
-                f"test@selected={row['test_selected_mean']:.3f}"
-                f"+/-{row['test_selected_std']:.3f} "
+                f"test@selected={selected} "
                 f"test@T={row['test_at_T_mean']} endpoint-n={row['endpoint_seeds']} "
                 f"update-active={row['update_active_seeds']}"
             )

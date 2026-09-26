@@ -42,7 +42,11 @@ def summarize_results(
 
     summary: list[dict[str, object]] = []
     for (radius, method, evaluation_method), group in sorted(groups.items()):
-        selected = [float(row["test_cert_at_selected"]) for row in group]
+        selected = [
+            float(row["test_cert_at_selected"])
+            for row in group
+            if row["test_cert_at_selected"]
+        ]
         endpoints = []
         for row in group:
             if row["status"] == "completed" and row["test_cert_at_T"]:
@@ -58,8 +62,8 @@ def summarize_results(
                 "completed_seeds": sum(row["status"] == "completed" for row in group),
                 "diverged_seeds": sum(row["status"] == "diverged" for row in group),
                 "endpoint_seeds": len(endpoints),
-                "test_selected_mean": statistics.mean(selected),
-                "test_selected_std": statistics.pstdev(selected),
+                "test_selected_mean": statistics.mean(selected) if selected else None,
+                "test_selected_std": statistics.pstdev(selected) if selected else None,
                 "test_at_T_mean": statistics.mean(endpoints) if endpoints else None,
                 "test_at_T_std": statistics.pstdev(endpoints) if endpoints else None,
                 "iwau_active_seeds": sum(
