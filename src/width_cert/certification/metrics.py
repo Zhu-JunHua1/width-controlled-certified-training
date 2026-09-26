@@ -8,7 +8,7 @@ import torch
 import torch.nn.functional as functional
 
 from ..bounds.lirpa import bounded_parameters, bounded_tensor, flatten_parameters
-from ..bounds.methods import BoundMethod, intersect_bounds
+from ..bounds.methods import BoundMethod, IntersectionDiagnostics, intersect_bounds
 
 
 @dataclass(frozen=True)
@@ -54,12 +54,23 @@ def evaluate_center_accuracy(data_loader, state, *, dimensions: list[int]) -> fl
     return 100.0 * correct / total
 
 
-def _output_bounds(graph, inputs, method: BoundMethod):
+def _output_bounds(
+    graph,
+    inputs,
+    method: BoundMethod,
+    diagnostics: IntersectionDiagnostics | None = None,
+):
     ibp_lower, ibp_upper = graph.compute_bounds(x=inputs, method="IBP")
     if method is BoundMethod.IBP:
         return ibp_lower, ibp_upper
     crown_lower, crown_upper = graph.compute_bounds(x=inputs, method="CROWN")
-    return intersect_bounds(ibp_lower, ibp_upper, crown_lower, crown_upper)
+    return intersect_bounds(
+        ibp_lower,
+        ibp_upper,
+        crown_lower,
+        crown_upper,
+        diagnostics=diagnostics,
+    )
 
 
 def evaluate_certification(
@@ -70,6 +81,7 @@ def evaluate_certification(
     input_radius: float,
     method: BoundMethod,
     dimensions: list[int],
+    diagnostics: IntersectionDiagnostics | None = None,
 ) -> CertificationMetrics:
     input_dim, classes = dimensions[0], dimensions[-1]
     linear_layers = len(dimensions) - 1
@@ -80,7 +92,12 @@ def evaluate_certification(
         batch = inputs.shape[0]
         center = inputs.reshape(batch, 1, input_dim)
         bounded_inputs = bounded_tensor(center - input_radius, center + input_radius)
-        lower, upper = _output_bounds(evaluation_graph, (bounded_inputs, *parameters), method)
+        lower, upper = _output_bounds(
+            evaluation_graph,
+            (bounded_inputs, *parameters),
+            method,
+            diagnostics=diagnostics,
+        )
         if classes == 1:
             lower, upper = lower.reshape(-1), upper.reshape(-1)
             labels = targets.reshape(-1)

@@ -3,8 +3,11 @@ output_dir: results/example_twomoons
 data:
   dataset: twomoons
   train_size: 100
+  calibration_size: 200
   test_size: 200
   seed: 10123310
+  calibration_seed: 314159
+  test_seed: 42
 model:
   hidden_layers: 1
   hidden_width: 20

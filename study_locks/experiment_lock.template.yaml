@@ -1,0 +1,50 @@
+schema_version: "1.0"
+status: draft  # draft | frozen | superseded
+study_id: protocol-v2
+target_venue: IJAR
+
+# Fill these fields only after the implementation and all development runs are
+# complete.  A frozen lock is committed before final test evaluation begins.
+code:
+  git_commit: TO_BE_FROZEN
+  dependency_lock_sha256: TO_BE_FROZEN
+  auto_lirpa_source_sha256: TO_BE_FROZEN
+
+data:
+  split_policy: explicit_train_calibration_test
+  split_hash_manifest: TO_BE_FROZEN
+  development_test_results_used_for_design: false
+
+selection:
+  split: calibration
+  checkpoint_rule: first_argmax_calibration_certified_accuracy
+  retention: 0.8
+  tie_breaking: earliest_epoch
+  test_access: after_checkpoint_and_schedule_freeze_only
+
+endpoints:
+  primary: test_cert_at_calibration_selected_checkpoint
+  secondary: test_cert_at_T
+  safety_cost:
+    - test_clean_at_selected
+    - test_clean_at_T
+    - total_wall_time
+    - peak_device_memory
+  mechanism_calibration_only:
+    - parameter_interval_width
+    - gradient_bound_width
+    - effective_step
+
+evaluation:
+  test_certifiers: [IBP, IC]
+  require_common_test_samples: true
+  require_common_checkpoint_rule: true
+
+statistics:
+  hypotheses: TO_BE_FROZEN
+  sidedness: TO_BE_FROZEN
+  multiple_comparison_family: TO_BE_FROZEN
+  correction: TO_BE_FROZEN
+
+protocols: TO_BE_FROZEN
+

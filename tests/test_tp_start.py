@@ -136,6 +136,7 @@ def test_direct_continuation_starts_with_transition_tp_to_tp_plus_one():
     first = next(update for update in result.run.updates if update.iwau_active)
     assert (first.epoch, first.next_epoch) == (2, 3)
     assert result.run.states[:3] == fixed.states[:3]
+    assert sorted(result.run.snapshots) == [0, 1, 2, 3, 4]
 
 
 def test_zero_coefficient_iwau_is_exactly_fixed_update():
@@ -174,7 +175,10 @@ def test_divergence_is_not_silently_reported_as_zero_cert_at_T():
 def test_structured_logger_writes_states_updates_and_status():
     output = Path(__file__).parent / ".test-output" / "structured-logger"
     output.mkdir(parents=True, exist_ok=True)
-    for name in ("config.json", "states.csv", "updates.csv", "summary.json", "status.json"):
+    for name in (
+        "config.json", "states.csv", "updates.csv", "summary.json", "status.json",
+        "last_state.pt", "selected_state.pt",
+    ):
         path = output / name
         if path.exists():
             path.unlink()
@@ -185,7 +189,7 @@ def test_structured_logger_writes_states_updates_and_status():
     logger.write_run(run, extra_summary={"seconds_per_epoch": 0.01})
     assert {p.name for p in output.iterdir()} == {
         "config.json", "states.csv", "updates.csv", "summary.json", "status.json",
-        "last_state.pt", "peak_state.pt",
+            "last_state.pt", "selected_state.pt",
     }
     with (output / "states.csv").open(encoding="utf-8") as handle:
         states = list(csv.DictReader(handle))
@@ -193,11 +197,13 @@ def test_structured_logger_writes_states_updates_and_status():
         updates = list(csv.DictReader(handle))
     status = json.loads((output / "status.json").read_text(encoding="utf-8"))
     assert [int(row["epoch"]) for row in states] == [0, 1, 2]
+    assert "calibration_certified_accuracy" in states[0]
+    assert "certified_accuracy" not in states[0]
     assert [(int(row["epoch"]), int(row["next_epoch"])) for row in updates] == [(0, 1), (1, 2)]
     assert status["status"] == "completed"
-    assert status["cert_at_T"] is not None
+    assert status["calibration_cert_at_T"] is not None
     last_epoch, _ = load_checkpoint(output / "last_state.pt")
-    peak_epoch, _ = load_checkpoint(output / "peak_state.pt")
+    peak_epoch, _ = load_checkpoint(output / "selected_state.pt")
     assert last_epoch == 2
     assert peak_epoch == run.peak_epoch
 
@@ -220,11 +226,11 @@ def test_terminal_logger_uses_aligned_unambiguous_metric_names(capsys):
     logger.finish_run(run, elapsed_seconds=0.25)
     terminal = capsys.readouterr().out
     assert "[RUN 001/004 START]" in terminal
-    assert "cert_acc" in terminal
-    assert "clean_acc" in terminal
+    assert "cal_cert" in terminal
+    assert "cal_clean" in terminal
     assert "weight_width" in terminal
     assert "grad_width" in terminal
     assert "mean_step" in terminal
-    assert "[RUN COMPLETE]" in terminal
+    assert "[TRAINING COMPLETE]" in terminal
     assert "omega=" not in terminal
     assert " clean=" not in terminal

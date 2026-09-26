@@ -5,7 +5,8 @@ The package extends FullCert-style interval training with two sound components:
 
 - **IC** intersects IBP and CROWN gradient bounds coordinate by coordinate on the full gradient graph.
 - **IWAU** (interval-width-adaptive update) rescales every coordinate by
-  `base_step / (1 + coefficient * gradient_width)` and starts from the saved peak state `B_tp`.
+  `base_step / (1 + coefficient * gradient_width)` and starts from the state `B_tp` selected on a
+  disjoint calibration split.
 
 The repository contains the final direct-`t_p` algorithm and excludes private paper-audit data.
 
@@ -71,7 +72,7 @@ fixed counterpart, the runner performs the required same-bound fixed pre-run int
 stores it under that adaptive arm's `calibration_pre_run/` directory, and does not add it to `results.csv`,
 the progress-cell count, or the terminal result tables.
 
-The configuration explicitly fixes the dataset, architecture, shared-start pretraining, perturbation
+The configuration explicitly fixes disjoint train/calibration/test data, the architecture, shared-start pretraining, perturbation
 radii, training horizon, base step, methods, a candidate seed range, the number of accepted starts, and
 the evaluation input domain. Seeds are not hand-listed: the runner examines candidates in ascending order,
 performs pretraining once, and retains the first requested number satisfying the shared-start criterion
@@ -92,7 +93,7 @@ Set `echo_epochs: true` in a YAML configuration to print structured progress at 
 1. experiment metadata and the total number of training cells;
 2. candidate-seed decisions and the final shared seed set;
 3. seed and method/radius boundaries with a completion summary for every cell;
-4. an aligned epoch table with `cert_acc`, `clean_acc`, `weight_width`, `grad_width`,
+4. an aligned epoch table with `cal_cert`, `cal_clean`, `weight_width`, `grad_width`,
    `mean_step`, and the active update rule (`fixed` or `IWAU`).
 
 After each seed, the terminal prints one table containing all requested method results. After the final
@@ -114,12 +115,12 @@ own directory containing:
 | `config.json` | Resolved protocol, loss definitions, environment, and dependency provenance |
 | `states.csv` | State metrics: row `t` describes the interval state `B_t` |
 | `updates.csv` | Update metrics: row `t` describes `B_t -> B_{t+1}` and `Omega_t` |
-| `summary.json` | Peak, peak epoch, cert@T, timing, and IWAU calibration status |
+| `summary.json` | Calibration-selected epoch, calibration endpoint, frozen test metrics, timing, IWAU status, and intersection diagnostics |
 | `status.json` | Terminal state, stop reason, and last observed certified accuracy |
 | `last_state.pt` | Last valid interval state and its epoch (also written for interrupted horizons) |
-| `peak_state.pt` | Peak state of a captured fixed-update pre-run, used for direct continuation |
+| `selected_state.pt` | State selected by the calibration trajectory and used for direct continuation/final test evaluation |
 
-`cert_at_T` is `null` when the requested horizon was not reached. A diverged run is never silently encoded
+`test_cert_at_T` is `null` when the requested horizon was not reached. A diverged run is never silently encoded
 as a completed run with zero certification. The configurable `max_gradient_width` is a numerical safety
 stop, not the theoretical reference width used by the finite-horizon analysis.
 
@@ -131,8 +132,8 @@ width-cert summarize results/P1_twomoons_ablation/results.csv \
   --output results/P1_twomoons_ablation/summary.csv
 ```
 
-The raw log keeps `cert_at_T: null` for an unfinished run. `--diverged-as-zero` is an explicit analysis
-policy matching the paper tables: it retains the observed pre-divergence peak and assigns endpoint zero.
+The raw log keeps `test_cert_at_T: null` for an unfinished run. `--diverged-as-zero` is an explicit analysis
+policy that assigns endpoint zero without altering the raw record.
 
 Export all experiment-level aggregates below a result root together with a path-safe provenance manifest:
 
@@ -177,13 +178,18 @@ datasets, print progress, or choose output paths.
 ## Final IWAU semantics
 
 1. Run the same bound method with fixed updates through horizon `T` and save `B_0,...,B_T`.
-2. Select the first state `B_tp` attaining peak certified accuracy, including `B_0`.
+2. On the calibration split, select the first state `B_tp` attaining the maximum calibration certified
+   accuracy, including `B_0`.
 3. Let `t_ref > t_p` be the first state below `retention * peak`.
 4. Compute `S_Omega = sum(Omega_t, t=t_p,...,t_ref-1)` and
    `coefficient = (T - t_p) / S_Omega`.
 5. Reuse the exact fixed prefix through `B_tp`; the first IWAU transition is `B_tp -> B_{tp+1}`.
 6. If no reference decline occurs within `T`, calibration returns `not_required` and the IWAU arm equals
    the fixed arm by definition.
+
+Only after this trajectory and checkpoint are frozen does the runner materialize the test loader.  The
+same checkpoint is then evaluated by every configured test certifier.  See
+[`docs/experimental_locking.md`](docs/experimental_locking.md) for the final-study lock procedure.
 
 The calibration result has one of three explicit states: `active`, `not_required`, or `invalid`.
 
@@ -193,9 +199,9 @@ The calibration result has one of three explicit states: `active`, `not_required
 pytest
 ```
 
-The CPU suite checks state/update indexing, the exact `S_Omega` summation window, peak-state continuation,
-the coefficient-zero identity, the coordinate-wise width cap, non-silent divergence, and the logging
-schema.
+The CPU suite checks state/update indexing, the exact `S_Omega` summation window, calibration-selected
+continuation, the coefficient-zero identity, the coordinate-wise width cap, conservative intersection
+fallback, final-test isolation, non-silent divergence, and the logging schema.
 
 ## Reproducibility and citation
 

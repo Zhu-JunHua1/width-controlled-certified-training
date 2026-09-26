@@ -3,8 +3,11 @@ output_dir: results/P4_twomoons_baseline
 data:
   dataset: twomoons
   train_size: 100
+  calibration_size: 200
   test_size: 200
   seed: 0
+  calibration_seed: 314159
+  test_seed: 42
   per_training_seed: true
   strategy: combined_split
 model:

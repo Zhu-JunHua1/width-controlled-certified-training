@@ -1,7 +1,7 @@
 base:
   name: P7_twomoons_stability
   output_dir: results/P7_twomoons_L2_stability/base
-  data: {dataset: twomoons, train_size: 100, test_size: 500, seed: 10123310}
+  data: {dataset: twomoons, train_size: 100, calibration_size: 500, test_size: 500, seed: 10123310, calibration_seed: 314159, test_seed: 42}
   model: {hidden_layers: 2, hidden_width: 20}
   pretraining:
     enabled: true

@@ -123,7 +123,7 @@ def continue_with_iwau(
         ),
         start_epoch=calibration.peak_epoch,
         peak_floor=calibration.peak_certified_accuracy,
-        capture_snapshots=False,
+        capture_snapshots=True,
     )
     prefix_states = [s for s in fixed_run.states if s.epoch <= calibration.peak_epoch]
     prefix_updates = [u for u in fixed_run.updates if u.epoch < calibration.peak_epoch]
@@ -135,7 +135,13 @@ def continue_with_iwau(
         status=continuation.status,
         status_reason=continuation.status_reason,
         final_state=continuation.final_state,
-        snapshots={},
+        snapshots={
+            **{
+                epoch: snapshot
+                for epoch, snapshot in fixed_run.snapshots.items()
+                if epoch <= calibration.peak_epoch
+            },
+            **continuation.snapshots,
+        },
     )
     return IWAUResult(merged, calibration)
-

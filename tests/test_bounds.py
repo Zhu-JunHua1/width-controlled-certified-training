@@ -2,7 +2,7 @@
 
 import torch
 
-from width_cert.bounds import intersect_bounds
+from width_cert.bounds import IntersectionDiagnostics, intersect_bounds
 
 
 def test_intersection_keeps_tighter_coordinates():
@@ -25,14 +25,21 @@ def test_numerically_empty_coordinate_falls_back_to_ibp():
     assert torch.equal(upper, ibp_upper)
 
 
-def test_materially_empty_intersection_is_rejected():
+def test_materially_empty_intersection_falls_back_and_is_audited():
     ibp_lower = torch.tensor([0.0])
     ibp_upper = torch.tensor([1.0])
     crown_lower = torch.tensor([2.0])
     crown_upper = torch.tensor([3.0])
-    try:
-        intersect_bounds(ibp_lower, ibp_upper, crown_lower, crown_upper)
-    except RuntimeError as error:
-        assert "materially empty" in str(error)
-    else:
-        raise AssertionError("materially disjoint bounds must not be hidden")
+    diagnostics = IntersectionDiagnostics()
+    lower, upper = intersect_bounds(
+        ibp_lower,
+        ibp_upper,
+        crown_lower,
+        crown_upper,
+        diagnostics=diagnostics,
+    )
+    assert torch.equal(lower, ibp_lower)
+    assert torch.equal(upper, ibp_upper)
+    assert diagnostics.fallback_calls == 1
+    assert diagnostics.fallback_coordinates == 1
+    assert diagnostics.maximum_gap == 1.0

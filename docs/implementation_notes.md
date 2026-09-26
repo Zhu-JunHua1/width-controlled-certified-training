@@ -36,9 +36,10 @@ The derivative of ReLU is represented by a step node. Stable-sign intervals are 
 zero. Other supported operators follow auto_LiRPA's sound IBP/CROWN propagation. IC intersects the two
 sound results and cannot be looser than either input bound coordinate-wise.
 
-At degenerate point intervals, floating-point kernels may produce a tiny numerical inconsistency between
-the two enclosures. On such coordinates IC conservatively falls back to the IBP bound. This is sound and
-retains non-inferiority relative to IBP; constructing an artificial midpoint would not be sound.
+Floating-point kernels may produce a numerical inconsistency between the two enclosures. On every affected
+coordinate IC conservatively falls back to the IBP bound, regardless of gap size. The implementation logs
+the number of fallback calls, affected coordinates, and maximum gap for training, calibration selection,
+and final test evaluation. It never swaps endpoints or constructs an artificial midpoint.
 
 ## Terminal status
 
@@ -53,6 +54,8 @@ certified accuracy so that an endpoint penalty remains auditable.
 
 ## Clean accuracy
 
-`clean_accuracy` is evaluated by setting every interval parameter to its exact midpoint and running the
-resulting ordinary model on unperturbed test inputs. It is not inferred from the midpoint of propagated
-output bounds, which need not equal the output of the midpoint-parameter model in a nonlinear network.
+Clean accuracy is evaluated by setting every interval parameter to its exact midpoint and running the
+resulting ordinary model on unperturbed inputs. During training, `calibration_clean_accuracy` uses only the
+calibration split. The frozen selected and terminal checkpoints are later reported as
+`test_clean_at_selected` and `test_clean_at_T`. No value is inferred from the midpoint of propagated output
+bounds, which need not equal the output of the midpoint-parameter model in a nonlinear network.

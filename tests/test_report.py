@@ -7,15 +7,16 @@ from pathlib import Path
 from width_cert.analysis import export_report
 
 
-def _write_results(path: Path, peak: float) -> None:
+def _write_results(path: Path, selected: float) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     rows = [
         {
             "radius": 0.01,
             "seed": 0,
             "method": "IC",
-            "peak_certified_accuracy": peak,
-            "cert_at_T": peak - 1,
+            "evaluation_method": "IC",
+            "test_cert_at_selected": selected,
+            "test_cert_at_T": selected - 1,
             "status": "completed",
             "iwau_effective": False,
         }
@@ -42,6 +43,6 @@ def test_export_report_is_relative_and_traceable():
     ]
 
     payload = json.loads(manifest.read_text(encoding="utf-8"))
-    assert payload["schema_version"] == "1.0"
+    assert payload["schema_version"] == "2.0"
     assert len(payload["sources"]) == 2
     assert str(output.resolve()) not in manifest.read_text(encoding="utf-8")

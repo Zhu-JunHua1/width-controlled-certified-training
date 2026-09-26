@@ -13,7 +13,7 @@ import torch.nn.functional as functional
 from auto_LiRPA import BoundedModule
 from torch.utils.data import DataLoader, TensorDataset
 
-from ..bounds import BoundMethod, CUSTOM_BOUND_OPERATORS
+from ..bounds import BoundMethod, CUSTOM_BOUND_OPERATORS, IntersectionDiagnostics
 from ..bounds.lirpa import (
     apply_flat_interval_update,
     bounded_tensor,
@@ -29,11 +29,19 @@ from ..logging import ConsoleReporter, RunLogger, SCHEMA_VERSION
 from ..models import BinaryBCEGradientGraph, EvaluationGraph, PretrainingMLP, layer_dimensions
 from .config import ExperimentConfig
 from .environment import environment_metadata
+from .evaluation import evaluate_frozen_checkpoints
 from .pretrain import PretrainingRejected, PretrainingResult, pretrain_to_accuracy
 
 
 def _method_parts(name: str) -> tuple[BoundMethod, bool]:
     return (BoundMethod.IC if name.startswith("IC") else BoundMethod.IBP, name.endswith("+IWAU"))
+
+
+def _configured_bound_method(name: str) -> BoundMethod:
+    try:
+        return BoundMethod(name.lower())
+    except ValueError as error:
+        raise ValueError(f"unknown configured bound method: {name}") from error
 
 
 def _write_index(path: Path, rows: list[dict[str, object]]) -> None:
@@ -67,8 +75,11 @@ def _prepare_starts(
         shared_bundle = build_dataset(
             config.data.dataset,
             train_size=config.data.train_size,
+            calibration_size=config.data.calibration_size,
             test_size=config.data.test_size,
             seed=config.data.seed,
+            calibration_seed=config.data.calibration_seed,
+            test_seed=config.data.test_seed,
             strategy=config.data.strategy,
         )
 
@@ -89,14 +100,17 @@ def _prepare_starts(
         bundle = shared_bundle or build_dataset(
             config.data.dataset,
             train_size=config.data.train_size,
+            calibration_size=config.data.calibration_size,
             test_size=config.data.test_size,
             seed=seed,
+            calibration_seed=config.data.calibration_seed,
+            test_seed=config.data.test_seed,
             strategy=config.data.strategy,
         )
         train_inputs = bundle.train_inputs.to(device)
         train_targets = bundle.train_targets.to(device)
-        test_inputs = bundle.test_inputs.to(device)
-        test_targets = bundle.test_targets.to(device)
+        calibration_inputs = bundle.calibration_inputs.to(device)
+        calibration_targets = bundle.calibration_targets.to(device)
         train_loader = DataLoader(
             TensorDataset(train_inputs, train_targets),
             batch_size=config.data.train_size,
@@ -114,8 +128,8 @@ def _prepare_starts(
             result = pretrain_to_accuracy(
                 point_model,
                 train_loader,
-                test_inputs,
-                test_targets,
+                calibration_inputs,
+                calibration_targets,
                 target_accuracy=config.pretraining.target_accuracy,
                 maximum_initial_accuracy=config.pretraining.maximum_initial_accuracy,
                 maximum_final_accuracy=config.pretraining.maximum_final_accuracy,
@@ -251,11 +265,11 @@ def run_experiment(config: ExperimentConfig) -> Path:
         bundle = prepared.bundle
         train_inputs = bundle.train_inputs.to(device)
         train_targets = bundle.train_targets.to(device)
-        test_inputs = bundle.test_inputs.to(device)
-        test_targets = bundle.test_targets.to(device)
-        test_loader = DataLoader(
-            TensorDataset(test_inputs, test_targets),
-            batch_size=config.data.test_size,
+        calibration_inputs = bundle.calibration_inputs.to(device)
+        calibration_targets = bundle.calibration_targets.to(device)
+        calibration_loader = DataLoader(
+            TensorDataset(calibration_inputs, calibration_targets),
+            batch_size=config.data.calibration_size,
             shuffle=False,
         )
         dimensions = prepared.dimensions
@@ -287,11 +301,21 @@ def run_experiment(config: ExperimentConfig) -> Path:
 
         for radius in config.radii:
             evaluation_radius = config.evaluation.radius(radius)
+            selection_bound_method = _configured_bound_method(
+                config.evaluation.selection_bound_method
+            )
+            test_bound_methods = tuple(
+                _configured_bound_method(name)
+                for name in config.evaluation.bound_methods
+            )
             fixed_runs = {}
             fixed_timings = {}
+            fixed_diagnostics = {}
             for method_name in config.methods:
                 bound_method, adaptive = _method_parts(method_name)
                 fixed_name = bound_method.name
+                gradient_diagnostics = IntersectionDiagnostics()
+                calibration_diagnostics = IntersectionDiagnostics()
 
                 def gradient_bounds(state, selected=bound_method):
                     flat_lower, flat_upper = flatten_parameters(state, linear_layers)
@@ -313,26 +337,34 @@ def run_experiment(config: ExperimentConfig) -> Path:
                             flat_upper,
                             dimensions,
                             selected,
+                            diagnostics=gradient_diagnostics,
                         )
                         total_lower += lower.sum(dim=0).reshape(-1)
                         total_upper += upper.sum(dim=0).reshape(-1)
                     return total_lower / len(train_inputs), total_upper / len(train_inputs)
 
-                def metrics(state, selected=bound_method, test_radius=evaluation_radius):
+                def calibration_metrics(
+                    state,
+                    selected=selection_bound_method,
+                    calibration_radius=evaluation_radius,
+                ):
                     return evaluate_certification(
                         evaluation_graph,
-                        test_loader,
+                        calibration_loader,
                         state,
-                        input_radius=test_radius,
+                        input_radius=calibration_radius,
                         method=selected,
                         dimensions=dimensions,
+                        diagnostics=calibration_diagnostics,
                     )
 
                 trainer = CertifiedTrainer(
                     gradient_bounds=gradient_bounds,
-                    certified_accuracy=lambda state: metrics(state).certified_accuracy,
+                    certified_accuracy=lambda state: calibration_metrics(
+                        state
+                    ).certified_accuracy,
                     clean_accuracy=lambda state: evaluate_center_accuracy(
-                        test_loader, state, dimensions=dimensions
+                        calibration_loader, state, dimensions=dimensions
                     ),
                     apply_update=lambda state, lower, upper, step: apply_flat_interval_update(
                         state, lower, upper, step, dimensions
@@ -366,6 +398,10 @@ def run_experiment(config: ExperimentConfig) -> Path:
                     "evaluation": {
                         **asdict(config.evaluation),
                         "resolved_radius": evaluation_radius,
+                        "selection_split": "calibration",
+                        "selection_bound_method": selection_bound_method.name,
+                        "test_bound_methods": [method.name for method in test_bound_methods],
+                        "test_accessed_during_training": False,
                     },
                     "training_radius": radius,
                     "seed": seed,
@@ -395,6 +431,10 @@ def run_experiment(config: ExperimentConfig) -> Path:
                             dependency_seconds = time.perf_counter() - dependency_start
                             fixed_runs[fixed_name] = fixed_run
                             fixed_timings[fixed_name] = dependency_seconds
+                            fixed_diagnostics[fixed_name] = {
+                                "gradient": gradient_diagnostics,
+                                "calibration": calibration_diagnostics,
+                            }
                             dependency_logger = RunLogger(
                                 cell_dir / "calibration_pre_run",
                                 echo=False,
@@ -419,6 +459,10 @@ def run_experiment(config: ExperimentConfig) -> Path:
                                 run=fixed_run,
                                 elapsed_seconds=dependency_seconds,
                             )
+                        # The reported continuation has independent counters;
+                        # the fixed pre-run remains separately auditable.
+                        gradient_diagnostics = IntersectionDiagnostics()
+                        calibration_diagnostics = IntersectionDiagnostics()
                         continuation_start = time.perf_counter()
                         result = continue_with_iwau(
                             trainer,
@@ -468,6 +512,10 @@ def run_experiment(config: ExperimentConfig) -> Path:
                             fixed_runs[fixed_name] = run
                             elapsed = time.perf_counter() - start_time
                             fixed_timings[fixed_name] = elapsed
+                            fixed_diagnostics[fixed_name] = {
+                                "gradient": gradient_diagnostics,
+                                "calibration": calibration_diagnostics,
+                            }
                         pre_run_seconds = 0.0
                         continuation_seconds = elapsed
                         calibration_summary = {
@@ -476,6 +524,75 @@ def run_experiment(config: ExperimentConfig) -> Path:
                         }
                     if adaptive and config.echo_epochs:
                         logger.echo_run(run)
+                    # Test data are materialized only after the complete
+                    # calibration trajectory and selected epoch are frozen.
+                    test_loader = DataLoader(
+                        TensorDataset(
+                            bundle.test_inputs.to(device),
+                            bundle.test_targets.to(device),
+                        ),
+                        batch_size=config.data.test_size,
+                        shuffle=False,
+                    )
+                    test_diagnostics = {
+                        method: IntersectionDiagnostics() for method in test_bound_methods
+                    }
+                    test_diagnostics_by_name = {
+                        method.name: diagnostics
+                        for method, diagnostics in test_diagnostics.items()
+                    }
+                    frozen_evaluations = evaluate_frozen_checkpoints(
+                        run=run,
+                        evaluation_graph=evaluation_graph,
+                        test_loader=test_loader,
+                        input_radius=evaluation_radius,
+                        methods=test_bound_methods,
+                        dimensions=dimensions,
+                        diagnostics=test_diagnostics,
+                    )
+                    test_evaluations = [
+                        evaluation.as_record() for evaluation in frozen_evaluations
+                    ]
+                    result_rows = []
+                    for evaluation_record in test_evaluations:
+                        result_rows.append(
+                            {
+                                "schema_version": SCHEMA_VERSION,
+                                "radius": radius,
+                                "evaluation_radius": evaluation_radius,
+                                "seed": seed,
+                                "method": method_name,
+                                "training_bound_method": bound_method.name,
+                                **evaluation_record,
+                                "pretraining_accuracy": 100.0 * pretrain_accuracy,
+                                "peak_calibration_certified_accuracy": (
+                                    run.peak_certified_accuracy
+                                ),
+                                "selected_epoch": run.peak_epoch,
+                                "calibration_cert_at_T": run.cert_at_horizon,
+                                "status": run.status.value,
+                                "iwau_status": calibration_summary[
+                                    "calibration_status"
+                                ],
+                                "iwau_effective": calibration_summary[
+                                    "iwau_effective"
+                                ],
+                                "elapsed_seconds": elapsed,
+                                "intersection_fallbacks_test": (
+                                    test_diagnostics_by_name[
+                                        evaluation_record["evaluation_method"]
+                                    ].fallback_coordinates
+                                ),
+                            }
+                        )
+
+                    executed_updates = (
+                        len(fixed_runs[fixed_name].updates)
+                        + len(run.updates)
+                        - calibration.peak_epoch
+                        if adaptive and calibration.iwau_effective
+                        else len(run.updates)
+                    )
                     logger.write_run(
                         run,
                         extra_summary={
@@ -484,24 +601,33 @@ def run_experiment(config: ExperimentConfig) -> Path:
                             "elapsed_seconds": elapsed,
                             "pre_run_seconds": pre_run_seconds,
                             "continuation_seconds": continuation_seconds,
-                            "executed_updates": (
-                                len(fixed_runs[fixed_name].updates) + len(run.updates) - calibration.peak_epoch
-                                if adaptive and calibration.iwau_effective
-                                else len(run.updates)
+                            "executed_updates": executed_updates,
+                            "seconds_per_executed_update": elapsed
+                            / max(executed_updates, 1),
+                            "wall_seconds_per_reported_epoch": elapsed
+                            / max(config.training.horizon, 1),
+                            "primary_endpoint": (
+                                "test_cert_at_calibration_selected_checkpoint"
                             ),
-                            "seconds_per_executed_update": elapsed / max(
-                                (
-                                    len(fixed_runs[fixed_name].updates)
-                                    + len(run.updates)
-                                    - calibration.peak_epoch
-                                    if adaptive and calibration.iwau_effective
-                                    else len(run.updates)
-                                ),
-                                1,
-                            ),
-                            "wall_seconds_per_reported_epoch": elapsed / max(
-                                config.training.horizon, 1
-                            ),
+                            "test_evaluations": test_evaluations,
+                            "intersection_diagnostics": {
+                                "fixed_pre_run": {
+                                    key: value.as_dict()
+                                    for key, value in (
+                                        fixed_diagnostics.get(fixed_name, {})
+                                        if adaptive
+                                        else {}
+                                    ).items()
+                                },
+                                "reported_trajectory": {
+                                    "gradient": gradient_diagnostics.as_dict(),
+                                    "calibration": calibration_diagnostics.as_dict(),
+                                },
+                                "test": {
+                                    method.name: diagnostics.as_dict()
+                                    for method, diagnostics in test_diagnostics.items()
+                                },
+                            },
                         },
                     )
                     logger.finish_run(run, elapsed_seconds=elapsed)
@@ -518,25 +644,8 @@ def run_experiment(config: ExperimentConfig) -> Path:
                     )
                     logger.fail_run(error)
                     raise
-                result_row = {
-                    "schema_version": SCHEMA_VERSION,
-                    "radius": radius,
-                    "evaluation_radius": evaluation_radius,
-                    "seed": seed,
-                    "method": method_name,
-                    "pretraining_accuracy": 100.0 * pretrain_accuracy,
-                    "peak_certified_accuracy": run.peak_certified_accuracy,
-                    "peak_epoch": run.peak_epoch,
-                    "cert_at_T": run.cert_at_horizon,
-                    "final_clean_accuracy": run.states[-1].clean_accuracy,
-                    "final_weight_width": run.states[-1].weight_width,
-                    "status": run.status.value,
-                    "iwau_status": calibration_summary["calibration_status"],
-                    "iwau_effective": calibration_summary["iwau_effective"],
-                    "elapsed_seconds": elapsed,
-                }
-                index_rows.append(result_row)
-                seed_rows.append(result_row)
+                index_rows.extend(result_rows)
+                seed_rows.extend(result_rows)
                 _write_index(output_root / "results.csv", index_rows)
                 completed_cells += 1
         reporter.seed_summary(seed=seed, rows=seed_rows)

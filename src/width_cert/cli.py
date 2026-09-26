@@ -62,7 +62,7 @@ def main(argv=None) -> int:
         help="run a sampled (non-certified) Lipschitz-margin checkpoint diagnostic",
     )
     lipschitz_parser.add_argument("config", help="single resolved YAML experiment configuration")
-    lipschitz_parser.add_argument("checkpoint", help="last_state.pt or peak_state.pt")
+    lipschitz_parser.add_argument("checkpoint", help="last_state.pt or selected_state.pt")
     lipschitz_parser.add_argument("output_dir", help="diagnostic output directory")
     lipschitz_parser.add_argument("--training-seed", type=int, required=True)
     lipschitz_parser.add_argument("--input-radius", type=float, required=True)
@@ -76,8 +76,10 @@ def main(argv=None) -> int:
         for row in summary:
             print(
                 f"radius={row['radius']:g} method={row['method']} n={row['seeds']} "
-                f"peak={row['peak_mean']:.3f}+/-{row['peak_std']:.3f} "
-                f"cert@T={row['cert_at_T_mean']} endpoint-n={row['endpoint_seeds']} "
+                f"eval={row['evaluation_method']} "
+                f"test@selected={row['test_selected_mean']:.3f}"
+                f"+/-{row['test_selected_std']:.3f} "
+                f"test@T={row['test_at_T_mean']} endpoint-n={row['endpoint_seeds']} "
                 f"IWAU-active={row['iwau_active_seeds']}"
             )
         return 0

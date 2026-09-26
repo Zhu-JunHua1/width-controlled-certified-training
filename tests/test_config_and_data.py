@@ -72,6 +72,13 @@ def test_adaptive_method_can_hide_its_fixed_calibration_dependency():
     adaptive_only.validate()
 
 
+def test_default_protocol_uses_a_common_calibration_certifier_and_dual_test_evaluation():
+    config = load_config(ROOT / "configs" / "examples" / "example_twomoons.yaml")
+    assert config.evaluation.selection_bound_method == "IC"
+    assert config.evaluation.bound_methods == ("IBP", "IC")
+    assert config.data.calibration_size == 200
+
+
 def test_coefficient_scale_cannot_weaken_the_calibrated_guarantee():
     config = load_config(ROOT / "configs" / "examples" / "example_twomoons.yaml")
     config = replace(
@@ -93,16 +100,45 @@ def test_coefficient_scale_at_least_one_is_valid():
 
 def test_twomoons_combined_split_matches_reference_protocol():
     bundle = build_dataset(
-        "twomoons", train_size=100, test_size=200, seed=3, strategy="combined_split"
+        "twomoons",
+        train_size=100,
+        calibration_size=100,
+        test_size=200,
+        seed=3,
+        calibration_seed=314159,
+        test_seed=42,
+        strategy="combined_split",
     )
-    inputs, targets = make_moons(n_samples=300, noise=0.1, random_state=3)
-    expected_train_x, expected_test_x, expected_train_y, expected_test_y = train_test_split(
-        inputs, targets, test_size=200 / 300, random_state=42
+    inputs, targets = make_moons(n_samples=400, noise=0.1, random_state=3)
+    expected_train_x, holdout_x, expected_train_y, holdout_y = train_test_split(
+        inputs,
+        targets,
+        train_size=100,
+        test_size=300,
+        random_state=314159,
+        stratify=targets,
+    )
+    expected_calibration_x, expected_test_x, expected_calibration_y, expected_test_y = train_test_split(
+        holdout_x,
+        holdout_y,
+        train_size=100,
+        test_size=200,
+        random_state=42,
+        stratify=holdout_y,
     )
     assert np.allclose(bundle.train_inputs.numpy(), expected_train_x)
+    assert np.allclose(bundle.calibration_inputs.numpy(), expected_calibration_x)
     assert np.allclose(bundle.test_inputs.numpy(), expected_test_x)
     assert np.allclose(bundle.train_targets.numpy(), expected_train_y)
+    assert np.allclose(bundle.calibration_targets.numpy(), expected_calibration_y)
     assert np.allclose(bundle.test_targets.numpy(), expected_test_y)
+
+
+def test_every_public_config_has_an_explicit_calibration_split():
+    for path in (ROOT / "configs").rglob("*.yaml"):
+        for config in load_configs(path):
+            assert config.data.calibration_size > 0
+            assert config.data.calibration_seed != config.data.test_seed
 
 
 def test_public_environment_metadata_omits_absolute_dependency_path():
@@ -113,4 +149,4 @@ def test_public_environment_metadata_omits_absolute_dependency_path():
 
 
 def test_log_schema_version_reflects_center_accuracy_semantics():
-    assert SCHEMA_VERSION == "1.2"
+    assert SCHEMA_VERSION == "2.0"

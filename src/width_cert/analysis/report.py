@@ -83,7 +83,7 @@ def export_report(
 
     manifest_path = destination / "report_manifest.json"
     manifest = {
-        "schema_version": "1.0",
+        "schema_version": "2.0",
         "endpoint_policy": "diverged_as_zero" if diverged_as_zero else "completed_only",
         "summary": summary_path.name,
         "summary_sha256": _sha256(summary_path),

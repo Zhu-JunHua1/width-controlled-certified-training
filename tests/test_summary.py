@@ -12,19 +12,21 @@ def test_summary_uses_population_standard_deviation():
     output.mkdir(parents=True, exist_ok=True)
     source = output / "results.csv"
     rows = [
-        {"radius": 0.1, "seed": 0, "method": "IC", "peak_certified_accuracy": 60.0,
-         "cert_at_T": 10.0, "status": "completed", "iwau_effective": False},
-        {"radius": 0.1, "seed": 1, "method": "IC", "peak_certified_accuracy": 80.0,
-         "cert_at_T": 20.0, "status": "completed", "iwau_effective": False},
+        {"radius": 0.1, "seed": 0, "method": "IC", "evaluation_method": "IC",
+         "test_cert_at_selected": 60.0, "test_cert_at_T": 10.0,
+         "status": "completed", "iwau_effective": False},
+        {"radius": 0.1, "seed": 1, "method": "IC", "evaluation_method": "IC",
+         "test_cert_at_selected": 80.0, "test_cert_at_T": 20.0,
+         "status": "completed", "iwau_effective": False},
     ]
     with source.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
         writer.writeheader()
         writer.writerows(rows)
     row = summarize_results(source)[0]
-    assert row["peak_mean"] == 70.0
-    assert row["peak_std"] == 10.0
-    assert row["cert_at_T_std"] == 5.0
+    assert row["test_selected_mean"] == 70.0
+    assert row["test_selected_std"] == 10.0
+    assert row["test_at_T_std"] == 5.0
 
 
 def test_divergence_policy_preserves_peak_and_optionally_sets_endpoint_zero():
@@ -32,10 +34,12 @@ def test_divergence_policy_preserves_peak_and_optionally_sets_endpoint_zero():
     output.mkdir(parents=True, exist_ok=True)
     source = output / "results.csv"
     rows = [
-        {"radius": 0.1, "seed": 0, "method": "IBP", "peak_certified_accuracy": 70.0,
-         "cert_at_T": "", "status": "diverged", "iwau_effective": False},
-        {"radius": 0.1, "seed": 1, "method": "IBP", "peak_certified_accuracy": 50.0,
-         "cert_at_T": 20.0, "status": "completed", "iwau_effective": False},
+        {"radius": 0.1, "seed": 0, "method": "IBP", "evaluation_method": "IBP",
+         "test_cert_at_selected": 70.0, "test_cert_at_T": "",
+         "status": "diverged", "iwau_effective": False},
+        {"radius": 0.1, "seed": 1, "method": "IBP", "evaluation_method": "IBP",
+         "test_cert_at_selected": 50.0, "test_cert_at_T": 20.0,
+         "status": "completed", "iwau_effective": False},
     ]
     with source.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
@@ -43,10 +47,10 @@ def test_divergence_policy_preserves_peak_and_optionally_sets_endpoint_zero():
         writer.writerows(rows)
     completed_only = summarize_results(source)[0]
     paper_policy = summarize_results(source, diverged_as_zero=True)[0]
-    assert completed_only["peak_mean"] == 60.0
-    assert completed_only["cert_at_T_mean"] == 20.0
+    assert completed_only["test_selected_mean"] == 60.0
+    assert completed_only["test_at_T_mean"] == 20.0
     assert completed_only["endpoint_seeds"] == 1
-    assert paper_policy["cert_at_T_mean"] == 10.0
+    assert paper_policy["test_at_T_mean"] == 10.0
     assert paper_policy["endpoint_seeds"] == 2
 
 
@@ -56,10 +60,11 @@ def test_console_reports_requested_methods_per_seed_and_in_aggregate(capsys):
             "radius": 0.01,
             "seed": 3,
             "method": "IBP",
-            "peak_certified_accuracy": 60.0,
-            "peak_epoch": 2,
-            "cert_at_T": 0.0,
-            "final_clean_accuracy": 74.0,
+            "evaluation_method": "IC",
+            "test_cert_at_selected": 60.0,
+            "test_cert_at_T": 0.0,
+            "test_clean_at_selected": 73.0,
+            "test_clean_at_T": 74.0,
             "status": "completed",
             "iwau_status": "not_applicable",
             "iwau_effective": False,
@@ -68,10 +73,11 @@ def test_console_reports_requested_methods_per_seed_and_in_aggregate(capsys):
             "radius": 0.01,
             "seed": 3,
             "method": "IC+IWAU",
-            "peak_certified_accuracy": 70.0,
-            "peak_epoch": 5,
-            "cert_at_T": 68.0,
-            "final_clean_accuracy": 77.0,
+            "evaluation_method": "IC",
+            "test_cert_at_selected": 70.0,
+            "test_cert_at_T": 68.0,
+            "test_clean_at_selected": 76.0,
+            "test_clean_at_T": 77.0,
             "status": "completed",
             "iwau_status": "active",
             "iwau_effective": True,

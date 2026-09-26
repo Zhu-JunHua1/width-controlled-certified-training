@@ -5,7 +5,7 @@ from __future__ import annotations
 import torch
 from auto_LiRPA import BoundedTensor, PerturbationLpNorm
 
-from .methods import BoundMethod, intersect_bounds
+from .methods import BoundMethod, IntersectionDiagnostics, intersect_bounds
 
 
 def bounded_tensor(lower: torch.Tensor, upper: torch.Tensor) -> BoundedTensor:
@@ -109,6 +109,7 @@ def compute_gradient_bounds(
     flat_upper,
     dimensions: list[int],
     method: BoundMethod,
+    diagnostics: IntersectionDiagnostics | None = None,
 ):
     if targets.ndim == 1:
         targets = targets.reshape(-1, 1)
@@ -121,5 +122,10 @@ def compute_gradient_bounds(
     if method is BoundMethod.IBP:
         return ibp_lower, ibp_upper
     crown_lower, crown_upper = bounded_graph.compute_bounds(x=inputs, method="CROWN")
-    return intersect_bounds(ibp_lower, ibp_upper, crown_lower, crown_upper)
-
+    return intersect_bounds(
+        ibp_lower,
+        ibp_upper,
+        crown_lower,
+        crown_upper,
+        diagnostics=diagnostics,
+    )

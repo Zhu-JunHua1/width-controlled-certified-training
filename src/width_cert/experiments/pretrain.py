@@ -41,8 +41,8 @@ def point_accuracy(model, inputs, targets, *, multiclass: bool) -> float:
 def pretrain_to_accuracy(
     model,
     loader,
-    test_inputs,
-    test_targets,
+    selection_inputs,
+    selection_targets,
     *,
     target_accuracy: float,
     maximum_initial_accuracy: float,
@@ -55,7 +55,9 @@ def pretrain_to_accuracy(
     enabled: bool,
     optimizer_name: str,
 ) -> PretrainingResult:
-    initial = point_accuracy(model, test_inputs, test_targets, multiclass=multiclass)
+    initial = point_accuracy(
+        model, selection_inputs, selection_targets, multiclass=multiclass
+    )
     if enabled and initial > maximum_initial_accuracy:
         raise PretrainingRejected(
             "initial_accuracy_above_maximum",
@@ -90,7 +92,9 @@ def pretrain_to_accuracy(
                 )
             loss.backward()
             optimizer.step()
-        accuracy = point_accuracy(model, test_inputs, test_targets, multiclass=multiclass)
+        accuracy = point_accuracy(
+            model, selection_inputs, selection_targets, multiclass=multiclass
+        )
         if (
             epoch >= minimum_epochs
             and accuracy >= target_accuracy

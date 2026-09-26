@@ -134,8 +134,11 @@ def analyze_checkpoint(
     bundle = build_dataset(
         config.data.dataset,
         train_size=config.data.train_size,
+        calibration_size=config.data.calibration_size,
         test_size=config.data.test_size,
         seed=data_seed,
+        calibration_seed=config.data.calibration_seed,
+        test_seed=config.data.test_seed,
         strategy=config.data.strategy,
     )
     if bundle.output_dim != 1:
@@ -150,8 +153,8 @@ def analyze_checkpoint(
     device = next(iter(state.values())).device
     report = sampled_lipschitz_margin(
         state=state,
-        inputs=bundle.test_inputs.to(device),
-        targets=bundle.test_targets.to(device),
+        inputs=bundle.calibration_inputs.to(device),
+        targets=bundle.calibration_targets.to(device),
         dimensions=dimensions,
         input_radius=input_radius,
         parameter_samples=parameter_samples,
@@ -164,6 +167,7 @@ def analyze_checkpoint(
             "checkpoint_epoch": epoch,
             "experiment": config.name,
             "training_seed": training_seed,
+            "analysis_split": "calibration",
         }
     )
 

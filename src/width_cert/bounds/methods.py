@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from enum import Enum
 from typing import Any
 
@@ -11,13 +12,45 @@ class BoundMethod(str, Enum):
     IC = "ic"
 
 
+@dataclass
+class IntersectionDiagnostics:
+    """Audit counters for floating-point IC intersection conflicts."""
+
+    calls: int = 0
+    fallback_calls: int = 0
+    fallback_coordinates: int = 0
+    maximum_gap: float = 0.0
+
+    def record(self, conflict, gaps) -> None:
+        self.calls += 1
+        if conflict.any():
+            self.fallback_calls += 1
+            self.fallback_coordinates += int(conflict.sum())
+            self.maximum_gap = max(self.maximum_gap, float(gaps.max()))
+
+    def as_dict(self) -> dict[str, int | float]:
+        return {
+            "calls": self.calls,
+            "fallback_calls": self.fallback_calls,
+            "fallback_coordinates": self.fallback_coordinates,
+            "maximum_gap": self.maximum_gap,
+        }
+
+
 def intersect_bounds(
     ibp_lower: Any,
     ibp_upper: Any,
     crown_lower: Any,
     crown_upper: Any,
+    diagnostics: IntersectionDiagnostics | None = None,
 ) -> tuple[Any, Any]:
-    """Coordinate-wise intersection of two sound interval bounds."""
+    """Coordinate-wise intersection with conservative floating fallback.
+
+    A non-empty intersection is guaranteed in real arithmetic when both input
+    bounds are sound enclosures of the same value.  If floating-point
+    computation produces ``lower > upper``, that coordinate falls back to the
+    IBP enclosure.  No endpoint swapping or midpoint fabrication is allowed.
+    """
 
     import torch
 
@@ -29,13 +62,8 @@ def intersect_bounds(
     # only on those coordinates preserves soundness and the IC non-inferiority
     # guarantee relative to IBP; inventing a midpoint would not.
     conflict = lower > upper
-    if torch.any(conflict):
-        largest_gap = float((lower[conflict] - upper[conflict]).max())
-        if largest_gap > 1e-5:
-            raise RuntimeError(
-                "IBP and CROWN bounds have a materially empty intersection "
-                f"(maximum gap {largest_gap:.3e})"
-            )
+    if diagnostics is not None:
+        diagnostics.record(conflict, lower[conflict] - upper[conflict])
     lower = torch.where(conflict, ibp_lower, lower)
     upper = torch.where(conflict, ibp_upper, upper)
     return lower, upper

@@ -7,7 +7,7 @@ from enum import Enum
 from typing import Any
 
 
-SCHEMA_VERSION = "1.2"
+SCHEMA_VERSION = "2.0"
 
 
 class RunStatus(str, Enum):
@@ -66,15 +66,24 @@ class TrainingRun:
             "schema_version": SCHEMA_VERSION,
             "status": self.status.value,
             "status_reason": self.status_reason,
-            "peak_certified_accuracy": self.peak_certified_accuracy,
-            "peak_epoch": self.peak_epoch,
-            "cert_at_horizon": self.cert_at_horizon,
+            "selection_split": "calibration",
+            "peak_calibration_certified_accuracy": self.peak_certified_accuracy,
+            "selected_epoch": self.peak_epoch,
+            "calibration_cert_at_horizon": self.cert_at_horizon,
             "num_states": len(self.states),
             "num_updates": len(self.updates),
         }
 
     def state_rows(self) -> list[dict[str, Any]]:
-        return [asdict(record) for record in self.states]
+        return [
+            {
+                "epoch": record.epoch,
+                "calibration_certified_accuracy": record.certified_accuracy,
+                "weight_width": record.weight_width,
+                "calibration_clean_accuracy": record.clean_accuracy,
+            }
+            for record in self.states
+        ]
 
     def update_rows(self) -> list[dict[str, Any]]:
         return [asdict(record) for record in self.updates]

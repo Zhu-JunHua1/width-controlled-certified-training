@@ -146,18 +146,20 @@ class ConsoleReporter:
         print()
         print(f"[SEED SUMMARY] seed={seed}")
         print(
-            " train_eps | method     | peak_cert | peak_epoch | cert_at_T | clean_at_T | status      | IWAU_status"
+            " train_eps | method     | eval | test@selected | test@T | clean@selected | clean@T | status      | IWAU_status"
         )
         print(
-            "-----------+------------+-----------+------------+-----------+------------+-------------+---------------"
+            "-----------+------------+------+---------------+--------+----------------+---------+-------------+---------------"
         )
         for row in rows:
             iwau_status = str(row.get("iwau_status", "active" if row["iwau_effective"] else "n/a"))
             print(
                 f" {float(row['radius']):9g} | {str(row['method']):10s} | "
-                f"{_percentage(float(row['peak_certified_accuracy']))} | "
-                f"{int(row['peak_epoch']):10d} | {_percentage(row['cert_at_T'])} | "
-                f"{_percentage(row['final_clean_accuracy'])} | "
+                f"{str(row['evaluation_method']):4s} | "
+                f"{_percentage(row['test_cert_at_selected'])} | "
+                f"{_percentage(row['test_cert_at_T'])} | "
+                f"{_percentage(row['test_clean_at_selected'])} | "
+                f"{_percentage(row['test_clean_at_T'])} | "
                 f"{str(row['status']):11s} | {iwau_status:13s}"
             )
 
@@ -166,23 +168,35 @@ class ConsoleReporter:
 
         if not self.enabled or not rows:
             return
-        groups: dict[tuple[float, str], list[dict[str, Any]]] = {}
+        groups: dict[tuple[float, str, str], list[dict[str, Any]]] = {}
         for row in rows:
-            key = (float(row["radius"]), str(row["method"]))
+            key = (
+                float(row["radius"]),
+                str(row["method"]),
+                str(row["evaluation_method"]),
+            )
             groups.setdefault(key, []).append(row)
         print()
-        print("[EXPERIMENT SUMMARY] mean +/- population std across accepted seeds")
+        print("[EXPERIMENT SUMMARY] frozen-checkpoint test results; mean +/- population std")
         print(
-            " train_eps | method     | seeds |       peak_cert |        cert_at_T | endpoint_n | completed | IWAU_active"
+            " train_eps | method     | eval | seeds |    test@selected |          test@T | endpoint_n | completed | IWAU_active"
         )
         print(
-            "-----------+------------+-------+-----------------+------------------+------------+-----------+------------"
+            "-----------+------------+------+-------+------------------+-----------------+------------+-----------+------------"
         )
-        for (radius, method), group in groups.items():
-            peaks = [float(row["peak_certified_accuracy"]) for row in group]
-            endpoints = [float(row["cert_at_T"]) for row in group if row["cert_at_T"] is not None]
-            peak_mean = fmean(peaks)
-            peak_std = pstdev(peaks) if len(peaks) > 1 else 0.0
+        for (radius, method, evaluation_method), group in groups.items():
+            selected = [
+                float(row["test_cert_at_selected"])
+                for row in group
+                if row["test_cert_at_selected"] is not None
+            ]
+            endpoints = [
+                float(row["test_cert_at_T"])
+                for row in group
+                if row["test_cert_at_T"] is not None
+            ]
+            selected_mean = fmean(selected)
+            selected_std = pstdev(selected) if len(selected) > 1 else 0.0
             if endpoints:
                 endpoint_mean = fmean(endpoints)
                 endpoint_std = pstdev(endpoints) if len(endpoints) > 1 else 0.0
@@ -192,8 +206,9 @@ class ConsoleReporter:
             completed = sum(row["status"] == "completed" for row in group)
             active = sum(bool(row["iwau_effective"]) for row in group)
             print(
-                f" {radius:9g} | {method:10s} | {len(group):5d} | "
-                f"{peak_mean:6.2f}+/-{peak_std:5.2f}% | {endpoint_text:>16s} | "
+                f" {radius:9g} | {method:10s} | {evaluation_method:4s} | "
+                f"{len(group):5d} | {selected_mean:6.2f}+/-{selected_std:5.2f}% | "
+                f"{endpoint_text:>15s} | "
                 f"{len(endpoints):10d} | {completed:9d} | {active:11d}"
             )
 
@@ -272,8 +287,8 @@ class RunLogger:
         if not self.echo:
             return
         print(
-            f"[CALIBRATION PRE-RUN COMPLETE] peak_cert={run.peak_certified_accuracy:.2f}% "
-            f"(epoch={run.peak_epoch}) | cert_at_T={_percentage(run.cert_at_horizon).strip()} "
+            f"[CALIBRATION PRE-RUN COMPLETE] peak_cal_cert={run.peak_certified_accuracy:.2f}% "
+            f"(epoch={run.peak_epoch}) | cal_cert_at_T={_percentage(run.cert_at_horizon).strip()} "
             f"| elapsed={elapsed_seconds:.2f}s"
         )
 
@@ -281,7 +296,7 @@ class RunLogger:
         if self._epoch_header_printed:
             return
         print(
-            "  epoch |   cert_acc |  clean_acc | weight_width |   grad_width |  mean_step | update"
+            "  epoch |    cal_cert |   cal_clean | weight_width |   grad_width |  mean_step | update"
         )
         print(
             "--------+------------+------------+--------------+--------------+------------+--------"
@@ -320,10 +335,10 @@ class RunLogger:
         final_state = run.states[-1]
         print(_MINOR_RULE)
         print(
-            f"[RUN COMPLETE] status={run.status.value} | "
-            f"peak_cert={run.peak_certified_accuracy:.2f}% (epoch={run.peak_epoch}) | "
-            f"cert_at_T={_percentage(run.cert_at_horizon).strip()} | "
-            f"final_clean_acc={_percentage(final_state.clean_accuracy).strip()} | "
+            f"[TRAINING COMPLETE] status={run.status.value} | "
+            f"peak_cal_cert={run.peak_certified_accuracy:.2f}% (selected_epoch={run.peak_epoch}) | "
+            f"cal_cert_at_T={_percentage(run.cert_at_horizon).strip()} | "
+            f"final_cal_clean={_percentage(final_state.clean_accuracy).strip()} | "
             f"elapsed={elapsed_seconds:.2f}s"
         )
         if run.status_reason:
@@ -345,7 +360,7 @@ class RunLogger:
         )
         if run.peak_epoch in run.snapshots:
             save_checkpoint(
-                self.output_dir / "peak_state.pt",
+                self.output_dir / "selected_state.pt",
                 epoch=run.peak_epoch,
                 state=run.snapshots[run.peak_epoch],
             )
@@ -356,8 +371,8 @@ class RunLogger:
         self.write_terminal_status(
             status=run.status.value,
             reason=run.status_reason,
-            cert_at_T=run.cert_at_horizon,
-            last_observed_certified_accuracy=run.states[-1].certified_accuracy,
+            calibration_cert_at_T=run.cert_at_horizon,
+            last_observed_calibration_certified_accuracy=run.states[-1].certified_accuracy,
         )
 
     def write_terminal_status(
@@ -365,8 +380,8 @@ class RunLogger:
         *,
         status: str,
         reason: str,
-        cert_at_T: float | None = None,
-        last_observed_certified_accuracy: float | None = None,
+        calibration_cert_at_T: float | None = None,
+        last_observed_calibration_certified_accuracy: float | None = None,
         finalized: bool = True,
     ) -> None:
         self._write_json(
@@ -376,8 +391,10 @@ class RunLogger:
                 "status": status,
                 "reason": reason,
                 "finalized": finalized,
-                "cert_at_T": cert_at_T,
-                "last_observed_certified_accuracy": last_observed_certified_accuracy,
+                "calibration_cert_at_T": calibration_cert_at_T,
+                "last_observed_calibration_certified_accuracy": (
+                    last_observed_calibration_certified_accuracy
+                ),
             },
         )
 

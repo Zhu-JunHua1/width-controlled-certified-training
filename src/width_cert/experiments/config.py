@@ -13,8 +13,11 @@ import yaml
 class DataConfig:
     dataset: str
     train_size: int
+    calibration_size: int
     test_size: int
     seed: int = 10123310
+    calibration_seed: int = 314159
+    test_seed: int = 42
     per_training_seed: bool = False
     strategy: str = "separate"
 
@@ -52,6 +55,8 @@ class TrainingConfig:
 class EvaluationConfig:
     input_domain: str = "same_as_training"
     explicit_radius: float | None = None
+    selection_bound_method: str = "IC"
+    bound_methods: tuple[str, ...] = ("IBP", "IC")
 
     def radius(self, training_radius: float) -> float:
         if self.input_domain == "same_as_training":
@@ -64,6 +69,15 @@ class EvaluationConfig:
             "evaluation.input_domain must be same_as_training, clean, or explicit "
             "(with explicit_radius)"
         )
+
+    def validate(self) -> None:
+        allowed = {"IBP", "IC"}
+        if self.selection_bound_method not in allowed:
+            raise ValueError("evaluation.selection_bound_method must be IBP or IC")
+        if not self.bound_methods or set(self.bound_methods) - allowed:
+            raise ValueError("evaluation.bound_methods must be a non-empty subset of [IBP, IC]")
+        if len(set(self.bound_methods)) != len(self.bound_methods):
+            raise ValueError("evaluation.bound_methods must not contain duplicates")
 
 
 @dataclass(frozen=True)
@@ -115,6 +129,14 @@ class ExperimentConfig:
             )
         if self.training.max_gradient_width <= 0:
             raise ValueError("training.max_gradient_width must be positive")
+        if min(
+            self.data.train_size,
+            self.data.calibration_size,
+            self.data.test_size,
+        ) <= 0:
+            raise ValueError(
+                "data train_size, calibration_size, and test_size must all be positive"
+            )
         if self.pretraining.optimizer not in {"sgd", "adam"}:
             raise ValueError("pretraining.optimizer must be 'sgd' or 'adam'")
         if not 0 <= self.pretraining.minimum_epochs <= self.pretraining.maximum_epochs:
@@ -140,9 +162,13 @@ class ExperimentConfig:
         # the runner treats that pre-run as an internal dependency when the
         # corresponding fixed arm is not requested for reporting.
         self.evaluation.radius(self.radii[0])
+        self.evaluation.validate()
 
 
 def _construct(data: dict[str, Any]) -> ExperimentConfig:
+    evaluation_data = dict(data.get("evaluation", {}))
+    if "bound_methods" in evaluation_data:
+        evaluation_data["bound_methods"] = tuple(evaluation_data["bound_methods"])
     config = ExperimentConfig(
         name=data["name"],
         output_dir=data["output_dir"],
@@ -150,7 +176,7 @@ def _construct(data: dict[str, Any]) -> ExperimentConfig:
         model=ModelConfig(**data["model"]),
         pretraining=PretrainingConfig(**data.get("pretraining", {})),
         training=TrainingConfig(**data["training"]),
-        evaluation=EvaluationConfig(**data.get("evaluation", {})),
+        evaluation=EvaluationConfig(**evaluation_data),
         radii=tuple(float(value) for value in data["radii"]),
         seed_selection=SeedSelectionConfig(**data["seed_selection"]),
         methods=tuple(data.get("methods", ("IBP", "IC", "IBP+IWAU", "IC+IWAU"))),
