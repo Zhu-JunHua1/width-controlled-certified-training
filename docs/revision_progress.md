@@ -78,6 +78,16 @@ Implemented fairness infrastructure:
 Representative seeds only; no final test claims.  Gate on bound validity,
 non-vacuous calibration behavior, method ordering, and compute feasibility.
 
+## Theory-scope revision (draft complete)
+
+[`theory_revision_v2.md`](theory_revision_v2.md) now fixes the theorem scope
+before manuscript edits: fixed-step IC nesting requires a common predeclared
+step sequence and common certifier; separately calibrated IWAU paths are not
+covered. Direct `t_p` continuation is only a calibration-trajectory property,
+not an independent-test guarantee. The positive-`lambda` theorem, the
+`lambda=0` identity branch, real-arithmetic enclosure proof, and finite-precision
+implementation checks are explicitly separated.
+
 ## Stage C/D — frozen representative and full experiments (not started)
 
 These stages begin only after the lock file is complete and committed.
