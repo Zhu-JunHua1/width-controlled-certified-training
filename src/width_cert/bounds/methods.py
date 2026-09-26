@@ -9,6 +9,8 @@ from typing import Any
 
 class BoundMethod(str, Enum):
     IBP = "ibp"
+    HYBRID = "hybrid"
+    CROWN = "crown"
     IC = "ic"
 
 

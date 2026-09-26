@@ -72,6 +72,14 @@ def test_adaptive_method_can_hide_its_fixed_calibration_dependency():
     adaptive_only.validate()
 
 
+def test_controlled_gradient_bound_ablation_methods_are_valid():
+    config = load_config(ROOT / "configs" / "examples" / "example_twomoons.yaml")
+    replace(
+        config,
+        methods=("IBP", "AGT-Hybrid", "CROWN", "IC"),
+    ).validate()
+
+
 def test_default_protocol_uses_a_common_calibration_certifier_and_dual_test_evaluation():
     config = load_config(ROOT / "configs" / "examples" / "example_twomoons.yaml")
     assert config.evaluation.selection_bound_method == "IC"

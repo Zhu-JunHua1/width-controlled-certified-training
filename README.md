@@ -157,18 +157,35 @@ This command deliberately labels its constants as `sampled_estimate` and `sound_
 Finite box sampling can underestimate the true supremum, so the resulting coverage is an optimistic
 diagnostic rather than a certified lower bound.
 
+Compare the supported gradient-bound constructions on exactly the same frozen
+parameter box with:
+
+```bash
+width-cert audit-bounds configs/development/gradient_bound_ablation.yaml \
+  path/to/last_state.pt diagnostics/same-box \
+  --training-seed 1 --input-radius 0.01
+```
+
+The audit reports IBP, an AGT-inspired forward-CROWN/backward-IBP hybrid,
+full-gradient-graph CROWN, Full-IC, and Hybrid-IC.  It records bound width,
+relative tightening, end-to-end construction time, peak device memory, and
+which endpoints the intersections retain.  Its finite random sampling is an
+implementation check only; it is explicitly marked as not being a soundness
+proof.  The AGT-inspired arm is a controlled ablation implemented in this
+repository, not a claim of bitwise equivalence to the AGT software.
+
 ## Package layout
 
 | Path | Responsibility |
 |---|---|
 | `core/` | State cloning, update rules, training loop, same-method calibration, direct peak continuation |
-| `bounds/` | IBP/CROWN selection, IC intersection, auto_LiRPA adapters, custom sound operators |
+| `bounds/` | IBP/CROWN selection, hybrid bounds, IC intersection, auto_LiRPA adapters, custom sound operators |
 | `certification/` | Binary and multi-class certified-accuracy criteria |
 | `models/` | MLPs and explicit full gradient computation graphs |
 | `data/` | Dataset registry for TwoMoons, MNIST pairs, and synthetic multi-class data |
 | `experiments/` | Configuration schema, pretraining, environment capture, and unified runner |
 | `logging/` | Structured state/update records, terminal output, JSON/CSV files, and checkpoints |
-| `analysis/` | Generic aggregation and path-safe report/provenance export |
+| `analysis/` | Aggregation, path-safe report export, and checkpoint-level mechanism audits |
 | `configs/paper/` | Reproducible paper protocol files |
 | `tests/` | CPU regression tests for indexing, calibration, capping, status, and logging |
 

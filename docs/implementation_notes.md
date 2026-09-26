@@ -41,6 +41,34 @@ coordinate IC conservatively falls back to the IBP bound, regardless of gap size
 the number of fallback calls, affected coordinates, and maximum gap for training, calibration selection,
 and final test evaluation. It never swaps endpoints or constructs an artificial midpoint.
 
+## Controlled gradient-bound constructions
+
+The public runner distinguishes four training-bound methods:
+
+- `IBP`: interval propagation on the complete gradient graph;
+- `AGT-Hybrid`: an AGT-inspired controlled ablation whose forward
+  preactivations use CROWN while the loss derivative, ReLU derivative, backward
+  matrix products, and parameter-gradient outer products use explicit interval
+  arithmetic;
+- `CROWN`: CROWN/linear-relaxation bounds on the complete supported gradient
+  graph, with the ReLU-derivative step node conservatively represented by its
+  constant interval box;
+- `IC`: the coordinate-wise intersection of the `IBP` and `CROWN` bounds.
+
+`AGT-Hybrid` is deliberately named *inspired*: the implementation is an
+independent controlled baseline and is not asserted to reproduce every detail
+of the AGT reference software.  Full-CROWN and IBP differ at bilinear nodes:
+CROWN retains McCormick-type affine relations before later concretization,
+whereas IBP uses four-corner interval multiplication.  Their one-node marginal
+ranges can coincide, but their propagated bounds need not.
+
+The `audit-bounds` command evaluates all constructions on one identical frozen
+parameter box.  This separates bound tightness from the confounding effect of
+different training trajectories.  Full-IC timing includes both source-bound
+computations and the final intersection; reporting intersection-only time would
+understate its cost.  Random point sampling in the audit is a regression check,
+not a proof of real-arithmetic soundness.
+
 ## Terminal status
 
 Runs distinguish `completed`, `diverged`, `numerical_error`, `failed`, and `interrupted`. `cert_at_T` is

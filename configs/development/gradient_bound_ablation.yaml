@@ -1,0 +1,33 @@
+name: development_gradient_bound_ablation
+output_dir: results/development_gradient_bound_ablation
+data:
+  dataset: twomoons
+  train_size: 100
+  calibration_size: 200
+  test_size: 200
+  seed: 10123310
+  calibration_seed: 314159
+  test_seed: 42
+model: {hidden_layers: 1, hidden_width: 10}
+pretraining:
+  enabled: true
+  target_accuracy: 0.50
+  maximum_initial_accuracy: 0.505
+  maximum_final_accuracy: 0.52
+  step_size: 0.02
+  maximum_epochs: 4000
+  optimizer: sgd
+training:
+  horizon: 5
+  base_step: 0.1
+  retention: 0.8
+  gradient_batch_size: 10
+  max_gradient_width: 50.0
+evaluation:
+  input_domain: same_as_training
+  selection_bound_method: IC
+  bound_methods: [IBP, IC]
+radii: [0.01]
+seed_selection: {start: 0, stop: 10, count: 1}
+methods: [IBP, AGT-Hybrid, CROWN, IC]
+echo_epochs: true

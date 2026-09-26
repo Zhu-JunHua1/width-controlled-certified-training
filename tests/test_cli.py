@@ -36,3 +36,44 @@ def test_packaged_example_matches_editable_workspace_example():
     workspace = load_config(root / "configs" / "examples" / "example_twomoons.yaml")
     packaged = load_config(root / "src" / "width_cert" / "configs" / "example_twomoons.yaml")
     assert workspace == packaged
+
+
+def test_audit_bounds_cli_passes_explicit_protocol_arguments(monkeypatch):
+    observed = {}
+    output = Path(__file__).parent / ".test-output" / "audit-cli"
+
+    def fake_audit(config, checkpoint, output_dir, **kwargs):
+        observed.update(
+            config=config,
+            checkpoint=checkpoint,
+            output_dir=output_dir,
+            **kwargs,
+        )
+        return output / "audit.csv", output / "audit.json"
+
+    monkeypatch.setattr(cli, "audit_same_box", fake_audit)
+    root = Path(__file__).resolve().parents[1]
+    config = root / "configs" / "examples" / "example_twomoons.yaml"
+    assert (
+        cli.main(
+            [
+                "audit-bounds",
+                str(config),
+                "checkpoint.pt",
+                str(output),
+                "--training-seed",
+                "3",
+                "--input-radius",
+                "0.01",
+                "--batch-size",
+                "4",
+                "--parameter-samples",
+                "7",
+            ]
+        )
+        == 0
+    )
+    assert observed["training_seed"] == 3
+    assert observed["input_radius"] == 0.01
+    assert observed["batch_size"] == 4
+    assert observed["parameter_samples"] == 7

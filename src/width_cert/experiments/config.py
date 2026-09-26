@@ -114,7 +114,8 @@ class ExperimentConfig:
     echo_epochs: bool = True
 
     def validate(self) -> None:
-        allowed = {"IBP", "IC", "IBP+IWAU", "IC+IWAU"}
+        bases = {"IBP", "AGT-Hybrid", "CROWN", "IC"}
+        allowed = bases | {f"{base}+IWAU" for base in bases}
         unknown = set(self.methods) - allowed
         if unknown:
             raise ValueError(f"unknown methods: {sorted(unknown)}")

@@ -6,7 +6,7 @@ import argparse
 from importlib.resources import as_file, files
 from pathlib import Path
 
-from .analysis import analyze_checkpoint, export_report, summarize_results
+from .analysis import audit_same_box, analyze_checkpoint, export_report, summarize_results
 from .experiments import load_config, load_configs, run_experiment, select_seeds
 
 
@@ -68,6 +68,18 @@ def main(argv=None) -> int:
     lipschitz_parser.add_argument("--input-radius", type=float, required=True)
     lipschitz_parser.add_argument("--parameter-samples", type=int, default=8)
     lipschitz_parser.add_argument("--sampling-seed", type=int, default=0)
+    audit_parser = subparsers.add_parser(
+        "audit-bounds",
+        help="compare gradient bounds on one frozen parameter box",
+    )
+    audit_parser.add_argument("config", help="single resolved YAML experiment configuration")
+    audit_parser.add_argument("checkpoint", help="trusted interval checkpoint")
+    audit_parser.add_argument("output_dir", help="audit output directory")
+    audit_parser.add_argument("--training-seed", type=int, required=True)
+    audit_parser.add_argument("--input-radius", type=float, required=True)
+    audit_parser.add_argument("--batch-size", type=int, default=8)
+    audit_parser.add_argument("--parameter-samples", type=int, default=32)
+    audit_parser.add_argument("--sampling-seed", type=int, default=0)
     args = parser.parse_args(argv)
     if args.command == "summarize":
         summary = summarize_results(
@@ -105,6 +117,21 @@ def main(argv=None) -> int:
         print(f"sampled diagnostic written to {report}")
         print(f"margin CDF written to {cdf}")
         print("note: sampled_estimate is optimistic and is not a sound certificate")
+        return 0
+    if args.command == "audit-bounds":
+        report, manifest = audit_same_box(
+            load_config(args.config),
+            args.checkpoint,
+            args.output_dir,
+            training_seed=args.training_seed,
+            input_radius=args.input_radius,
+            batch_size=args.batch_size,
+            parameter_samples=args.parameter_samples,
+            sampling_seed=args.sampling_seed,
+        )
+        print(f"same-box audit written to {report}")
+        print(f"audit manifest written to {manifest}")
+        print("note: random sampling is an implementation check, not a soundness proof")
         return 0
     if args.command == "run":
         if args.config and args.config_file:

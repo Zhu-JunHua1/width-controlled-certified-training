@@ -121,7 +121,11 @@ def compute_gradient_bounds(
     ibp_lower, ibp_upper = bounded_graph.compute_bounds(x=inputs, method="IBP")
     if method is BoundMethod.IBP:
         return ibp_lower, ibp_upper
+    if method is BoundMethod.HYBRID:
+        raise ValueError("the hybrid method requires AGTInspiredHybridBounder")
     crown_lower, crown_upper = bounded_graph.compute_bounds(x=inputs, method="CROWN")
+    if method is BoundMethod.CROWN:
+        return crown_lower, crown_upper
     return intersect_bounds(
         ibp_lower,
         ibp_upper,

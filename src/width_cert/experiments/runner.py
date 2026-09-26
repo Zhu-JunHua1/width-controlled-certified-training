@@ -13,7 +13,12 @@ import torch.nn.functional as functional
 from auto_LiRPA import BoundedModule
 from torch.utils.data import DataLoader, TensorDataset
 
-from ..bounds import BoundMethod, CUSTOM_BOUND_OPERATORS, IntersectionDiagnostics
+from ..bounds import (
+    AGTInspiredHybridBounder,
+    BoundMethod,
+    CUSTOM_BOUND_OPERATORS,
+    IntersectionDiagnostics,
+)
 from ..bounds.lirpa import (
     apply_flat_interval_update,
     bounded_tensor,
@@ -34,7 +39,18 @@ from .pretrain import PretrainingRejected, PretrainingResult, pretrain_to_accura
 
 
 def _method_parts(name: str) -> tuple[BoundMethod, bool]:
-    return (BoundMethod.IC if name.startswith("IC") else BoundMethod.IBP, name.endswith("+IWAU"))
+    adaptive = name.endswith("+IWAU")
+    base = name.removesuffix("+IWAU")
+    methods = {
+        "IBP": BoundMethod.IBP,
+        "AGT-Hybrid": BoundMethod.HYBRID,
+        "CROWN": BoundMethod.CROWN,
+        "IC": BoundMethod.IC,
+    }
+    try:
+        return methods[base], adaptive
+    except KeyError as error:
+        raise ValueError(f"unknown method: {name}") from error
 
 
 def _configured_bound_method(name: str) -> BoundMethod:
@@ -298,6 +314,11 @@ def run_experiment(config: ExperimentConfig) -> Path:
             custom_ops=CUSTOM_BOUND_OPERATORS,
             bound_opts={"override_dependent_operations": True},
         )
+        hybrid_bounder = (
+            AGTInspiredHybridBounder(dimensions, device)
+            if any(_method_parts(name)[0] is BoundMethod.HYBRID for name in config.methods)
+            else None
+        )
 
         for radius in config.radii:
             evaluation_radius = config.evaluation.radius(radius)
@@ -325,20 +346,33 @@ def run_experiment(config: ExperimentConfig) -> Path:
                     for start in range(0, len(train_inputs), batch_size):
                         end = min(start + batch_size, len(train_inputs))
                         inputs = train_inputs[start:end].reshape(-1, 1, bundle.input_dim)
-                        bounded_inputs = bounded_tensor(inputs - radius, inputs + radius)
+                        input_lower, input_upper = inputs - radius, inputs + radius
+                        bounded_inputs = bounded_tensor(input_lower, input_upper)
                         targets = train_targets[start:end]
                         if bundle.output_dim > 1:
                             targets = functional.one_hot(targets.long(), bundle.output_dim).float()
-                        lower, upper = compute_gradient_bounds(
-                            gradient_graph,
-                            bounded_inputs,
-                            targets,
-                            flat_lower,
-                            flat_upper,
-                            dimensions,
-                            selected,
-                            diagnostics=gradient_diagnostics,
-                        )
+                        if selected is BoundMethod.HYBRID:
+                            if hybrid_bounder is None:
+                                raise RuntimeError("hybrid bounder was not initialized")
+                            lower, upper = hybrid_bounder.compute(
+                                bounded_inputs=bounded_inputs,
+                                input_lower=input_lower,
+                                input_upper=input_upper,
+                                targets=targets,
+                                flat_lower=flat_lower,
+                                flat_upper=flat_upper,
+                            )
+                        else:
+                            lower, upper = compute_gradient_bounds(
+                                gradient_graph,
+                                bounded_inputs,
+                                targets,
+                                flat_lower,
+                                flat_upper,
+                                dimensions,
+                                selected,
+                                diagnostics=gradient_diagnostics,
+                            )
                         total_lower += lower.sum(dim=0).reshape(-1)
                         total_upper += upper.sum(dim=0).reshape(-1)
                     return total_lower / len(train_inputs), total_upper / len(train_inputs)
