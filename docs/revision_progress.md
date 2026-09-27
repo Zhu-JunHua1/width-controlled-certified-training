@@ -29,7 +29,7 @@ Verification at commit `6f6dce0`:
   exposed test split is retired and will not be used in the final study.
 - No final protocol-v2 paper claim is made from this smoke run.
 
-## Stage A2 — controlled methods and fairness baselines (in progress)
+## Stage A2 — controlled methods and fairness baselines (complete)
 
 Completed mechanism-audit deliverables:
 
@@ -48,12 +48,14 @@ Completed mechanism-audit deliverables:
   zero violations in 10,496 sampled coordinate checks; sampling is not treated
   as a soundness proof.
 - CPU tests: 42 passed after the mechanism-audit additions.
-
-Remaining fairness deliverables:
-
-- Run the implemented fixed, inverse-time, cosine, step-decay, global-width,
-  and coordinate-wise IWAU comparison on multiple development seeds before
-  freezing the final target step and hypothesis set.
+- A second audit used the trained fixed-prefix peak checkpoint on seed 0
+  (4,008 gradient coordinates). Mean widths were 0.002538 (IBP), 0.002339
+  (AGT-inspired hybrid), 0.002320 (full CROWN), and 0.002292 (Full-IC), giving
+  7.8%, 8.6%, and 9.7% tightening relative to IBP. Full-IC selected a CROWN
+  lower endpoint on 21.7% and upper endpoint on 19.9% of coordinates. No
+  sampled violation or floating-point intersection fallback occurred in
+  256,512 coordinate checks. These checks validate the implementation on the
+  sampled points; they do not replace the real-arithmetic soundness argument.
 
 Implemented fairness infrastructure:
 
@@ -64,19 +66,34 @@ Implemented fairness infrastructure:
 - Complete cost includes the fixed pre-run and continuation.  Synchronized
   wall-clock timing, frozen-test time, bound-evaluation count, and peak device
   memory are recorded separately.
-- On one development-only active-calibration seed (using an already exposed,
-  now-retired test split), all two-stage arms used 66
-  gradient-bound evaluations and selected `t_p=14`.  At an exactly matched
-  final mean step of 0.056703, inverse-time, cosine, and step-decay ended at 0%
-  IC-certified test accuracy; global-width control ended at 52.0%, and
-  coordinate-wise IWAU at 64.5%.  This is a development gate, not a paper
-  result or a statistical claim. Re-running the same development configuration
-  now leaves all test fields null by default.
+- A calibration-only pilot on three accepted shared starts (seeds 0, 4, and 5)
+  estimated coordinate-wise IWAU final mean steps of 0.056703, 0.040261, and
+  0.055975. Their frozen development median, 0.055975, was used as the common
+  target for the scalar schedules. This is a population-level development
+  target, not an oracle per-seed match.
+- In the subsequent three-seed comparison, every arm reproduced the fixed
+  prefix exactly through its calibration-selected `t_p`; all two-stage arms
+  also used the same number of bound evaluations within each seed (66, 64,
+  and 69). Inverse-time, cosine, and step-decay all ended at 0% calibration
+  certified accuracy. Global-width control ended at 52.0%, 35.0%, and 62.0%,
+  while coordinate-wise IWAU ended at 65.0%, 56.5%, and 75.5%. Mean clean
+  accuracies at the horizon were 76.3%, 68.5%, 68.5%, 78.5%, and 78.8% for
+  inverse-time, cosine, step-decay, global-width, and coordinate IWAU,
+  respectively. Complete wall-clock time and peak device memory were nearly
+  equal across the two-stage arms (about 160 seconds and 94 MiB on this
+  machine).
+- Test access was disabled for both pilots: all test result fields are null.
+  The values above are development diagnostics only and are not paper results
+  or statistical claims.
 
-## Stage B — development gates (not started)
+## Stage B — development gates (in progress)
 
-Representative seeds only; no final test claims.  Gate on bound validity,
-non-vacuous calibration behavior, method ordering, and compute feasibility.
+Representative seeds only; no final test claims. Bound validity, non-vacuous
+calibration behavior, exact common-prefix reuse, and compute feasibility have
+passed. Before freezing the final study, the update-budget comparison still
+needs one explicit choice between (i) the deployable population-level target
+estimated above and (ii) a calibration-only per-seed oracle match whose extra
+calibration cost is fully charged to the comparator.
 
 ## Theory-scope revision (draft complete)
 

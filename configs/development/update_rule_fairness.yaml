@@ -1,5 +1,5 @@
 name: development_update_rule_fairness
-output_dir: results/development_update_rule_fairness_matched_seed0
+output_dir: results/development_update_rule_fairness_three_seed
 data:
   dataset: twomoons
   train_size: 100
@@ -23,15 +23,15 @@ training:
   retention: 0.8
   gradient_batch_size: 10
   max_gradient_width: 50.0
-  # Development-only value measured from seed 0's calibration-only IWAU run.
-  # A final study must freeze one aggregate target from development seeds.
-  schedule_target_final_step: 0.05670302361249924
+  # Median of the calibration-only IWAU final mean steps for development
+  # seeds 0, 4, and 5. A final study must freeze this in its study lock.
+  schedule_target_final_step: 0.055974505841732025
   step_decay_milestone_fraction: 0.5
 evaluation:
   input_domain: same_as_training
   selection_bound_method: IC
   bound_methods: [IBP, IC]
 radii: [0.01]
-seed_selection: {start: 0, stop: 10, count: 1}
+seed_selection: {start: 0, stop: 15, count: 3}
 methods: [IC, IC+InverseTime, IC+Cosine, IC+StepDecay, IC+GlobalIWAU, IC+IWAU]
 echo_epochs: false
