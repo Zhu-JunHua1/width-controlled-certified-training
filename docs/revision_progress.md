@@ -95,6 +95,32 @@ needs one explicit choice between (i) the deployable population-level target
 estimated above and (ii) a calibration-only per-seed oracle match whose extra
 calibration cost is fully charged to the comparator.
 
+The real-image computation gate also passed on one MNIST 1/7 shared start
+(`epsilon=0.001`, five updates). IBP, AGT-inspired hybrid, full CROWN, and
+Full-IC all reached the horizon with zero numerical-intersection fallbacks and
+without accessing test data. Their calibration cert@T values were 48.6%,
+49.0%, 48.8%, and 49.0%; the run is too short and has only one seed, so these
+values are path-validation diagnostics rather than an effectiveness claim.
+The measured cost difference is material: IBP and the hybrid took 1.09 and
+1.33 seconds with about 0.6 GiB peak device memory, whereas full CROWN and
+Full-IC took about 420 seconds and 12.0 GiB.
+
+Same-box audits at the MNIST calibration-selected checkpoint and horizon
+further delimit the mechanism. At the selected checkpoint, mean tightening
+relative to IBP was 2.68% (hybrid), 2.33% (full CROWN), 3.04% (Full-IC), and
+2.76% (Hybrid-IC). At the horizon, full CROWN alone was 4.70% wider than IBP,
+while Full-IC remained 1.54% tighter because the intersection discarded the
+looser CROWN coordinates; Hybrid-IC was 0.93% tighter. Across both audits,
+there were no violations in 1,257,760 sampled coordinate checks and no
+intersection fallback. This supports the intersection mechanism, but it does
+not by itself establish a practically large benefit from full backward CROWN.
+Final claims about that component remain conditional on the frozen multi-seed
+study.
+
+Future runs now persist `initial_state.pt` in addition to selected and horizon
+checkpoints, so the preregistered initial/selected/expanded same-box audits can
+be reproduced without reconstructing a state.
+
 ## Theory-scope revision (draft complete)
 
 [`theory_revision_v2.md`](theory_revision_v2.md) now fixes the theorem scope

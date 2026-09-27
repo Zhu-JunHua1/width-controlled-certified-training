@@ -177,7 +177,7 @@ def test_structured_logger_writes_states_updates_and_status():
     output.mkdir(parents=True, exist_ok=True)
     for name in (
         "config.json", "states.csv", "updates.csv", "summary.json", "status.json",
-        "last_state.pt", "selected_state.pt",
+        "initial_state.pt", "last_state.pt", "selected_state.pt",
     ):
         path = output / name
         if path.exists():
@@ -189,7 +189,7 @@ def test_structured_logger_writes_states_updates_and_status():
     logger.write_run(run, extra_summary={"seconds_per_epoch": 0.01})
     assert {p.name for p in output.iterdir()} == {
         "config.json", "states.csv", "updates.csv", "summary.json", "status.json",
-            "last_state.pt", "selected_state.pt",
+            "initial_state.pt", "last_state.pt", "selected_state.pt",
     }
     with (output / "states.csv").open(encoding="utf-8") as handle:
         states = list(csv.DictReader(handle))
@@ -202,8 +202,10 @@ def test_structured_logger_writes_states_updates_and_status():
     assert [(int(row["epoch"]), int(row["next_epoch"])) for row in updates] == [(0, 1), (1, 2)]
     assert status["status"] == "completed"
     assert status["calibration_cert_at_T"] is not None
+    initial_epoch, _ = load_checkpoint(output / "initial_state.pt")
     last_epoch, _ = load_checkpoint(output / "last_state.pt")
     peak_epoch, _ = load_checkpoint(output / "selected_state.pt")
+    assert initial_epoch == 0
     assert last_epoch == 2
     assert peak_epoch == run.peak_epoch
 

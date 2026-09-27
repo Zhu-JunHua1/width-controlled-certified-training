@@ -386,6 +386,13 @@ class RunLogger:
     def write_run(self, run: TrainingRun, *, extra_summary: dict[str, Any] | None = None) -> None:
         self._write_csv("states.csv", run.state_rows())
         self._write_csv("updates.csv", run.update_rows())
+        initial_epoch = run.states[0].epoch
+        if initial_epoch in run.snapshots:
+            save_checkpoint(
+                self.output_dir / "initial_state.pt",
+                epoch=initial_epoch,
+                state=run.snapshots[initial_epoch],
+            )
         save_checkpoint(
             self.output_dir / "last_state.pt",
             epoch=run.states[-1].epoch,
