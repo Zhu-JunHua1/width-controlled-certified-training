@@ -45,7 +45,11 @@ from .config import ExperimentConfig
 from .environment import environment_metadata
 from .evaluation import evaluate_frozen_checkpoints
 from .pretrain import PretrainingRejected, PretrainingResult, pretrain_to_accuracy
-from .study_lock import experiment_config_sha256, verify_frozen_study_lock
+from .study_lock import (
+    canonical_mapping_sha256,
+    experiment_config_sha256,
+    verify_frozen_study_lock,
+)
 
 
 def _method_parts(name: str) -> tuple[BoundMethod, str]:
@@ -290,13 +294,19 @@ def run_experiment(config: ExperimentConfig) -> Path:
 
     config.validate()
     final_test_enabled = config.evaluation.test_access == "frozen_final"
+    resolved_config_hash = experiment_config_sha256(config)
+    study_lock_payload = None
+    study_lock_hash = None
+    protocol_lock = None
     if final_test_enabled:
-        verify_frozen_study_lock(
+        study_lock_payload = verify_frozen_study_lock(
             config.evaluation.study_lock,
             protocol_name=config.name,
-            config_sha256=experiment_config_sha256(config),
+            config_sha256=resolved_config_hash,
             split_manifest=config.data.split_manifest,
         )
+        study_lock_hash = canonical_mapping_sha256(study_lock_payload)
+        protocol_lock = study_lock_payload["protocols"][config.name]
     output_root = Path(config.output_dir).resolve()
     output_root.mkdir(parents=True, exist_ok=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -776,6 +786,24 @@ def run_experiment(config: ExperimentConfig) -> Path:
                                 ],
                                 "update_rule": calibration_summary["update_rule"],
                                 "test_access": config.evaluation.test_access,
+                                "analysis_tier": config.evaluation.analysis_tier,
+                                "selection_split": "calibration",
+                                "selection_metric": (
+                                    f"calibration_certified_accuracy_"
+                                    f"{selection_bound_method.name}"
+                                ),
+                                "experiment_lock_hash": study_lock_hash,
+                                "code_commit": (
+                                    study_lock_payload["code"]["git_commit"]
+                                    if study_lock_payload is not None
+                                    else None
+                                ),
+                                "resolved_config_sha256": resolved_config_hash,
+                                "data_split_sha256": (
+                                    protocol_lock.get("split_manifest_sha256")
+                                    if protocol_lock is not None
+                                    else None
+                                ),
                                 "elapsed_seconds": elapsed,
                                 "test_evaluation_seconds": test_seconds,
                                 "complete_elapsed_seconds": complete_elapsed_seconds,
@@ -823,6 +851,24 @@ def run_experiment(config: ExperimentConfig) -> Path:
                                 "test_cert_at_calibration_selected_checkpoint"
                                 if final_test_enabled
                                 else "not_evaluated_in_development"
+                            ),
+                            "analysis_tier": config.evaluation.analysis_tier,
+                            "selection_split": "calibration",
+                            "selection_metric": (
+                                f"calibration_certified_accuracy_"
+                                f"{selection_bound_method.name}"
+                            ),
+                            "experiment_lock_hash": study_lock_hash,
+                            "code_commit": (
+                                study_lock_payload["code"]["git_commit"]
+                                if study_lock_payload is not None
+                                else None
+                            ),
+                            "resolved_config_sha256": resolved_config_hash,
+                            "data_split_sha256": (
+                                protocol_lock.get("split_manifest_sha256")
+                                if protocol_lock is not None
+                                else None
                             ),
                             "test_evaluations": test_evaluations,
                             "intersection_diagnostics": {

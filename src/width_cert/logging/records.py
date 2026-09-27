@@ -7,7 +7,7 @@ from enum import Enum
 from typing import Any
 
 
-SCHEMA_VERSION = "2.1"
+SCHEMA_VERSION = "2.2"
 
 
 class RunStatus(str, Enum):

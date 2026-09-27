@@ -287,5 +287,5 @@ def test_public_environment_metadata_omits_absolute_dependency_path():
     assert "auto_lirpa_python_tree_sha256" in metadata
 
 
-def test_log_schema_version_reflects_center_accuracy_semantics():
-    assert SCHEMA_VERSION == "2.1"
+def test_log_schema_version_reflects_frozen_study_provenance():
+    assert SCHEMA_VERSION == "2.2"

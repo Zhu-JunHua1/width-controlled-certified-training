@@ -35,6 +35,16 @@ def experiment_config_sha256(config: Any) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def canonical_mapping_sha256(payload: dict[str, Any]) -> str:
+    encoded = json.dumps(
+        payload,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def verify_frozen_study_lock(
     path: str | Path,
     *,

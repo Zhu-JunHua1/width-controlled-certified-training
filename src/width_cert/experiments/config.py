@@ -62,6 +62,7 @@ class EvaluationConfig:
     bound_methods: tuple[str, ...] = ("IBP", "IC")
     test_access: str = "disabled"
     study_lock: str | None = None
+    analysis_tier: str = "development"
 
     def radius(self, training_radius: float) -> float:
         if self.input_domain == "same_as_training":
@@ -89,6 +90,17 @@ class EvaluationConfig:
             raise ValueError("frozen_final test access requires evaluation.study_lock")
         if self.test_access == "disabled" and self.study_lock is not None:
             raise ValueError("evaluation.study_lock is only valid for frozen_final access")
+        if self.analysis_tier not in {
+            "development",
+            "primary",
+            "secondary",
+            "exploratory",
+        }:
+            raise ValueError(
+                "evaluation.analysis_tier must be development, primary, secondary, or exploratory"
+            )
+        if self.test_access == "frozen_final" and self.analysis_tier == "development":
+            raise ValueError("frozen_final access requires a non-development analysis_tier")
 
 
 @dataclass(frozen=True)
