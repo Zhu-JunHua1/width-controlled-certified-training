@@ -7,6 +7,7 @@ from importlib.resources import as_file, files
 from pathlib import Path
 
 from .analysis import audit_same_box, analyze_checkpoint, export_report, summarize_results
+from .data import create_mnist_split_manifest
 from .experiments import load_config, load_configs, run_experiment, select_seeds
 
 
@@ -80,6 +81,30 @@ def main(argv=None) -> int:
     audit_parser.add_argument("--batch-size", type=int, default=8)
     audit_parser.add_argument("--parameter-samples", type=int, default=32)
     audit_parser.add_argument("--sampling-seed", type=int, default=0)
+    split_parser = subparsers.add_parser(
+        "make-mnist-split",
+        help="create a frozen MNIST-pair index manifest without reading metrics",
+    )
+    split_parser.add_argument("output", help="output JSON manifest")
+    split_parser.add_argument("--digits", nargs=2, type=int, required=True)
+    split_parser.add_argument("--train-size", type=int, required=True)
+    split_parser.add_argument("--calibration-size", type=int, required=True)
+    split_parser.add_argument("--test-size", type=int, required=True)
+    split_parser.add_argument("--train-seed", type=int, required=True)
+    split_parser.add_argument("--calibration-seed", type=int, required=True)
+    split_parser.add_argument("--test-seed", type=int, required=True)
+    split_parser.add_argument("--data-root", default="data")
+    split_parser.add_argument(
+        "--exclude-manifest",
+        action="append",
+        default=[],
+        help="prior manifest whose train/calibration/test indices must be excluded",
+    )
+    split_parser.add_argument(
+        "--legacy-consecutive-calibration",
+        action="store_true",
+        help="reconstruct the legacy consecutive train/calibration split",
+    )
     args = parser.parse_args(argv)
     if args.command == "summarize":
         summary = summarize_results(
@@ -139,6 +164,22 @@ def main(argv=None) -> int:
         print(f"same-box audit written to {report}")
         print(f"audit manifest written to {manifest}")
         print("note: random sampling is an implementation check, not a soundness proof")
+        return 0
+    if args.command == "make-mnist-split":
+        output = create_mnist_split_manifest(
+            args.output,
+            pair=tuple(args.digits),
+            train_size=args.train_size,
+            calibration_size=args.calibration_size,
+            test_size=args.test_size,
+            train_seed=args.train_seed,
+            calibration_seed=args.calibration_seed,
+            test_seed=args.test_seed,
+            data_root=args.data_root,
+            exclude_manifests=args.exclude_manifest,
+            legacy_consecutive_calibration=args.legacy_consecutive_calibration,
+        )
+        print(f"MNIST split manifest written to {output}")
         return 0
     if args.command == "run":
         if args.config and args.config_file:

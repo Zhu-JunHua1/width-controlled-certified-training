@@ -10,6 +10,7 @@ from sklearn.datasets import make_moons
 from sklearn.model_selection import train_test_split
 
 from width_cert.data import build_dataset
+from width_cert.data import select_mnist_indices
 from width_cert.data.registry import _load_mnist_indices
 from width_cert.experiments import load_config, load_configs
 from width_cert.experiments.environment import environment_metadata
@@ -246,6 +247,28 @@ def test_frozen_mnist_manifest_requires_exact_disjoint_indices():
             official_train_size=4,
             official_test_size=3,
         )
+
+
+def test_mnist_manifest_selection_is_deterministic_disjoint_and_excludes_prior_data():
+    kwargs = {
+        "official_train_size": 30,
+        "official_test_size": 12,
+        "train_size": 5,
+        "calibration_size": 6,
+        "test_size": 4,
+        "train_seed": 11,
+        "calibration_seed": 13,
+        "test_seed": 17,
+        "excluded_train": {0, 1, 2},
+        "excluded_test": {0, 1},
+    }
+    first = select_mnist_indices(**kwargs)
+    second = select_mnist_indices(**kwargs)
+    assert first == second
+    train, calibration, test = map(set, first)
+    assert train.isdisjoint(calibration)
+    assert (train | calibration).isdisjoint({0, 1, 2})
+    assert test.isdisjoint({0, 1})
 
 
 def test_public_environment_metadata_omits_absolute_dependency_path():

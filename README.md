@@ -137,6 +137,7 @@ own directory containing:
 | `updates.csv` | Update metrics: row `t` describes `B_t -> B_{t+1}`, `Omega_t`, the mean step, and the active rule |
 | `summary.json` | Calibration-selected epoch, endpoints, frozen test metrics, two-stage timing/update budget, peak device memory, update status, and intersection diagnostics |
 | `status.json` | Terminal state, stop reason, and last observed certified accuracy |
+| `initial_state.pt` | Frozen interval state at the beginning of the reported trajectory |
 | `last_state.pt` | Last valid interval state and its epoch (also written for interrupted horizons) |
 | `selected_state.pt` | State selected by the calibration trajectory and used for direct continuation/final test evaluation |
 
@@ -193,6 +194,21 @@ which endpoints the intersections retain.  Its finite random sampling is an
 implementation check only; it is explicitly marked as not being a soundness
 proof.  The AGT-inspired arm is a controlled ablation implemented in this
 repository, not a claim of bitwise equivalence to the AGT software.
+
+Frozen-final MNIST protocols use explicit index manifests rather than relying
+on a nominally new random seed. Create a manifest, optionally excluding one or
+more exposed development manifests, with:
+
+```bash
+width-cert make-mnist-split data_splits/final_mnist17.json \
+  --digits 1 7 --train-size 100 --calibration-size 500 --test-size 500 \
+  --train-seed 55873755 --calibration-seed 261026576 --test-seed 1608498564 \
+  --exclude-manifest data_splits/retired_mnist17_development.json
+```
+
+The command reads no model metric. It records only filtered official-dataset
+indices and provenance; the loader validates the manifest and the frozen study
+lock binds its SHA-256.
 
 ## Package layout
 
