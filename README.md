@@ -195,6 +195,22 @@ implementation check only; it is explicitly marked as not being a soundness
 proof.  The AGT-inspired arm is a controlled ablation implemented in this
 repository, not a claim of bitwise equivalence to the AGT software.
 
+For a deterministic implementation check that does not require a trained
+checkpoint, run:
+
+```bash
+width-cert validate-small-bound diagnostics/small-network-grid
+```
+
+This command evaluates a scalar-input, one-hidden-unit BCE gradient graph on
+endpoint/midpoint Cartesian grids for interval inputs and parameters. It covers
+active, inactive, and zero-crossing ReLU cases, positive/negative/mixed-sign
+bilinear factors, both binary targets, and both admissible derivative endpoint
+choices at a ReLU kink. Reference gradients are evaluated analytically rather
+than by the bound graph under test. The generated JSON nevertheless states
+`is_real_arithmetic_soundness_proof: false`: finite enumeration is a regression
+check, while the soundness claim rests on the operator-wise proof.
+
 Frozen-final MNIST protocols use explicit index manifests rather than relying
 on a nominally new random seed. Create a manifest, optionally excluding one or
 more exposed development manifests, with:

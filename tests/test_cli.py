@@ -77,3 +77,18 @@ def test_audit_bounds_cli_passes_explicit_protocol_arguments(monkeypatch):
     assert observed["input_radius"] == 0.01
     assert observed["batch_size"] == 4
     assert observed["parameter_samples"] == 7
+
+
+def test_validate_small_bound_cli_writes_reports(monkeypatch, capsys, tmp_path):
+    observed = {}
+
+    def fake_validate(output_dir, *, tolerance):
+        observed["output_dir"] = output_dir
+        observed["tolerance"] = tolerance
+        return tmp_path / "grid.csv", tmp_path / "grid.json"
+
+    monkeypatch.setattr(cli, "validate_small_network_grid", fake_validate)
+    assert cli.main(["validate-small-bound", str(tmp_path), "--tolerance", "1e-6"]) == 0
+    assert observed == {"output_dir": str(tmp_path), "tolerance": 1e-6}
+    terminal = capsys.readouterr().out
+    assert "implementation check, not a proof" in terminal

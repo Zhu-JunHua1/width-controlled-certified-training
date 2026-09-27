@@ -3,6 +3,7 @@
 from .bound_audit import audit_same_box
 from .lipschitz_margin import analyze_checkpoint, sampled_lipschitz_margin
 from .report import discover_result_files, export_report
+from .soundness_grid import validate_small_network_grid
 from .summary import summarize_results
 from .statistics import analyze_paired_hypotheses
 
@@ -14,4 +15,5 @@ __all__ = [
     "sampled_lipschitz_margin",
     "summarize_results",
     "analyze_paired_hypotheses",
+    "validate_small_network_grid",
 ]

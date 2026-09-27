@@ -87,6 +87,17 @@ computations and the final intersection; reporting intersection-only time would
 understate its cost.  Random point sampling in the audit is a regression check,
 not a proof of real-arithmetic soundness.
 
+The complementary `validate-small-bound` command is deterministic and
+checkpoint-free.  It uses a `[1,1,1]` binary MLP and enumerates the lower
+endpoint, midpoint, and upper endpoint of every input and parameter interval.
+Its reference BCE gradients are computed by an independent analytic formula.
+When the hidden preactivation is exactly zero, the check evaluates both
+derivative endpoint choices, 0 and 1, so the implementation is tested against
+the complete constant step box used by the mathematical construction.  The
+default cases also vary the sign of the downstream weight to exercise the
+bilinear backward products.  This remains a finite implementation diagnostic,
+not a substitute for the real-arithmetic compositional proof.
+
 ## Terminal status
 
 Runs distinguish `completed`, `diverged`, `numerical_error`, `failed`, and `interrupted`. `cert_at_T` is

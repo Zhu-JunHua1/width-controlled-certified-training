@@ -121,6 +121,24 @@ Future runs now persist `initial_state.pt` in addition to selected and horizon
 checkpoints, so the preregistered initial/selected/expanded same-box audits can
 be reproduced without reconstructing a state.
 
+## Deterministic small-network implementation validation
+
+A checkpoint-free dense-grid validator is now part of the public CLI as
+`width-cert validate-small-bound`.  The default suite contains five
+`[1,1,1]` BCE networks covering crossing, active, and inactive hidden ReLUs and
+positive, negative, and mixed-sign downstream intervals.  Each input and
+parameter interval is evaluated at its lower endpoint, midpoint, and upper
+endpoint for both targets.  At an exact ReLU kink, both derivative endpoint
+choices in `[0,1]` are checked using an independent analytic gradient formula.
+
+The current development run evaluated 2,430 parameter/input grid points, 2,484
+admitted gradients (including the additional kink choices), and 49,680
+method-gradient coordinates across IBP, the AGT-inspired hybrid, full CROWN,
+Full-IC, and Hybrid-IC.  It found zero enclosure violations at tolerance
+`1e-5` and zero floating-point intersection fallbacks.  These numbers are an
+implementation regression result only; the generated manifest explicitly sets
+`is_real_arithmetic_soundness_proof` to false.
+
 ## Theory-scope revision (draft complete)
 
 [`theory_revision_v2.md`](theory_revision_v2.md) now fixes the theorem scope

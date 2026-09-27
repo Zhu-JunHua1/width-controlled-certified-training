@@ -12,6 +12,7 @@ from .analysis import (
     analyze_checkpoint,
     export_report,
     summarize_results,
+    validate_small_network_grid,
 )
 from .data import create_mnist_split_manifest
 from .experiments import load_config, load_configs, run_experiment, select_seeds
@@ -121,6 +122,12 @@ def main(argv=None) -> int:
     )
     paired_parser.add_argument("specification", help="YAML hypothesis specification")
     paired_parser.add_argument("output", help="output paired-statistics CSV")
+    grid_parser = subparsers.add_parser(
+        "validate-small-bound",
+        help="run a deterministic tiny-network gradient-bound implementation check",
+    )
+    grid_parser.add_argument("output_dir", help="directory for the CSV and JSON reports")
+    grid_parser.add_argument("--tolerance", type=float, default=1e-5)
     args = parser.parse_args(argv)
     if args.command == "summarize":
         summary = summarize_results(
@@ -211,6 +218,15 @@ def main(argv=None) -> int:
                 f"p={result.p_value:.6g} holm={result.holm_adjusted_p:.6g}"
             )
         print(f"paired report written to {Path(args.output).resolve()}")
+        return 0
+    if args.command == "validate-small-bound":
+        report, manifest = validate_small_network_grid(
+            args.output_dir,
+            tolerance=args.tolerance,
+        )
+        print(f"dense-grid rows written to {report}")
+        print(f"dense-grid manifest written to {manifest}")
+        print("note: finite grid enumeration is an implementation check, not a proof")
         return 0
     if args.command == "run":
         if args.config and args.config_file:
