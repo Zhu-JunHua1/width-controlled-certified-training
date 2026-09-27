@@ -157,3 +157,24 @@ development-population schedule target are recorded in
 [`final_study_design_draft.md`](final_study_design_draft.md). These stages begin
 only after the remaining split manifests and resolved configuration hashes are
 complete and the study lock is committed.
+
+## Protocol-v2 primary candidates (test still sealed)
+
+The prospective P1/P2 primary configurations are now recorded under
+`configs/protocol_v2_candidates/`. Both use a common IC calibration certifier,
+request both IBP and IC only for later frozen checkpoint evaluation, and keep
+`test_access: disabled`. The files therefore authorize calibration-only gates,
+not final paper metrics.
+
+Seed selection was rerun on the new data roles and recorded in
+`study_locks/candidate_audits/`. P1 selected the first ten valid starts from
+`[0,25)`: `0,4,5,6,7,9,10,11,12,13`. The initial P2 pool `[0,15)` yielded only
+five valid 50% starts under the new disjoint MNIST split. Before any final-test
+access, the prospective range was expanded to `[0,50)` and the first ten valid
+starts were fixed as `0,5,9,11,13,17,19,21,29,30`. This is deterministic
+calibration-only filtering; no seed was selected from certification results.
+
+The TwoMoons train/calibration/test seeds were derived without reading a metric
+from the SHA-256 phrase documented beside the candidate configuration. The
+MNIST candidate uses the committed index manifest whose test indices have not
+been evaluated by protocol-v2.

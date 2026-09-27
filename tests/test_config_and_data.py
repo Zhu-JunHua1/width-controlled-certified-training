@@ -287,5 +287,21 @@ def test_public_environment_metadata_omits_absolute_dependency_path():
     assert "auto_lirpa_python_tree_sha256" in metadata
 
 
+def test_protocol_v2_primary_candidates_keep_final_test_sealed():
+    root = Path(__file__).resolve().parents[1]
+    p1 = load_config(root / "configs" / "protocol_v2_candidates" / "P1_twomoons_primary.yaml")
+    p2 = load_config(root / "configs" / "protocol_v2_candidates" / "P2_mnist17_primary.yaml")
+    for config in (p1, p2):
+        assert config.evaluation.test_access == "disabled"
+        assert config.evaluation.analysis_tier == "development"
+        assert config.evaluation.selection_bound_method == "IC"
+        assert config.evaluation.bound_methods == ("IBP", "IC")
+        assert config.seed_selection.count == 10
+        assert config.pretraining.target_accuracy == 0.50
+    assert p1.data.test_seed != 42
+    assert p2.data.split_manifest == "data_splits/final_mnist17_protocol_v2.json"
+    assert p2.seed_selection.stop == 50
+
+
 def test_log_schema_version_reflects_frozen_study_provenance():
     assert SCHEMA_VERSION == "2.2"
