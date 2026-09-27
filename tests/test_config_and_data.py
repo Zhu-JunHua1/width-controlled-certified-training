@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import torch
 from sklearn.datasets import make_moons
 from sklearn.model_selection import train_test_split
 
@@ -301,6 +302,62 @@ def test_protocol_v2_primary_candidates_keep_final_test_sealed():
     assert p1.data.test_seed != 42
     assert p2.data.split_manifest == "data_splits/final_mnist17_protocol_v2.json"
     assert p2.seed_selection.stop == 50
+
+
+def test_synthetic_separate_strategy_uses_all_three_split_seeds():
+    first = build_dataset(
+        "synthetic:3",
+        train_size=30,
+        calibration_size=30,
+        test_size=30,
+        seed=11,
+        calibration_seed=22,
+        test_seed=33,
+        strategy="separate",
+    )
+    changed_calibration = build_dataset(
+        "synthetic:3",
+        train_size=30,
+        calibration_size=30,
+        test_size=30,
+        seed=11,
+        calibration_seed=23,
+        test_seed=33,
+        strategy="separate",
+    )
+    assert torch.equal(first.train_inputs, changed_calibration.train_inputs)
+    assert not torch.equal(
+        first.calibration_inputs, changed_calibration.calibration_inputs
+    )
+    assert torch.equal(first.test_inputs, changed_calibration.test_inputs)
+
+
+def test_synthetic_combined_split_preserves_legacy_single_seed_behavior():
+    first = build_dataset(
+        "synthetic:4",
+        train_size=30,
+        calibration_size=30,
+        test_size=30,
+        seed=11,
+        calibration_seed=22,
+        test_seed=33,
+        strategy="combined_split",
+    )
+    changed_unused_seeds = build_dataset(
+        "synthetic:4",
+        train_size=30,
+        calibration_size=30,
+        test_size=30,
+        seed=11,
+        calibration_seed=44,
+        test_seed=55,
+        strategy="combined_split",
+    )
+    assert torch.equal(first.train_inputs, changed_unused_seeds.train_inputs)
+    assert torch.equal(
+        first.calibration_inputs, changed_unused_seeds.calibration_inputs
+    )
+    assert torch.equal(first.test_inputs, changed_unused_seeds.test_inputs)
 
 
 def test_log_schema_version_reflects_frozen_study_provenance():

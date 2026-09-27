@@ -219,37 +219,57 @@ def _synthetic(
     calibration_size: int,
     test_size: int,
     seed: int,
+    calibration_seed: int,
+    test_seed: int,
+    strategy: str,
 ) -> DatasetBundle:
     features = 6
-    inputs, targets = make_classification(
-        n_samples=train_size + calibration_size + test_size,
-        n_features=features,
-        n_informative=features,
-        n_redundant=0,
-        n_repeated=0,
-        n_classes=classes,
-        n_clusters_per_class=1,
-        class_sep=2.0,
-        random_state=seed,
-    )
-    order = np.random.RandomState(seed).permutation(len(inputs))
-    inputs, targets = inputs[order].astype("float32"), targets[order]
-    scaler = StandardScaler().fit(inputs[:train_size])
-    train_x = _tensor(scaler.transform(inputs[:train_size]))
-    calibration_end = train_size + calibration_size
-    calibration_x = _tensor(scaler.transform(inputs[train_size:calibration_end]))
-    test_x = _tensor(
-        scaler.transform(inputs[calibration_end:calibration_end + test_size])
-    )
+    def generate(size: int, split_seed: int):
+        inputs, targets = make_classification(
+            n_samples=size,
+            n_features=features,
+            n_informative=features,
+            n_redundant=0,
+            n_repeated=0,
+            n_classes=classes,
+            n_clusters_per_class=1,
+            class_sep=2.0,
+            random_state=split_seed,
+        )
+        order = np.random.RandomState(split_seed).permutation(len(inputs))
+        return inputs[order].astype("float32"), targets[order]
+
+    if strategy == "combined_split":
+        inputs, targets = generate(
+            train_size + calibration_size + test_size,
+            seed,
+        )
+        train_inputs, train_targets = inputs[:train_size], targets[:train_size]
+        calibration_end = train_size + calibration_size
+        calibration_inputs = inputs[train_size:calibration_end]
+        calibration_targets = targets[train_size:calibration_end]
+        test_inputs = inputs[calibration_end:calibration_end + test_size]
+        test_targets = targets[calibration_end:calibration_end + test_size]
+    elif strategy == "separate":
+        train_inputs, train_targets = generate(train_size, seed)
+        calibration_inputs, calibration_targets = generate(
+            calibration_size, calibration_seed
+        )
+        test_inputs, test_targets = generate(test_size, test_seed)
+    else:
+        raise ValueError(f"unknown synthetic data strategy: {strategy}")
+
+    scaler = StandardScaler().fit(train_inputs)
+    train_x = _tensor(scaler.transform(train_inputs))
+    calibration_x = _tensor(scaler.transform(calibration_inputs))
+    test_x = _tensor(scaler.transform(test_inputs))
     return DatasetBundle(
         train_x,
-        torch.tensor(targets[:train_size], dtype=torch.long),
+        torch.tensor(train_targets, dtype=torch.long),
         calibration_x,
-        torch.tensor(targets[train_size:calibration_end], dtype=torch.long),
+        torch.tensor(calibration_targets, dtype=torch.long),
         test_x,
-        torch.tensor(
-            targets[calibration_end:calibration_end + test_size], dtype=torch.long
-        ),
+        torch.tensor(test_targets, dtype=torch.long),
         features,
         classes,
         f"Synthetic {classes}-class",
@@ -296,5 +316,14 @@ def build_dataset(
         classes = int(spec.split(":", 1)[1])
         if classes < 3:
             raise ValueError("synthetic multi-class experiments require at least three classes")
-        return _synthetic(classes, train_size, calibration_size, test_size, seed)
+        return _synthetic(
+            classes,
+            train_size,
+            calibration_size,
+            test_size,
+            seed,
+            calibration_seed,
+            test_seed,
+            strategy,
+        )
     raise ValueError(f"unknown dataset spec: {spec}")

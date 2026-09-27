@@ -195,3 +195,10 @@ IBP/IC peaked at 58.2%/58.6% and ended at 0%, while the adaptive arms ended at
 completed their horizons, and no numerical IC fallback occurred on P2. These
 single-start calibration results are feasibility gates, not final effect
 estimates, and will not be quoted as independent test performance.
+
+The synthetic multi-class registry was also corrected before protocol-v2
+freezing. `strategy: separate` now generates train, calibration, and test sets
+from their three declared seeds and fits preprocessing on train only. The
+retired P5 configurations explicitly request `combined_split`, preserving the
+legacy one-pool behavior for provenance. Regression tests verify that changing
+the calibration seed changes only the calibration split under the new strategy.

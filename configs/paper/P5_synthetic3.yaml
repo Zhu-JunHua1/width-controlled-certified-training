@@ -8,6 +8,7 @@ data:
   seed: 10123310
   calibration_seed: 314159
   test_seed: 42
+  strategy: combined_split
 model:
   hidden_layers: 1
   hidden_width: 20
