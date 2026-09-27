@@ -1,0 +1,1893 @@
+{
+  "groups": {
+    "depth": {
+      "candidate_range": {
+        "count": 10,
+        "group": null,
+        "manifest": null,
+        "start": 0,
+        "stop": 150
+      },
+      "candidates_evaluated": [
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.40800002217292786,
+              "pretraining_accuracy": 0.5120000243186951,
+              "pretraining_epochs": 4
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5060000419616699,
+              "pretraining_epochs": 158
+            }
+          },
+          "seed": 0
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 211
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 1
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.550000011920929,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5700000524520874,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 2
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 30
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 58
+            }
+          },
+          "seed": 3
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 25
+            }
+          },
+          "seed": 4
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 5
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5560000538825989,
+              "reason": "prepared_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 38
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 123
+            }
+          },
+          "seed": 6
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5360000133514404,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 49
+            }
+          },
+          "seed": 7
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.3660000264644623,
+              "pretraining_accuracy": 0.5060000419616699,
+              "pretraining_epochs": 2
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 8
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49000000953674316,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 2
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 10
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 55
+            }
+          },
+          "seed": 9
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.4320000112056732,
+              "pretraining_accuracy": 0.5080000162124634,
+              "pretraining_epochs": 5
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 10
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 1
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 26
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 11
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 10
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 12
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49000000953674316,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 4
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 13
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5180000066757202,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 14
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 52
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5040000081062317,
+              "pretraining_epochs": 113
+            }
+          },
+          "seed": 15
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5360000133514404,
+              "reason": "prepared_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 22
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 72
+            }
+          },
+          "seed": 16
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 9
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 13
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 40
+            }
+          },
+          "seed": 17
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5840000510215759,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 18
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5060000419616699,
+              "pretraining_epochs": 11
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 50
+            }
+          },
+          "seed": 19
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5320000052452087,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 124
+            }
+          },
+          "seed": 20
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 6
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.6240000128746033,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 21
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5580000281333923,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 22
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5680000185966492,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 80
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 23
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5660000443458557,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 169
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 24
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5260000228881836,
+              "reason": "prepared_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 25
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5360000133514404,
+              "reason": "prepared_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 73
+            }
+          },
+          "seed": 26
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.6240000128746033,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 32
+            }
+          },
+          "seed": 27
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5800000429153442,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 11
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 104
+            }
+          },
+          "seed": 28
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 14
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 48
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 187
+            }
+          },
+          "seed": 29
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 23
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 193
+            }
+          },
+          "seed": 30
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 14
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5080000162124634,
+              "pretraining_epochs": 228
+            }
+          },
+          "seed": 31
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.6800000071525574,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.4300000071525574,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 8
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 32
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 33
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.4960000216960907,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 1
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 34
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.7860000133514404,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 4
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 62
+            }
+          },
+          "seed": 35
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5700000524520874,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 7
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 36
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 1
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 16
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5260000228881836,
+              "reason": "prepared_accuracy_above_maximum"
+            }
+          },
+          "seed": 37
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5160000324249268,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 38
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 59
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 176
+            }
+          },
+          "seed": 39
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 72
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 40
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 7
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 41
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 41
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5080000162124634,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 65
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 42
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 52
+            }
+          },
+          "seed": 43
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 8
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 44
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.527999997138977,
+              "reason": "prepared_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 88
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 45
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 46
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 63
+            }
+          },
+          "seed": 47
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 48
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5200000405311584,
+              "reason": "prepared_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 145
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 68
+            }
+          },
+          "seed": 49
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 173
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 50
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.6520000100135803,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5120000243186951,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 51
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5900000333786011,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.7700000405311584,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 52
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.4620000123977661,
+              "pretraining_accuracy": 0.5060000419616699,
+              "pretraining_epochs": 2
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 175
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 53
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 12
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 11
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 46
+            }
+          },
+          "seed": 54
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5680000185966492,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49400001764297485,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 2
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 49
+            }
+          },
+          "seed": 55
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 40
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 56
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 2
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 38
+            }
+          },
+          "seed": 57
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49400001764297485,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 5
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 26
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 58
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5040000081062317,
+              "pretraining_epochs": 8
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 93
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 189
+            }
+          },
+          "seed": 59
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5080000162124634,
+              "pretraining_epochs": 12
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 20
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 60
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.8380000591278076,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 20
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 61
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.4960000216960907,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 3
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 11
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 39
+            }
+          },
+          "seed": 62
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 3
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 63
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 15
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 64
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 21
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 17
+            }
+          },
+          "seed": 65
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 191
+            }
+          },
+          "seed": 66
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 5
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 67
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5360000133514404,
+              "reason": "prepared_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 68
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 67
+            }
+          },
+          "seed": 69
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5560000538825989,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 54
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 139
+            }
+          },
+          "seed": 70
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 46
+            }
+          },
+          "seed": 71
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 34
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 72
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 37
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.628000020980835,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 73
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 13
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 77
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 217
+            }
+          },
+          "seed": 74
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 35
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 75
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 5
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 76
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 12
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 77
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 40
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 260
+            }
+          },
+          "seed": 78
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 51
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 104
+            }
+          },
+          "seed": 79
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5040000081062317,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 48
+            }
+          },
+          "seed": 80
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": false,
+              "accuracy": 0.5139999985694885,
+              "reason": "initial_accuracy_above_maximum"
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 98
+            },
+            "P6_v2_L3": {
+              "accepted": false,
+              "accuracy": 0.5020000338554382,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 81
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P6_v2_L1": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5040000081062317,
+              "pretraining_epochs": 10
+            },
+            "P6_v2_L2": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 42
+            },
+            "P6_v2_L3": {
+              "accepted": true,
+              "initial_accuracy": 0.49800002574920654,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 69
+            }
+          },
+          "seed": 82
+        }
+      ],
+      "members": [
+        "P6_v2_L1",
+        "P6_v2_L2",
+        "P6_v2_L3"
+      ],
+      "selected_seeds": [
+        9,
+        17,
+        29,
+        30,
+        54,
+        59,
+        62,
+        74,
+        79,
+        82
+      ],
+      "selection_rule": "first_candidates_accepted_by_every_member",
+      "test_metrics_read": false
+    }
+  },
+  "schema_version": "1.0"
+}

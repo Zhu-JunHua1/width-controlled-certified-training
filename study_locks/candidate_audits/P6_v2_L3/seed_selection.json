@@ -1,0 +1,104 @@
+{
+  "accepted": [
+    {
+      "initial_accuracy": 0.49800002574920654,
+      "pretraining_accuracy": 0.5,
+      "pretraining_epochs": 55,
+      "seed": 9
+    },
+    {
+      "initial_accuracy": 0.49800002574920654,
+      "pretraining_accuracy": 0.5020000338554382,
+      "pretraining_epochs": 40,
+      "seed": 17
+    },
+    {
+      "initial_accuracy": 0.49800002574920654,
+      "pretraining_accuracy": 0.5,
+      "pretraining_epochs": 187,
+      "seed": 29
+    },
+    {
+      "initial_accuracy": 0.49800002574920654,
+      "pretraining_accuracy": 0.5,
+      "pretraining_epochs": 193,
+      "seed": 30
+    },
+    {
+      "initial_accuracy": 0.49800002574920654,
+      "pretraining_accuracy": 0.5020000338554382,
+      "pretraining_epochs": 46,
+      "seed": 54
+    },
+    {
+      "initial_accuracy": 0.49800002574920654,
+      "pretraining_accuracy": 0.5,
+      "pretraining_epochs": 189,
+      "seed": 59
+    },
+    {
+      "initial_accuracy": 0.49800002574920654,
+      "pretraining_accuracy": 0.5,
+      "pretraining_epochs": 39,
+      "seed": 62
+    },
+    {
+      "initial_accuracy": 0.49800002574920654,
+      "pretraining_accuracy": 0.5,
+      "pretraining_epochs": 217,
+      "seed": 74
+    },
+    {
+      "initial_accuracy": 0.49800002574920654,
+      "pretraining_accuracy": 0.5,
+      "pretraining_epochs": 104,
+      "seed": 79
+    },
+    {
+      "initial_accuracy": 0.49800002574920654,
+      "pretraining_accuracy": 0.5,
+      "pretraining_epochs": 69,
+      "seed": 82
+    }
+  ],
+  "candidate_range": {
+    "count": 10,
+    "group": "depth",
+    "manifest": "study_locks/candidate_audits/P6_shared_seeds.json",
+    "start": 0,
+    "stop": 150
+  },
+  "candidate_seeds": [
+    9,
+    17,
+    29,
+    30,
+    54,
+    59,
+    62,
+    74,
+    79,
+    82
+  ],
+  "rejected": [],
+  "schema_version": "2.2",
+  "selected_seeds": [
+    9,
+    17,
+    29,
+    30,
+    54,
+    59,
+    62,
+    74,
+    79,
+    82
+  ],
+  "selection_completed": true,
+  "selection_manifest": {
+    "group": "depth",
+    "path": "study_locks/candidate_audits/P6_shared_seeds.json",
+    "rule": "first_candidates_accepted_by_every_member",
+    "sha256": "5214152aee39480dbb9704b0763f2776f37b2e74b8bba40825cbed18710a6e7b"
+  }
+}

@@ -1,0 +1,50 @@
+base:
+  name: P3_protocol_v2_base
+  output_dir: results/protocol_v2_candidates/P3/base
+  data:
+    dataset: twomoons
+    train_size: 100
+    calibration_size: 500
+    test_size: 500
+    seed: 902882306
+    calibration_seed: 2783311725
+    test_seed: 2788144449
+    strategy: separate
+  model: {hidden_layers: 2, hidden_width: 20}
+  pretraining:
+    enabled: true
+    target_accuracy: 0.50
+    maximum_initial_accuracy: 0.50
+    maximum_final_accuracy: 0.52
+    minimum_accuracy_gain: 0.002
+    step_size: 0.02
+    optimizer: sgd
+  training:
+    horizon: 40
+    base_step: 0.1
+    retention: 0.8
+  evaluation:
+    input_domain: same_as_training
+    selection_bound_method: IC
+    bound_methods: [IBP, IC]
+    test_access: disabled
+    analysis_tier: secondary
+  radii: [0.001]
+  seed_selection: {start: 0, stop: 100, count: 10}
+  methods: [IBP, IC, IC+IWAU]
+  echo_epochs: false
+
+variants:
+  - overrides: {name: P3_v2_depth_L1, output_dir: results/protocol_v2_candidates/P3/depth_L1, model: {hidden_layers: 1}, seed_selection: {manifest: study_locks/candidate_audits/P3_shared_seeds.json, group: depth}}
+  - overrides: {name: P3_v2_depth_L2, output_dir: results/protocol_v2_candidates/P3/depth_L2, model: {hidden_layers: 2}, seed_selection: {manifest: study_locks/candidate_audits/P3_shared_seeds.json, group: depth}}
+  - overrides: {name: P3_v2_depth_L3, output_dir: results/protocol_v2_candidates/P3/depth_L3, model: {hidden_layers: 3}, seed_selection: {manifest: study_locks/candidate_audits/P3_shared_seeds.json, group: depth}}
+  - overrides: {name: P3_v2_depth_L4, output_dir: results/protocol_v2_candidates/P3/depth_L4, model: {hidden_layers: 4}, seed_selection: {manifest: study_locks/candidate_audits/P3_shared_seeds.json, group: depth}}
+  - overrides: {name: P3_v2_width_10, output_dir: results/protocol_v2_candidates/P3/width_10, model: {hidden_layers: 1, hidden_width: 10}, seed_selection: {stop: 500, manifest: study_locks/candidate_audits/P3_shared_seeds.json, group: width}}
+  - overrides: {name: P3_v2_width_20, output_dir: results/protocol_v2_candidates/P3/width_20, model: {hidden_layers: 1, hidden_width: 20}, seed_selection: {stop: 500, manifest: study_locks/candidate_audits/P3_shared_seeds.json, group: width}}
+  - overrides: {name: P3_v2_width_40, output_dir: results/protocol_v2_candidates/P3/width_40, model: {hidden_layers: 1, hidden_width: 40}, seed_selection: {stop: 500, manifest: study_locks/candidate_audits/P3_shared_seeds.json, group: width}}
+  - overrides: {name: P3_v2_width_80, output_dir: results/protocol_v2_candidates/P3/width_80, model: {hidden_layers: 1, hidden_width: 80}, seed_selection: {stop: 500, manifest: study_locks/candidate_audits/P3_shared_seeds.json, group: width}}
+  - overrides: {name: P3_v2_step_005, output_dir: results/protocol_v2_candidates/P3/step_005, training: {base_step: 0.05}, seed_selection: {manifest: study_locks/candidate_audits/P3_shared_seeds.json, group: step}}
+  - overrides: {name: P3_v2_step_01, output_dir: results/protocol_v2_candidates/P3/step_01, training: {base_step: 0.1}, seed_selection: {manifest: study_locks/candidate_audits/P3_shared_seeds.json, group: step}}
+  - overrides: {name: P3_v2_step_02, output_dir: results/protocol_v2_candidates/P3/step_02, training: {base_step: 0.2}, seed_selection: {manifest: study_locks/candidate_audits/P3_shared_seeds.json, group: step}}
+  - overrides: {name: P3_v2_step_05, output_dir: results/protocol_v2_candidates/P3/step_05, training: {base_step: 0.5}, seed_selection: {manifest: study_locks/candidate_audits/P3_shared_seeds.json, group: step}}
+  - overrides: {name: P3_v2_step_10, output_dir: results/protocol_v2_candidates/P3/step_10, training: {base_step: 1.0}, seed_selection: {manifest: study_locks/candidate_audits/P3_shared_seeds.json, group: step}}

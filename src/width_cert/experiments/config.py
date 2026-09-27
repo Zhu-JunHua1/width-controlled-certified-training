@@ -115,6 +115,8 @@ class SeedSelectionConfig:
     start: int
     stop: int
     count: int
+    manifest: str | None = None
+    group: str | None = None
 
     def candidates(self) -> tuple[int, ...]:
         return tuple(range(self.start, self.stop))
@@ -208,6 +210,10 @@ class ExperimentConfig:
             raise ValueError("seed_selection.count must be positive")
         if self.seed_selection.count > len(candidates):
             raise ValueError("seed_selection.count exceeds the candidate-pool size")
+        if (self.seed_selection.manifest is None) != (self.seed_selection.group is None):
+            raise ValueError(
+                "seed_selection.manifest and seed_selection.group must be set together"
+            )
         # An adaptive arm needs a same-bound fixed pre-run for calibration, but
         # the runner treats that pre-run as an internal dependency when the
         # corresponding fixed arm is not requested for reporting.

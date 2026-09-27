@@ -6,6 +6,7 @@ import csv
 import json
 import time
 from dataclasses import asdict, dataclass
+import hashlib
 from pathlib import Path
 
 import torch
@@ -113,6 +114,123 @@ class _PreparedStart:
     pretraining: PretrainingResult
 
 
+def _file_sha256(path: str | Path) -> str:
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _manifest_selected_seeds(config: ExperimentConfig) -> tuple[list[int], dict | None]:
+    selection = config.seed_selection
+    if selection.manifest is None:
+        return list(selection.candidates()), None
+    path = Path(selection.manifest)
+    if not path.is_file():
+        raise FileNotFoundError(f"seed-selection manifest not found: {path}")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if payload.get("schema_version") != "1.0":
+        raise ValueError("seed-selection manifest must use schema_version 1.0")
+    groups = payload.get("groups")
+    if not isinstance(groups, dict) or selection.group not in groups:
+        raise ValueError(
+            f"seed-selection group {selection.group!r} is missing from {path}"
+        )
+    group = groups[selection.group]
+    seeds = group.get("selected_seeds") if isinstance(group, dict) else None
+    if not isinstance(seeds, list) or any(not isinstance(seed, int) for seed in seeds):
+        raise ValueError("seed-selection manifest selected_seeds must be an integer list")
+    if len(seeds) != selection.count or len(set(seeds)) != len(seeds):
+        raise ValueError(
+            "seed-selection manifest must contain exactly the requested unique starts"
+        )
+    allowed = set(selection.candidates())
+    if any(seed not in allowed for seed in seeds):
+        raise ValueError("seed-selection manifest contains a seed outside the candidate range")
+    return seeds, {
+        "path": selection.manifest,
+        "group": selection.group,
+        "sha256": _file_sha256(path),
+        "rule": group.get("selection_rule"),
+    }
+
+
+def _shared_bundle(config: ExperimentConfig) -> DatasetBundle | None:
+    if config.data.per_training_seed:
+        return None
+    return build_dataset(
+        config.data.dataset,
+        train_size=config.data.train_size,
+        calibration_size=config.data.calibration_size,
+        test_size=config.data.test_size,
+        seed=config.data.seed,
+        calibration_seed=config.data.calibration_seed,
+        test_seed=config.data.test_seed,
+        strategy=config.data.strategy,
+        split_manifest=config.data.split_manifest,
+    )
+
+
+def _prepare_candidate(
+    config: ExperimentConfig,
+    seed: int,
+    device: torch.device,
+    shared_bundle: DatasetBundle | None,
+) -> _PreparedStart:
+    bundle = shared_bundle or build_dataset(
+        config.data.dataset,
+        train_size=config.data.train_size,
+        calibration_size=config.data.calibration_size,
+        test_size=config.data.test_size,
+        seed=seed,
+        calibration_seed=config.data.calibration_seed,
+        test_seed=config.data.test_seed,
+        strategy=config.data.strategy,
+        split_manifest=config.data.split_manifest,
+    )
+    train_inputs = bundle.train_inputs.to(device)
+    train_targets = bundle.train_targets.to(device)
+    calibration_inputs = bundle.calibration_inputs.to(device)
+    calibration_targets = bundle.calibration_targets.to(device)
+    train_loader = DataLoader(
+        TensorDataset(train_inputs, train_targets),
+        batch_size=config.data.train_size,
+        shuffle=False,
+    )
+    dimensions = layer_dimensions(
+        bundle.input_dim,
+        config.model.hidden_width,
+        bundle.output_dim,
+        config.model.hidden_layers,
+    )
+    torch.manual_seed(seed)
+    point_model = PretrainingMLP(dimensions).to(device)
+    result = pretrain_to_accuracy(
+        point_model,
+        train_loader,
+        calibration_inputs,
+        calibration_targets,
+        target_accuracy=config.pretraining.target_accuracy,
+        maximum_initial_accuracy=config.pretraining.maximum_initial_accuracy,
+        maximum_final_accuracy=config.pretraining.maximum_final_accuracy,
+        step_size=config.pretraining.step_size,
+        maximum_epochs=config.pretraining.maximum_epochs,
+        minimum_epochs=config.pretraining.minimum_epochs,
+        minimum_accuracy_gain=config.pretraining.minimum_accuracy_gain,
+        multiclass=bundle.output_dim > 1,
+        enabled=config.pretraining.enabled,
+        optimizer_name=config.pretraining.optimizer,
+    )
+    return _PreparedStart(
+        seed=seed,
+        bundle=bundle,
+        dimensions=dimensions,
+        initial_state=initialize_interval_state(point_model),
+        pretraining=result,
+    )
+
+
 def _prepare_starts(
     config: ExperimentConfig,
     device: torch.device,
@@ -121,24 +239,12 @@ def _prepare_starts(
 ) -> list[_PreparedStart]:
     """Select shared starts before running any certified-training method."""
 
-    shared_bundle = None
-    if not config.data.per_training_seed:
-        shared_bundle = build_dataset(
-            config.data.dataset,
-            train_size=config.data.train_size,
-            calibration_size=config.data.calibration_size,
-            test_size=config.data.test_size,
-            seed=config.data.seed,
-            calibration_seed=config.data.calibration_seed,
-            test_seed=config.data.test_seed,
-            strategy=config.data.strategy,
-            split_manifest=config.data.split_manifest,
-        )
+    shared_bundle = _shared_bundle(config)
 
     selected: list[_PreparedStart] = []
     accepted_rows: list[dict[str, object]] = []
     rejected_rows: list[dict[str, object]] = []
-    candidates = config.seed_selection.candidates()
+    candidates, selection_manifest = _manifest_selected_seeds(config)
     reporter.selection_start(
         candidate_start=config.seed_selection.start,
         candidate_stop=config.seed_selection.stop,
@@ -149,51 +255,8 @@ def _prepare_starts(
     for candidate_index, seed in enumerate(candidates, start=1):
         if len(selected) >= config.seed_selection.count:
             break
-        bundle = shared_bundle or build_dataset(
-            config.data.dataset,
-            train_size=config.data.train_size,
-            calibration_size=config.data.calibration_size,
-            test_size=config.data.test_size,
-            seed=seed,
-            calibration_seed=config.data.calibration_seed,
-            test_seed=config.data.test_seed,
-            strategy=config.data.strategy,
-            split_manifest=config.data.split_manifest,
-        )
-        train_inputs = bundle.train_inputs.to(device)
-        train_targets = bundle.train_targets.to(device)
-        calibration_inputs = bundle.calibration_inputs.to(device)
-        calibration_targets = bundle.calibration_targets.to(device)
-        train_loader = DataLoader(
-            TensorDataset(train_inputs, train_targets),
-            batch_size=config.data.train_size,
-            shuffle=False,
-        )
-        dimensions = layer_dimensions(
-            bundle.input_dim,
-            config.model.hidden_width,
-            bundle.output_dim,
-            config.model.hidden_layers,
-        )
-        torch.manual_seed(seed)
-        point_model = PretrainingMLP(dimensions).to(device)
         try:
-            result = pretrain_to_accuracy(
-                point_model,
-                train_loader,
-                calibration_inputs,
-                calibration_targets,
-                target_accuracy=config.pretraining.target_accuracy,
-                maximum_initial_accuracy=config.pretraining.maximum_initial_accuracy,
-                maximum_final_accuracy=config.pretraining.maximum_final_accuracy,
-                step_size=config.pretraining.step_size,
-                maximum_epochs=config.pretraining.maximum_epochs,
-                minimum_epochs=config.pretraining.minimum_epochs,
-                minimum_accuracy_gain=config.pretraining.minimum_accuracy_gain,
-                multiclass=bundle.output_dim > 1,
-                enabled=config.pretraining.enabled,
-                optimizer_name=config.pretraining.optimizer,
-            )
+            prepared = _prepare_candidate(config, seed, device, shared_bundle)
         except PretrainingRejected as error:
             rejected_rows.append(
                 {
@@ -211,15 +274,8 @@ def _prepare_starts(
                 reason=error.reason,
             )
             continue
-        selected.append(
-            _PreparedStart(
-                seed=seed,
-                bundle=bundle,
-                dimensions=dimensions,
-                initial_state=initialize_interval_state(point_model),
-                pretraining=result,
-            )
-        )
+        selected.append(prepared)
+        result = prepared.pretraining
         accepted_rows.append(
             {
                 "seed": seed,
@@ -246,6 +302,7 @@ def _prepare_starts(
         "accepted": accepted_rows,
         "rejected": rejected_rows,
         "selection_completed": len(selected) == config.seed_selection.count,
+        "selection_manifest": selection_manifest,
     }
     (output_root / "seed_selection.json").write_text(
         json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8"
@@ -261,6 +318,98 @@ def _prepare_starts(
             f"{config.seed_selection.stop})"
         )
     return selected
+
+
+def select_common_seeds(
+    configs: list[ExperimentConfig],
+    output_path: str | Path,
+    *,
+    group: str,
+) -> Path:
+    """Select the first seeds accepted by every configuration in a group."""
+
+    if not configs:
+        raise ValueError("common seed selection requires at least one configuration")
+    for config in configs:
+        config.validate()
+        if config.seed_selection.manifest is not None:
+            raise ValueError("common seed selection inputs must not already use a manifest")
+    reference = configs[0].seed_selection
+    if any(
+        (config.seed_selection.start, config.seed_selection.stop, config.seed_selection.count)
+        != (reference.start, reference.stop, reference.count)
+        for config in configs[1:]
+    ):
+        raise ValueError("common seed selection requires one candidate range and count")
+    if len({config.name for config in configs}) != len(configs):
+        raise ValueError("common seed selection configuration names must be unique")
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    shared_bundles = {config.name: _shared_bundle(config) for config in configs}
+    selected = []
+    candidate_records = []
+    for seed in reference.candidates():
+        if len(selected) >= reference.count:
+            break
+        outcomes = {}
+        accepted_by_all = True
+        for config in configs:
+            try:
+                prepared = _prepare_candidate(
+                    config,
+                    seed,
+                    device,
+                    shared_bundles[config.name],
+                )
+                result = prepared.pretraining
+                outcomes[config.name] = {
+                    "accepted": True,
+                    "initial_accuracy": result.initial_accuracy,
+                    "pretraining_accuracy": result.final_accuracy,
+                    "pretraining_epochs": result.epochs,
+                }
+            except PretrainingRejected as error:
+                accepted_by_all = False
+                outcomes[config.name] = {
+                    "accepted": False,
+                    "reason": error.reason,
+                    "accuracy": error.accuracy,
+                }
+        if accepted_by_all:
+            selected.append(seed)
+        candidate_records.append(
+            {
+                "seed": seed,
+                "accepted_by_all": accepted_by_all,
+                "outcomes": outcomes,
+            }
+        )
+    if len(selected) != reference.count:
+        raise RuntimeError(
+            f"only {len(selected)} of {reference.count} common starts passed within "
+            f"[{reference.start}, {reference.stop})"
+        )
+
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists():
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if payload.get("schema_version") != "1.0" or not isinstance(
+            payload.get("groups"), dict
+        ):
+            raise ValueError("existing common seed manifest has an incompatible schema")
+    else:
+        payload = {"schema_version": "1.0", "groups": {}}
+    payload["groups"][group] = {
+        "selection_rule": "first_candidates_accepted_by_every_member",
+        "candidate_range": asdict(reference),
+        "members": [config.name for config in configs],
+        "selected_seeds": selected,
+        "candidates_evaluated": candidate_records,
+        "test_metrics_read": False,
+    }
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    return path
 
 
 def select_seeds(

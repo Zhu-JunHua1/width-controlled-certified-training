@@ -304,6 +304,63 @@ def test_protocol_v2_primary_candidates_keep_final_test_sealed():
     assert p2.seed_selection.stop == 50
 
 
+def test_every_protocol_v2_candidate_keeps_final_test_sealed():
+    root = Path(__file__).resolve().parents[1] / "configs" / "protocol_v2_candidates"
+    configs = [
+        config
+        for path in sorted(root.glob("*.yaml"))
+        for config in load_configs(path)
+    ]
+    assert len(configs) == 25
+    assert len({config.name for config in configs}) == len(configs)
+    assert all(config.evaluation.test_access == "disabled" for config in configs)
+    assert all(config.evaluation.study_lock is None for config in configs)
+    assert all(
+        config.evaluation.analysis_tier in {"development", "secondary", "exploratory"}
+        for config in configs
+    )
+    assert all(config.data.test_seed != 42 for config in configs)
+
+
+def test_protocol_v2_trend_axes_use_shared_seed_manifests():
+    root = Path(__file__).resolve().parents[1] / "configs" / "protocol_v2_candidates"
+    grouped = {
+        "P3_twomoons_sensitivity.yaml": {
+            "P3_v2_depth_L1": "depth",
+            "P3_v2_depth_L2": "depth",
+            "P3_v2_depth_L3": "depth",
+            "P3_v2_depth_L4": "depth",
+            "P3_v2_width_10": "width",
+            "P3_v2_width_20": "width",
+            "P3_v2_width_40": "width",
+            "P3_v2_width_80": "width",
+            "P3_v2_step_005": "step",
+            "P3_v2_step_01": "step",
+            "P3_v2_step_02": "step",
+            "P3_v2_step_05": "step",
+            "P3_v2_step_10": "step",
+        },
+        "P6_mnist17_depth.yaml": {
+            "P6_v2_L1": "depth",
+            "P6_v2_L2": "depth",
+            "P6_v2_L3": "depth",
+        },
+        "P7_twomoons_stability.yaml": {
+            "P7_v2_T20": "training_length",
+            "P7_v2_T40": "training_length",
+            "P7_v2_T60": "training_length",
+            "P7_v2_T80": "training_length",
+        },
+    }
+    for filename, expected in grouped.items():
+        configs = {config.name: config for config in load_configs(root / filename)}
+        assert set(configs) == set(expected)
+        for name, group in expected.items():
+            selection = configs[name].seed_selection
+            assert selection.manifest is not None
+            assert selection.group == group
+
+
 def test_synthetic_separate_strategy_uses_all_three_split_seeds():
     first = build_dataset(
         "synthetic:3",

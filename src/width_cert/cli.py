@@ -15,7 +15,13 @@ from .analysis import (
     validate_small_network_grid,
 )
 from .data import create_mnist_split_manifest
-from .experiments import load_config, load_configs, run_experiment, select_seeds
+from .experiments import (
+    load_config,
+    load_configs,
+    run_experiment,
+    select_common_seeds,
+    select_seeds,
+)
 
 
 def main(argv=None) -> int:
@@ -45,6 +51,19 @@ def main(argv=None) -> int:
     select_parser.add_argument(
         "--output-dir",
         help="optional directory for seed_selection.json (defaults to config output_dir)",
+    )
+    common_seed_parser = subparsers.add_parser(
+        "select-common-seeds",
+        help="select starts accepted by every named variant in a sweep",
+    )
+    common_seed_parser.add_argument("config", help="YAML sweep configuration")
+    common_seed_parser.add_argument("output", help="shared seed-selection manifest JSON")
+    common_seed_parser.add_argument("--group", required=True, help="manifest group name")
+    common_seed_parser.add_argument(
+        "--member",
+        action="append",
+        required=True,
+        help="configuration name to include; repeat for every group member",
     )
     summary_parser = subparsers.add_parser("summarize", help="aggregate a results.csv over seeds")
     summary_parser.add_argument("results", help="path to results.csv")
@@ -218,6 +237,21 @@ def main(argv=None) -> int:
                 f"p={result.p_value:.6g} holm={result.holm_adjusted_p:.6g}"
             )
         print(f"paired report written to {Path(args.output).resolve()}")
+        return 0
+    if args.command == "select-common-seeds":
+        configs = load_configs(args.config)
+        by_name = {config.name: config for config in configs}
+        missing = [name for name in args.member if name not in by_name]
+        if missing:
+            raise ValueError(f"unknown common-seed members: {missing}")
+        if len(set(args.member)) != len(args.member):
+            raise ValueError("common-seed members must not contain duplicates")
+        output = select_common_seeds(
+            [by_name[name] for name in args.member],
+            args.output,
+            group=args.group,
+        )
+        print(f"common seed-selection manifest written to {output}")
         return 0
     if args.command == "validate-small-bound":
         report, manifest = validate_small_network_grid(

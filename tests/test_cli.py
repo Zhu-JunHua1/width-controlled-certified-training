@@ -92,3 +92,39 @@ def test_validate_small_bound_cli_writes_reports(monkeypatch, capsys, tmp_path):
     assert observed == {"output_dir": str(tmp_path), "tolerance": 1e-6}
     terminal = capsys.readouterr().out
     assert "implementation check, not a proof" in terminal
+
+
+def test_select_common_seeds_cli_uses_named_members(monkeypatch, tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    config = root / "configs" / "protocol_v2_candidates" / "P7_twomoons_stability.yaml"
+    observed = {}
+
+    def fake_select(configs, output, *, group):
+        observed["names"] = [item.name for item in configs]
+        observed["output"] = output
+        observed["group"] = group
+        return Path(output)
+
+    monkeypatch.setattr(cli, "select_common_seeds", fake_select)
+    output = tmp_path / "shared.json"
+    assert (
+        cli.main(
+            [
+                "select-common-seeds",
+                str(config),
+                str(output),
+                "--group",
+                "training_length",
+                "--member",
+                "P7_v2_T20",
+                "--member",
+                "P7_v2_T80",
+            ]
+        )
+        == 0
+    )
+    assert observed == {
+        "names": ["P7_v2_T20", "P7_v2_T80"],
+        "output": str(output),
+        "group": "training_length",
+    }

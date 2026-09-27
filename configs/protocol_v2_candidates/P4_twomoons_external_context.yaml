@@ -1,0 +1,31 @@
+# Exploratory same-source local comparison. External literature rows remain
+# contextual only and are not treated as paired protocol-v2 observations.
+name: P4_twomoons_external_context_v2
+output_dir: results/protocol_v2_candidates/P4_twomoons_external_context
+data:
+  dataset: twomoons
+  train_size: 100
+  calibration_size: 200
+  test_size: 200
+  seed: 3652403543
+  calibration_seed: 1262029184
+  test_seed: 558077497
+  per_training_seed: true
+  strategy: separate
+model: {hidden_layers: 1, hidden_width: 20}
+pretraining: {enabled: false}
+training:
+  horizon: 20
+  base_step: 2.0
+  retention: 0.8
+evaluation:
+  input_domain: clean
+  selection_bound_method: IC
+  bound_methods: [IBP, IC]
+  test_access: disabled
+  analysis_tier: exploratory
+radii: [0.0001, 0.001, 0.01]
+seed_selection: {start: 0, stop: 10, count: 10}
+methods: [AGT-Hybrid, IC, IC+IWAU]
+echo_epochs: false
+

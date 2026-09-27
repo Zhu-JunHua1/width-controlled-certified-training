@@ -202,3 +202,18 @@ from their three declared seeds and fits preprocessing on train only. The
 retired P5 configurations explicitly request `combined_split`, preserving the
 legacy one-pool behavior for provenance. Regression tests verify that changing
 the calibration seed changes only the calibration split under the new strategy.
+
+The remaining P3--P7 candidate families are also encoded with final-test access
+disabled. Trend axes now consume committed common-start manifests instead of
+selecting a different accepted set for each architecture or horizon. The
+calibration-only common sets are:
+
+- P3 depth: `0,10,11,17,26,31,34,35,40,43`;
+- P3 width: `14,23,47,58,62,80,96,101,109,120`;
+- P3 step size: `0,4,7,9,10,11,12,17,18,19`;
+- P6 MNIST depth: `9,17,29,30,54,59,62,74,79,82`;
+- P7 horizon: `0,4,5,6,7,9,10,11,12,13`.
+
+The selector records every member's pretraining outcome and explicitly states
+that no test metric was read. Candidate ranges were widened only when the
+original range contained fewer than ten starts accepted by all members.

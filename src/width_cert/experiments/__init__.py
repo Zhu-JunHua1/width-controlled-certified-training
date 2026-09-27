@@ -19,6 +19,14 @@ def select_seeds(config, output_dir=None):
 
     return _select_seeds(config, output_dir)
 
+
+def select_common_seeds(configs, output_path, *, group):
+    """Select shared starts accepted by every supplied configuration."""
+
+    from .runner import select_common_seeds as _select_common_seeds
+
+    return _select_common_seeds(configs, output_path, group=group)
+
 __all__ = [
     "ExperimentConfig",
     "SeedSelectionConfig",
@@ -26,6 +34,7 @@ __all__ = [
     "load_configs",
     "run_experiment",
     "select_seeds",
+    "select_common_seeds",
     "experiment_config_sha256",
     "verify_frozen_study_lock",
 ]

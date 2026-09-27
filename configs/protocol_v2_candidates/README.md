@@ -27,3 +27,26 @@ retained. During the freeze gate, MNIST candidates `[0,15)` produced only five
 valid starts under the new split, so the prospective pool was widened to
 `[0,50)` before final-test access. This design decision and every rejection are
 recorded in `seed_selection.json`.
+
+For a trend axis, every variant uses the same accepted starts. A shared
+manifest records the first ten candidate seeds that satisfy the declared
+pretraining rule for every member of the axis. P3 uses separate `depth`,
+`width`, and `step` groups; P6 uses one MNIST depth group; P7 uses one
+training-length group. The P3 width pool was prospectively widened from
+`[0,100)` to `[0,500)` after the original pool yielded only seven common
+starts, and the P6 depth pool from `[0,75)` to `[0,150)` after it yielded only
+eight. Both changes occurred while test access remained disabled. No
+certification metric was used to accept or reject a seed.
+
+The directory now contains all planned P1--P7 protocol families. P1/P2 are
+prospective primary analyses; P3, P5, P6, and P7 are secondary; P4 is an
+exploratory same-source context comparison because literature rows cannot be
+treated as paired observations from this implementation. Every candidate keeps
+test access disabled. Their final analysis tiers and study-lock path are added
+only in separately hashed frozen configurations.
+
+P5 uses independently generated train/calibration/test samples. Its split seeds
+were derived in the same metric-free way from the phrases ending in
+`p5-synthetic3` and `p5-synthetic4`; the exact values are committed in the YAML
+files. The retired P5 files explicitly retain `strategy: combined_split` so the
+old exploratory protocol remains reproducible.
