@@ -133,4 +133,9 @@ implementation checks are explicitly separated.
 
 ## Stage C/D — frozen representative and full experiments (not started)
 
-These stages begin only after the lock file is complete and committed.
+The prospective choices for endpoints, four primary hypotheses, Holm-corrected
+paired tests, common-certifier comparisons, same-box claims, and the
+development-population schedule target are recorded in
+[`final_study_design_draft.md`](final_study_design_draft.md). These stages begin
+only after the remaining split manifests and resolved configuration hashes are
+complete and the study lock is committed.
