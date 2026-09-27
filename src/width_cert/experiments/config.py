@@ -20,6 +20,7 @@ class DataConfig:
     test_seed: int = 42
     per_training_seed: bool = False
     strategy: str = "separate"
+    split_manifest: str | None = None
 
 
 @dataclass(frozen=True)
@@ -168,6 +169,14 @@ class ExperimentConfig:
             )
         if self.pretraining.optimizer not in {"sgd", "adam"}:
             raise ValueError("pretraining.optimizer must be 'sgd' or 'adam'")
+        if (
+            self.evaluation.test_access == "frozen_final"
+            and self.data.dataset.startswith("mnist:")
+            and not self.data.split_manifest
+        ):
+            raise ValueError(
+                "frozen-final MNIST protocols require data.split_manifest"
+            )
         if not 0 <= self.pretraining.minimum_epochs <= self.pretraining.maximum_epochs:
             raise ValueError(
                 "pretraining.minimum_epochs must be between zero and maximum_epochs"

@@ -1,6 +1,7 @@
 """Protocol configuration and dataset-construction tests."""
 
 from dataclasses import replace
+import json
 from pathlib import Path
 
 import numpy as np
@@ -9,6 +10,7 @@ from sklearn.datasets import make_moons
 from sklearn.model_selection import train_test_split
 
 from width_cert.data import build_dataset
+from width_cert.data.registry import _load_mnist_indices
 from width_cert.experiments import load_config, load_configs
 from width_cert.experiments.environment import environment_metadata
 from width_cert.logging.records import SCHEMA_VERSION
@@ -127,6 +129,20 @@ def test_final_test_access_requires_a_study_lock():
         candidate.validate()
 
 
+def test_frozen_final_mnist_requires_an_explicit_split_manifest():
+    config = load_config(ROOT / "configs" / "paper" / "P2_mnist17_ablation.yaml")
+    candidate = replace(
+        config,
+        evaluation=replace(
+            config.evaluation,
+            test_access="frozen_final",
+            study_lock="study_locks/frozen.yaml",
+        ),
+    )
+    with pytest.raises(ValueError, match="split_manifest"):
+        candidate.validate()
+
+
 def test_coefficient_scale_cannot_weaken_the_calibrated_guarantee():
     config = load_config(ROOT / "configs" / "examples" / "example_twomoons.yaml")
     config = replace(
@@ -187,6 +203,49 @@ def test_every_public_config_has_an_explicit_calibration_split():
         for config in load_configs(path):
             assert config.data.calibration_size > 0
             assert config.data.calibration_seed != config.data.test_seed
+
+
+def test_frozen_mnist_manifest_requires_exact_disjoint_indices():
+    path = ROOT / "tests" / ".test-output" / "mnist17-split.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(
+            {
+                "schema_version": "1.0",
+                "dataset": "mnist:1,7",
+                "train_indices": [0, 2],
+                "calibration_indices": [1, 3],
+                "test_indices": [0, 1, 2],
+            }
+        ),
+        encoding="utf-8",
+    )
+    train, calibration, test = _load_mnist_indices(
+        path,
+        pair=(1, 7),
+        train_size=2,
+        calibration_size=2,
+        test_size=3,
+        official_train_size=4,
+        official_test_size=3,
+    )
+    assert train.tolist() == [0, 2]
+    assert calibration.tolist() == [1, 3]
+    assert test.tolist() == [0, 1, 2]
+
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload["calibration_indices"] = [2, 3]
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(ValueError, match="must be disjoint"):
+        _load_mnist_indices(
+            path,
+            pair=(1, 7),
+            train_size=2,
+            calibration_size=2,
+            test_size=3,
+            official_train_size=4,
+            official_test_size=3,
+        )
 
 
 def test_public_environment_metadata_omits_absolute_dependency_path():

@@ -140,6 +140,7 @@ def analyze_checkpoint(
         calibration_seed=config.data.calibration_seed,
         test_seed=config.data.test_seed,
         strategy=config.data.strategy,
+        split_manifest=config.data.split_manifest,
     )
     if bundle.output_dim != 1:
         raise ValueError("the sampled Lipschitz-margin diagnostic currently supports binary data")

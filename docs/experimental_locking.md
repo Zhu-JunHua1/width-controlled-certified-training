@@ -9,7 +9,10 @@ Before a final run:
 
 1. Copy `study_locks/experiment_lock.template.yaml` to a versioned lock file.
 2. Freeze the code commit, dependency lock, auto_LiRPA source hash, data-split
-   manifest, protocols, endpoints, and statistical hypotheses.
+   manifest, protocols, endpoints, update-budget rule, and statistical
+   hypotheses. Each protocol entry contains the SHA-256 of its fully resolved
+   configuration; an MNIST protocol also contains the SHA-256 of its explicit
+   index manifest.
 3. Set `status: frozen`, commit the lock, and record that commit identifier.
 4. Give the final configuration `test_access: frozen_final` and the committed
    lock path. The runner rejects draft/incomplete locks and unlisted protocols.
@@ -29,3 +32,10 @@ protocol-v2 smoke runs is considered exposed. It must be listed under
 The primary endpoint is `test_cert_at_calibration_selected_checkpoint`.
 `test_cert_at_T` is secondary.  Parameter widths, gradient-bound widths, and
 effective steps are calibration-only mechanism diagnostics.
+
+For MNIST, a frozen-final configuration is rejected unless it supplies an
+explicit split manifest. The manifest records indices in the filtered official
+train and test sets, is checked for exact sizes, uniqueness, bounds, and
+train/calibration disjointness, and is content-hashed in the study lock. This
+prevents a nominally new seed from silently reusing an exposed development
+sample.

@@ -89,6 +89,7 @@ def audit_same_box(
         calibration_seed=config.data.calibration_seed,
         test_seed=config.data.test_seed,
         strategy=config.data.strategy,
+        split_manifest=config.data.split_manifest,
     )
     dimensions = layer_dimensions(
         bundle.input_dim,

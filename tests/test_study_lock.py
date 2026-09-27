@@ -26,13 +26,45 @@ def _write_lock(*, status="frozen", protocol="final_protocol", unresolved=False)
                     "dependency_lock_sha256": value,
                     "auto_lirpa_source_sha256": value,
                 },
+                "data": {
+                    "split_policy": "explicit_train_calibration_test",
+                    "split_hash_manifest": value,
+                    "retired_test_seeds": [42],
+                    "final_calibration_seeds": [271828],
+                    "final_test_seeds": [161803],
+                },
+                "selection": {
+                    "split": "calibration",
+                    "checkpoint_rule": "first_argmax_calibration_certified_accuracy",
+                    "retention": 0.8,
+                    "tie_breaking": "earliest_epoch",
+                },
+                "endpoints": {
+                    "primary": "test_cert_at_calibration_selected_checkpoint",
+                    "secondary": "test_cert_at_T",
+                },
+                "evaluation": {
+                    "test_certifiers": ["IBP", "IC"],
+                    "require_common_test_samples": True,
+                    "require_common_checkpoint_rule": True,
+                },
+                "update_budget": {
+                    "comparison_start": "common_calibration_t_p",
+                    "scalar_target_source": "frozen_development_median",
+                    "complete_cost_includes_fixed_pre_run": True,
+                },
                 "statistics": {
                     "hypotheses": ["H1"],
                     "sidedness": "one-sided",
                     "multiple_comparison_family": "primary",
                     "correction": "Holm",
                 },
-                "protocols": [protocol],
+                "protocols": {
+                    protocol: {
+                        "config_sha256": value,
+                        "split_manifest_sha256": "not_applicable",
+                    }
+                },
             }
         ),
         encoding="utf-8",
@@ -42,9 +74,17 @@ def _write_lock(*, status="frozen", protocol="final_protocol", unresolved=False)
 
 def test_complete_frozen_lock_authorizes_only_enumerated_protocol():
     path = _write_lock()
-    assert verify_frozen_study_lock(path, protocol_name="final_protocol")["status"] == "frozen"
+    assert verify_frozen_study_lock(
+        path,
+        protocol_name="final_protocol",
+        config_sha256="resolved",
+    )["status"] == "frozen"
     with pytest.raises(ValueError, match="not authorized"):
-        verify_frozen_study_lock(path, protocol_name="unlisted")
+        verify_frozen_study_lock(
+            path,
+            protocol_name="unlisted",
+            config_sha256="resolved",
+        )
 
 
 @pytest.mark.parametrize(
@@ -54,4 +94,18 @@ def test_complete_frozen_lock_authorizes_only_enumerated_protocol():
 def test_incomplete_or_draft_lock_cannot_open_final_test(status, unresolved, message):
     path = _write_lock(status=status, unresolved=unresolved)
     with pytest.raises(ValueError, match=message):
-        verify_frozen_study_lock(path, protocol_name="final_protocol")
+        verify_frozen_study_lock(
+            path,
+            protocol_name="final_protocol",
+            config_sha256="resolved",
+        )
+
+
+def test_frozen_lock_rejects_a_changed_resolved_config():
+    path = _write_lock()
+    with pytest.raises(ValueError, match="config hash"):
+        verify_frozen_study_lock(
+            path,
+            protocol_name="final_protocol",
+            config_sha256="changed",
+        )

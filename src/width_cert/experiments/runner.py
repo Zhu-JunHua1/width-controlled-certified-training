@@ -45,7 +45,7 @@ from .config import ExperimentConfig
 from .environment import environment_metadata
 from .evaluation import evaluate_frozen_checkpoints
 from .pretrain import PretrainingRejected, PretrainingResult, pretrain_to_accuracy
-from .study_lock import verify_frozen_study_lock
+from .study_lock import experiment_config_sha256, verify_frozen_study_lock
 
 
 def _method_parts(name: str) -> tuple[BoundMethod, str]:
@@ -128,6 +128,7 @@ def _prepare_starts(
             calibration_seed=config.data.calibration_seed,
             test_seed=config.data.test_seed,
             strategy=config.data.strategy,
+            split_manifest=config.data.split_manifest,
         )
 
     selected: list[_PreparedStart] = []
@@ -153,6 +154,7 @@ def _prepare_starts(
             calibration_seed=config.data.calibration_seed,
             test_seed=config.data.test_seed,
             strategy=config.data.strategy,
+            split_manifest=config.data.split_manifest,
         )
         train_inputs = bundle.train_inputs.to(device)
         train_targets = bundle.train_targets.to(device)
@@ -292,6 +294,8 @@ def run_experiment(config: ExperimentConfig) -> Path:
         verify_frozen_study_lock(
             config.evaluation.study_lock,
             protocol_name=config.name,
+            config_sha256=experiment_config_sha256(config),
+            split_manifest=config.data.split_manifest,
         )
     output_root = Path(config.output_dir).resolve()
     output_root.mkdir(parents=True, exist_ok=True)
