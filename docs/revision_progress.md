@@ -186,3 +186,12 @@ three-update MNIST path gate, calibration cert@T was 58.2% for IBP and 58.6%
 for IC. These values validate execution and cost only and are not paper-effect
 estimates. Neither short gate exhibited a reference decline, so the IWAU
 branches correctly returned `not_required` and reused their fixed trajectories.
+
+Full-horizon one-start representative gates were then completed without test
+access. On P1, fixed IBP/IC reached calibration peaks of 54.6%/64.8% and both
+ended at 0%, whereas IBP+IWAU/IC+IWAU ended at 56.2%/65.0%. On P2, fixed
+IBP/IC peaked at 58.2%/58.6% and ended at 0%, while the adaptive arms ended at
+60.6%/61.4%. Both tasks exercised the `active` IWAU branch, all four methods
+completed their horizons, and no numerical IC fallback occurred on P2. These
+single-start calibration results are feasibility gates, not final effect
+estimates, and will not be quoted as independent test performance.
