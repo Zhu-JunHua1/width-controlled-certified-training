@@ -1,0 +1,54 @@
+schema_version: "1.0"
+family: primary
+correction: Holm
+bootstrap:
+  samples: 50000
+  seed: 20260927
+
+# Paths are relative to the result root passed to `width-cert paired-report`.
+hypotheses:
+  - id: H1_TwoMoons_training_bound
+    results: P1_twomoons_protocol_v2/results.csv
+    radius: 0.01
+    method_a: IBP
+    method_b: IC
+    evaluation_method: IBP
+    endpoint: test_cert_at_selected
+    alternative: greater
+    missing_as_zero: false
+    expected_pairs: 10
+
+  - id: H1_MNIST17_training_bound
+    results: P2_mnist17_protocol_v2/results.csv
+    radius: 0.001
+    method_a: IBP
+    method_b: IC
+    evaluation_method: IBP
+    endpoint: test_cert_at_selected
+    alternative: greater
+    missing_as_zero: false
+    expected_pairs: 10
+
+  - id: H2_TwoMoons_width_control
+    results: P1_twomoons_protocol_v2/results.csv
+    radius: 0.01
+    method_a: IC
+    method_b: IC+IWAU
+    evaluation_method: IC
+    endpoint: test_cert_at_T
+    alternative: greater
+    # A numerically diverged trajectory has no raw cert@T. Assigning zero is
+    # the preregistered endpoint analysis policy, never a mutation of raw logs.
+    missing_as_zero: true
+    expected_pairs: 10
+
+  - id: H2_MNIST17_width_control
+    results: P2_mnist17_protocol_v2/results.csv
+    radius: 0.001
+    method_a: IC
+    method_b: IC+IWAU
+    evaluation_method: IC
+    endpoint: test_cert_at_T
+    alternative: greater
+    missing_as_zero: true
+    expected_pairs: 10

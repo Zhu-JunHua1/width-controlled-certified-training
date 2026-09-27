@@ -6,7 +6,13 @@ import argparse
 from importlib.resources import as_file, files
 from pathlib import Path
 
-from .analysis import audit_same_box, analyze_checkpoint, export_report, summarize_results
+from .analysis import (
+    analyze_paired_hypotheses,
+    audit_same_box,
+    analyze_checkpoint,
+    export_report,
+    summarize_results,
+)
 from .data import create_mnist_split_manifest
 from .experiments import load_config, load_configs, run_experiment, select_seeds
 
@@ -105,6 +111,16 @@ def main(argv=None) -> int:
         action="store_true",
         help="reconstruct the legacy consecutive train/calibration split",
     )
+    paired_parser = subparsers.add_parser(
+        "paired-report",
+        help="evaluate a preregistered paired hypothesis family with Holm correction",
+    )
+    paired_parser.add_argument(
+        "results",
+        help="frozen results.csv or root for per-hypothesis relative result paths",
+    )
+    paired_parser.add_argument("specification", help="YAML hypothesis specification")
+    paired_parser.add_argument("output", help="output paired-statistics CSV")
     args = parser.parse_args(argv)
     if args.command == "summarize":
         summary = summarize_results(
@@ -180,6 +196,21 @@ def main(argv=None) -> int:
             legacy_consecutive_calibration=args.legacy_consecutive_calibration,
         )
         print(f"MNIST split manifest written to {output}")
+        return 0
+    if args.command == "paired-report":
+        results = analyze_paired_hypotheses(
+            args.results,
+            args.specification,
+            args.output,
+        )
+        for result in results:
+            print(
+                f"{result.hypothesis}: mean_diff={result.mean_difference:.3f} "
+                f"95%CI=[{result.ci95_lower:.3f},{result.ci95_upper:.3f}] "
+                f"sign={result.positive}/{result.zero}/{result.negative} "
+                f"p={result.p_value:.6g} holm={result.holm_adjusted_p:.6g}"
+            )
+        print(f"paired report written to {Path(args.output).resolve()}")
         return 0
     if args.command == "run":
         if args.config and args.config_file:

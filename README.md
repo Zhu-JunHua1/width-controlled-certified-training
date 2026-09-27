@@ -210,6 +210,21 @@ The command reads no model metric. It records only filtered official-dataset
 indices and provenance; the loader validates the manifest and the frozen study
 lock binds its SHA-256.
 
+After all frozen protocols in a preregistered family finish, compute paired
+differences, an exact sign test, paired bootstrap confidence intervals, and
+Holm-adjusted p-values with:
+
+```bash
+width-cert paired-report results/final \
+  study_locks/primary_hypotheses.yaml \
+  results/final/primary_paired_statistics.csv
+```
+
+Each hypothesis declares its result path, radius, ordered method pair, common
+test certifier, endpoint, direction, and expected number of paired seeds. A
+missing cert@T is converted to zero only when both the specification opts in
+and the raw run status is `diverged`; other missing data fail closed.
+
 ## Package layout
 
 | Path | Responsibility |
