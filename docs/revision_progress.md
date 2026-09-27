@@ -178,3 +178,11 @@ The TwoMoons train/calibration/test seeds were derived without reading a metric
 from the SHA-256 phrase documented beside the candidate configuration. The
 MNIST candidate uses the committed index manifest whose test indices have not
 been evaluated by protocol-v2.
+
+One-start calibration-only gates were then run on both candidate data roles.
+Every P1/P2 arm reached its short development horizon; every result row used
+`evaluation_method=not_evaluated`, and all test fields remained null. On the
+three-update MNIST path gate, calibration cert@T was 58.2% for IBP and 58.6%
+for IC. These values validate execution and cost only and are not paper-effect
+estimates. Neither short gate exhibited a reference decline, so the IWAU
+branches correctly returned `not_required` and reused their fixed trajectories.

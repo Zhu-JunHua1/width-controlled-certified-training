@@ -1,0 +1,38 @@
+# One-start calibration-only gate for the protocol-v2 P2 data roles.
+name: development_protocol_v2_P2_gate
+output_dir: results/development_protocol_v2_P2_gate
+data:
+  dataset: mnist:1,7
+  train_size: 100
+  calibration_size: 500
+  test_size: 500
+  seed: 55873755
+  calibration_seed: 261026576
+  test_seed: 1608498564
+  strategy: separate
+  split_manifest: data_splits/final_mnist17_protocol_v2.json
+model: {hidden_layers: 1, hidden_width: 10}
+pretraining:
+  enabled: true
+  target_accuracy: 0.50
+  maximum_initial_accuracy: 0.50
+  maximum_final_accuracy: 0.52
+  step_size: 0.0002
+  maximum_epochs: 8000
+  optimizer: adam
+training:
+  horizon: 3
+  base_step: 0.1
+  retention: 0.8
+  gradient_batch_size: 4
+  max_gradient_width: 50.0
+evaluation:
+  input_domain: same_as_training
+  selection_bound_method: IC
+  bound_methods: [IBP, IC]
+  test_access: disabled
+  analysis_tier: development
+radii: [0.001]
+seed_selection: {start: 0, stop: 1, count: 1}
+methods: [IBP, IC, IBP+IWAU, IC+IWAU]
+echo_epochs: false
