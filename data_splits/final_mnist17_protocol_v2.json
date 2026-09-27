@@ -504,7 +504,7 @@
   "dataset": "mnist:1,7",
   "excluded_manifests": [
     {
-      "sha256": "1ab8be9815c34c271a0b840f6a1d5b52d822a9d14873b319df0aefc913d55071"
+      "sha256": "a69a8ca2b74136818e8b6204029dbef80121ec05bce968a904e7f9141425b443"
     }
   ],
   "filtered_counts": {

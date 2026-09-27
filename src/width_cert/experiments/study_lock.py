@@ -10,6 +10,8 @@ from typing import Any
 
 import yaml
 
+from ..data.manifests import canonical_json_sha256
+
 
 def _is_unresolved(value: Any) -> bool:
     if value is None or value == "" or value == "TO_BE_FROZEN":
@@ -31,14 +33,6 @@ def experiment_config_sha256(config: Any) -> str:
         ensure_ascii=True,
     ).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
-
-
-def file_sha256(path: str | Path) -> str:
-    digest = hashlib.sha256()
-    with Path(path).open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def verify_frozen_study_lock(
@@ -85,7 +79,7 @@ def verify_frozen_study_lock(
             raise ValueError(
                 f"protocol {protocol_name!r} has no frozen split-manifest hash"
             )
-        if file_sha256(split_manifest) != expected_manifest_hash:
+        if canonical_json_sha256(split_manifest) != expected_manifest_hash:
             raise ValueError(
                 f"protocol {protocol_name!r} split manifest does not match its frozen hash"
             )

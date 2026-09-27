@@ -9,8 +9,7 @@ import pytest
 from sklearn.datasets import make_moons
 from sklearn.model_selection import train_test_split
 
-from width_cert.data import build_dataset
-from width_cert.data import select_mnist_indices
+from width_cert.data import build_dataset, canonical_json_sha256, select_mnist_indices
 from width_cert.data.registry import _load_mnist_indices
 from width_cert.experiments import load_config, load_configs
 from width_cert.experiments.environment import environment_metadata
@@ -269,6 +268,16 @@ def test_mnist_manifest_selection_is_deterministic_disjoint_and_excludes_prior_d
     assert train.isdisjoint(calibration)
     assert (train | calibration).isdisjoint({0, 1, 2})
     assert test.isdisjoint({0, 1})
+
+
+def test_manifest_hash_is_independent_of_json_formatting():
+    output = ROOT / "tests" / ".test-output"
+    output.mkdir(parents=True, exist_ok=True)
+    compact = output / "manifest-compact.json"
+    pretty = output / "manifest-pretty.json"
+    compact.write_text('{"b":[2,3],"a":1}', encoding="utf-8")
+    pretty.write_text('{\r\n  "a": 1,\r\n  "b": [2, 3]\r\n}\r\n', encoding="utf-8")
+    assert canonical_json_sha256(compact) == canonical_json_sha256(pretty)
 
 
 def test_public_environment_metadata_omits_absolute_dependency_path():

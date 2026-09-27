@@ -20,9 +20,9 @@ SHA256("width-controlled-certified-training-protocol-v2-final-split")
 ```
 
 which gives train seed `55873755`, calibration seed `261026576`, and test seed
-`1608498564`. The final manifest records the SHA-256 of the retired manifest it
-excludes. The complete final manifest SHA-256 is
-`383a3c66ab2d565a028c9e7a64b1fc1592ca70cc91487bf70e2490fd9ee10c0c`.
+`1608498564`. The final manifest records the canonical-JSON SHA-256 of the
+retired manifest it excludes. The final manifest's canonical-JSON SHA-256 is
+`c47f88b92011d6d9893927b4811e15bb99290b74ec827a86f7038f3c7e7b9aec`.
 
 To reconstruct these files after installing the package and downloading the
 official MNIST files:
@@ -41,4 +41,5 @@ width-cert make-mnist-split data_splits/final_mnist17_protocol_v2.json \
 
 The loader validates schema version, dataset identity, exact split sizes,
 integer types, uniqueness, index ranges, and train/calibration disjointness.
-The frozen study lock additionally binds the final manifest by content hash.
+The frozen study lock additionally binds the final manifest by canonical JSON
+content hash, so whitespace and CRLF/LF differences do not change its identity.

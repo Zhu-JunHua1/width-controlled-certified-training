@@ -64,12 +64,17 @@ def select_mnist_indices(
     )
 
 
-def _sha256(path: str | Path) -> str:
-    digest = hashlib.sha256()
-    with Path(path).open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+def canonical_json_sha256(path: str | Path) -> str:
+    """Hash parsed JSON content independently of whitespace and line endings."""
+
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    encoded = json.dumps(
+        payload,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def create_mnist_split_manifest(
@@ -112,7 +117,7 @@ def create_mnist_split_manifest(
         excluded_train.update(int(value) for value in payload["train_indices"])
         excluded_train.update(int(value) for value in payload["calibration_indices"])
         excluded_test.update(int(value) for value in payload["test_indices"])
-        exclusion_records.append({"sha256": _sha256(path)})
+        exclusion_records.append({"sha256": canonical_json_sha256(path)})
 
     train_indices, calibration_indices, test_indices = select_mnist_indices(
         official_train_size=len(filtered_train),
