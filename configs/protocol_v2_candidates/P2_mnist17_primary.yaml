@@ -30,6 +30,8 @@ training:
   retention: 0.8
   gradient_batch_size: 4
   max_gradient_width: 50.0
+  schedule_target_final_step: 0.055974505841732025
+  step_decay_milestone_fraction: 0.5
 evaluation:
   input_domain: same_as_training
   selection_bound_method: IC
@@ -41,5 +43,5 @@ radii: [0.001]
 # the calibration-only 50% protocol are retained. The wider pool was fixed
 # before any protocol-v2 test evaluation because [0,15) yielded only five.
 seed_selection: {start: 0, stop: 50, count: 10}
-methods: [IBP, IC, IBP+IWAU, IC+IWAU]
+methods: [IBP, AGT-Hybrid, CROWN, IC, IBP+IWAU, IC+IWAU, IC+GlobalIWAU, IC+InverseTime, IC+Cosine, IC+StepDecay]
 echo_epochs: false

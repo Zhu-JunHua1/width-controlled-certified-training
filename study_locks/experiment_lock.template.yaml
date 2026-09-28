@@ -66,3 +66,6 @@ protocols:
     config_sha256: TO_BE_FROZEN
     # Use "not_applicable" only for generated datasets without an index file.
     split_manifest_sha256: TO_BE_FROZEN
+    # Hash a shared-start manifest when the protocol uses one; otherwise use
+    # "not_applicable". This prevents a post-freeze seed-set substitution.
+    seed_selection_manifest_sha256: TO_BE_FROZEN

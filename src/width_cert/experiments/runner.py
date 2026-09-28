@@ -453,6 +453,7 @@ def run_experiment(config: ExperimentConfig) -> Path:
             protocol_name=config.name,
             config_sha256=resolved_config_hash,
             split_manifest=config.data.split_manifest,
+            seed_selection_manifest=config.seed_selection.manifest,
         )
         study_lock_hash = canonical_mapping_sha256(study_lock_payload)
         protocol_lock = study_lock_payload["protocols"][config.name]

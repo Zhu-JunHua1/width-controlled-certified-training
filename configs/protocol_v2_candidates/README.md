@@ -45,6 +45,11 @@ treated as paired observations from this implementation. Every candidate keeps
 test access disabled. Their final analysis tiers and study-lock path are added
 only in separately hashed frozen configurations.
 
+P1/P2 include fixed IBP, AGT-inspired hybrid, Full-CROWN, and Full-IC arms;
+coordinate and global width-adaptive updates; and inverse-time, cosine, and
+step-decay controls matched to one development-frozen final mean step. This is
+the complete method set to be frozen, not a menu selected after test access.
+
 P5 uses independently generated train/calibration/test samples. Its split seeds
 were derived in the same metric-free way from the phrases ending in
 `p5-synthetic3` and `p5-synthetic4`; the exact values are committed in the YAML

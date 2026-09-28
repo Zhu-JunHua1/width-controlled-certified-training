@@ -217,3 +217,20 @@ calibration-only common sets are:
 The selector records every member's pretraining outcome and explicitly states
 that no test metric was read. Candidate ranges were widened only when the
 original range contained fewer than ten starts accepted by all members.
+
+Before freezing, the P1/P2 primary candidates were extended with the
+predeclared ordinary schedule controls (`InverseTime`, `Cosine`, and
+`StepDecay`), the scalar `GlobalIWAU` control, and fixed AGT-inspired hybrid
+and Full-CROWN training arms. Full-horizon, one-start calibration gates passed
+for every executable arm. On both tasks, coordinate-wise IWAU retained a
+higher terminal calibration certificate than GlobalIWAU, while all three
+matched-final-step time schedules ended at zero. The MNIST Full-CROWN gate
+diverged after attaining an early calibration peak; that status is preserved
+rather than rewritten as a completed zero endpoint. These are feasibility and
+failure-mode checks, not final test estimates.
+
+The complete 25-configuration frozen family is staged under
+`configs/protocol_v2_frozen/`. Each configuration names the same fail-closed
+study-lock path, and shared-start manifests are now themselves content-hashed
+by the lock verifier. Final test access remains impossible until the frozen
+lock is populated with the committed code and configuration hashes.

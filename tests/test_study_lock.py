@@ -63,6 +63,7 @@ def _write_lock(*, status="frozen", protocol="final_protocol", unresolved=False)
                     protocol: {
                         "config_sha256": value,
                         "split_manifest_sha256": "not_applicable",
+                        "seed_selection_manifest_sha256": "not_applicable",
                     }
                 },
             }
@@ -108,4 +109,20 @@ def test_frozen_lock_rejects_a_changed_resolved_config():
             path,
             protocol_name="final_protocol",
             config_sha256="changed",
+        )
+
+
+def test_frozen_lock_rejects_a_changed_seed_selection_manifest():
+    path = _write_lock()
+    lock = yaml.safe_load(path.read_text(encoding="utf-8"))
+    manifest = OUTPUT / "seeds.json"
+    manifest.write_text('{"schema_version":"1.0","groups":{}}', encoding="utf-8")
+    lock["protocols"]["final_protocol"]["seed_selection_manifest_sha256"] = "wrong"
+    path.write_text(yaml.safe_dump(lock), encoding="utf-8")
+    with pytest.raises(ValueError, match="seed-selection manifest"):
+        verify_frozen_study_lock(
+            path,
+            protocol_name="final_protocol",
+            config_sha256="resolved",
+            seed_selection_manifest=manifest,
         )

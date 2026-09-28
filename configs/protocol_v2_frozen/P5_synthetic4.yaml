@@ -1,0 +1,25 @@
+name: P5_synthetic4_protocol_v2
+output_dir: results/protocol_v2_final/P5_synthetic4
+data:
+  dataset: synthetic:4
+  train_size: 100
+  calibration_size: 300
+  test_size: 300
+  seed: 382109490
+  calibration_seed: 3738857715
+  test_seed: 1881035452
+  strategy: separate
+model: {hidden_layers: 1, hidden_width: 20}
+pretraining: {enabled: false}
+training: {horizon: 30, base_step: 0.1, retention: 0.8}
+evaluation:
+  input_domain: same_as_training
+  selection_bound_method: IC
+  bound_methods: [IBP, IC]
+  test_access: frozen_final
+  analysis_tier: secondary
+  study_lock: study_locks/protocol_v2_frozen.yaml
+radii: [0.005, 0.01, 0.02, 0.05]
+seed_selection: {start: 0, stop: 10, count: 10}
+methods: [IBP, IC, IC+IWAU]
+echo_epochs: false

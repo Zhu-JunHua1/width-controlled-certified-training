@@ -25,6 +25,8 @@ training:
   retention: 0.8
   gradient_batch_size: 4
   max_gradient_width: 50.0
+  schedule_target_final_step: 0.055974505841732025
+  step_decay_milestone_fraction: 0.5
 evaluation:
   input_domain: same_as_training
   selection_bound_method: IC
@@ -33,6 +35,5 @@ evaluation:
   analysis_tier: development
 radii: [0.01]
 seed_selection: {start: 0, stop: 1, count: 1}
-methods: [IBP, IC, IBP+IWAU, IC+IWAU]
+methods: [IBP, IC, IBP+IWAU, IC+IWAU, IC+GlobalIWAU, IC+InverseTime, IC+Cosine, IC+StepDecay]
 echo_epochs: false
-

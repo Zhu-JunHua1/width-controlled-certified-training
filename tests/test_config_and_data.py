@@ -361,6 +361,25 @@ def test_protocol_v2_trend_axes_use_shared_seed_manifests():
             assert selection.group == group
 
 
+def test_every_frozen_protocol_v2_config_is_fail_closed_by_one_lock():
+    root = Path(__file__).resolve().parents[1] / "configs" / "protocol_v2_frozen"
+    configs = [
+        config
+        for path in sorted(root.glob("*.yaml"))
+        for config in load_configs(path)
+    ]
+    assert len(configs) == 25
+    assert len({config.name for config in configs}) == len(configs)
+    assert all(config.evaluation.test_access == "frozen_final" for config in configs)
+    assert all(
+        config.evaluation.study_lock == "study_locks/protocol_v2_frozen.yaml"
+        for config in configs
+    )
+    by_name = {config.name: config for config in configs}
+    assert by_name["P1_twomoons_protocol_v2"].evaluation.analysis_tier == "primary"
+    assert by_name["P2_mnist17_protocol_v2"].evaluation.analysis_tier == "primary"
+
+
 def test_synthetic_separate_strategy_uses_all_three_split_seeds():
     first = build_dataset(
         "synthetic:3",

@@ -51,6 +51,7 @@ def verify_frozen_study_lock(
     protocol_name: str,
     config_sha256: str | None = None,
     split_manifest: str | Path | None = None,
+    seed_selection_manifest: str | Path | None = None,
 ) -> dict[str, Any]:
     """Fail closed unless a complete frozen lock authorizes the protocol."""
 
@@ -96,6 +97,22 @@ def verify_frozen_study_lock(
     elif expected_manifest_hash not in (None, "not_applicable"):
         raise ValueError(
             f"protocol {protocol_name!r} requires a split manifest that was not configured"
+        )
+    expected_seed_manifest_hash = protocol.get("seed_selection_manifest_sha256")
+    if seed_selection_manifest is not None:
+        if _is_unresolved(expected_seed_manifest_hash):
+            raise ValueError(
+                f"protocol {protocol_name!r} has no frozen seed-selection manifest hash"
+            )
+        if canonical_json_sha256(seed_selection_manifest) != expected_seed_manifest_hash:
+            raise ValueError(
+                f"protocol {protocol_name!r} seed-selection manifest does not match "
+                "its frozen hash"
+            )
+    elif expected_seed_manifest_hash not in (None, "not_applicable"):
+        raise ValueError(
+            f"protocol {protocol_name!r} requires a seed-selection manifest that "
+            "was not configured"
         )
     statistics = payload.get("statistics")
     required_statistics = (
