@@ -1,0 +1,179 @@
+schema_version: "1.0"
+status: frozen
+study_id: protocol-v2
+target_venue: IJAR
+
+code:
+  git_commit: a37e265e411915ff2f5432555ebadb747d27ded6
+  dependency_lock_sha256: 27d62072557620999fb58d533ef30fb4fb1121c5c7b507dcf53a48db02365df1
+  auto_lirpa_source_sha256: 6a8d960cdd013cbd63cc814d2e21e30ab2f3f23bada889eaf4a91f4be3994c73
+
+data:
+  split_policy: explicit_train_calibration_test
+  split_hash_manifest:
+    mnist17: c47f88b92011d6d9893927b4811e15bb99290b74ec827a86f7038f3c7e7b9aec
+    generated_data: seeds_frozen_in_resolved_configs
+  development_test_results_used_for_design: true
+  retired_test_seeds: [42]
+  final_calibration_seeds:
+    twomoons_primary: 2783311725
+    twomoons_external_context: 1262029184
+    synthetic3: 4183639674
+    synthetic4: 3738857715
+    mnist17: explicit_index_manifest
+  final_test_seeds:
+    twomoons_primary: 2788144449
+    twomoons_external_context: 558077497
+    synthetic3: 223818976
+    synthetic4: 1881035452
+    mnist17: explicit_index_manifest
+
+selection:
+  split: calibration
+  checkpoint_rule: first_argmax_calibration_certified_accuracy
+  retention: 0.8
+  tie_breaking: earliest_epoch
+  test_access: after_checkpoint_and_schedule_freeze_only
+
+endpoints:
+  primary: test_cert_at_calibration_selected_checkpoint
+  secondary: test_cert_at_T
+  safety_cost:
+    - test_clean_at_selected
+    - test_clean_at_T
+    - total_wall_time
+    - peak_device_memory
+    - numerical_intersection_fallbacks
+  mechanism_calibration_only:
+    - parameter_interval_width
+    - gradient_bound_width
+    - effective_step
+
+evaluation:
+  test_certifiers: [IBP, IC]
+  require_common_test_samples: true
+  require_common_checkpoint_rule: true
+
+update_budget:
+  common_prefix: fixed_update_through_calibration_selected_t_p
+  continuation_updates: equal_within_protocol
+  scalar_target_source: frozen_development_population_median
+  scalar_target_final_mean_step: 0.055974505841732025
+  global_width_rule: eta_base_over_1_plus_lambda_mean_omega
+  coordinate_rule: eta_base_over_1_plus_lambda_omega_i
+  complete_cost_includes_fixed_pre_run: true
+  report_bound_evaluations_wall_time_and_peak_memory: true
+
+statistics:
+  hypotheses:
+    - H1_TwoMoons_training_bound
+    - H1_MNIST17_training_bound
+    - H2_TwoMoons_width_control
+    - H2_MNIST17_width_control
+  sidedness: one-sided
+  multiple_comparison_family: four_primary_hypotheses
+  correction: Holm
+  bootstrap_samples: 50000
+  bootstrap_seed: 20260927
+
+protocols:
+  P1_twomoons_protocol_v2:
+    config_sha256: 8c8ac85a38477cd8ccd76cfbf32d3e96fa7bb4b5228e34ca99f12198eb866db9
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: not_applicable
+  P2_mnist17_protocol_v2:
+    config_sha256: aeb5da99a68b14391b0e4ef19f76865a8cdd00c44451119b307c306e68c38517
+    split_manifest_sha256: c47f88b92011d6d9893927b4811e15bb99290b74ec827a86f7038f3c7e7b9aec
+    seed_selection_manifest_sha256: not_applicable
+  P3_v2_depth_L1:
+    config_sha256: 2c9cc021084ba3d0cfbd44f07eded7bdf5e935034ebf9f76193453fd597b1b97
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 5d8833519a2622c2736e5d098208e6f5c2e425652dcdd79b825c3a56eae0b377
+  P3_v2_depth_L2:
+    config_sha256: f57ca77619bc7439de0272ae3f031ed536e54b4b4f69e5fb541288bb01631051
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 5d8833519a2622c2736e5d098208e6f5c2e425652dcdd79b825c3a56eae0b377
+  P3_v2_depth_L3:
+    config_sha256: b1da84506df2166c1e67c116a95bfe03f2130cb84f2396e119946489db79d6a4
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 5d8833519a2622c2736e5d098208e6f5c2e425652dcdd79b825c3a56eae0b377
+  P3_v2_depth_L4:
+    config_sha256: 85d04c884a7d37fa5ff231fddcde878d9bc81c09ec7588781ba0e27ed016ca51
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 5d8833519a2622c2736e5d098208e6f5c2e425652dcdd79b825c3a56eae0b377
+  P3_v2_width_10:
+    config_sha256: 06070d8888e86518adb71e1c1ab7e01b4ea2240f76e368c03cf9a72566246ecb
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 5d8833519a2622c2736e5d098208e6f5c2e425652dcdd79b825c3a56eae0b377
+  P3_v2_width_20:
+    config_sha256: a8a8369631b260eb1c71b81846b5054df62babb958228e7f174dbbc9f20becaf
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 5d8833519a2622c2736e5d098208e6f5c2e425652dcdd79b825c3a56eae0b377
+  P3_v2_width_40:
+    config_sha256: 507388849415bb7eac78dcfe7b377a68df9d5ea82529241c0aae2a7d6a474b4c
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 5d8833519a2622c2736e5d098208e6f5c2e425652dcdd79b825c3a56eae0b377
+  P3_v2_width_80:
+    config_sha256: 47292456d531a7ff983bd05c5d1fade4a8f9cb825464458d9e8481458a311eb7
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 5d8833519a2622c2736e5d098208e6f5c2e425652dcdd79b825c3a56eae0b377
+  P3_v2_step_005:
+    config_sha256: ed93d93658224376893d90d35ea16faa9ebc4f34dd49be24d3003660ee897bd9
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 5d8833519a2622c2736e5d098208e6f5c2e425652dcdd79b825c3a56eae0b377
+  P3_v2_step_01:
+    config_sha256: 50c7fd90e4dbf89aedfe0c27a83d94e4fc1fbca76d68268736626690d69117d9
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 5d8833519a2622c2736e5d098208e6f5c2e425652dcdd79b825c3a56eae0b377
+  P3_v2_step_02:
+    config_sha256: fe5f7cee4e5e13eb371e8ba97cf3644223054f0bc6c77724135c93fd2a61c637
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 5d8833519a2622c2736e5d098208e6f5c2e425652dcdd79b825c3a56eae0b377
+  P3_v2_step_05:
+    config_sha256: 34300318dba6b43180458abf92ed9e5886fe2de0e732eebba2eda798ace3e18f
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 5d8833519a2622c2736e5d098208e6f5c2e425652dcdd79b825c3a56eae0b377
+  P3_v2_step_10:
+    config_sha256: 825a6edb81148741631d1a46db9cb4945cf7e25fe47a13c60effb3e21a317239
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 5d8833519a2622c2736e5d098208e6f5c2e425652dcdd79b825c3a56eae0b377
+  P4_twomoons_external_context_v2:
+    config_sha256: 2181d59bb782abf7613974c125181a1459fc5ddc9c019cbd07257a198119f2be
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: not_applicable
+  P5_synthetic3_protocol_v2:
+    config_sha256: e65af9a41114ae363e03910258f0d397d89e87777fdf5384580e27f860473f24
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: not_applicable
+  P5_synthetic4_protocol_v2:
+    config_sha256: 44a8e4eeba4703393571e0feec56c1194433b14f42b8448b02eec32854e245e7
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: not_applicable
+  P6_v2_L1:
+    config_sha256: 38a02be258d8e6e6c42aa91d807a5db6bdbbd911a4d66a507cfac2d945fd17d3
+    split_manifest_sha256: c47f88b92011d6d9893927b4811e15bb99290b74ec827a86f7038f3c7e7b9aec
+    seed_selection_manifest_sha256: 5e1045f5807a0a8d855195cf993abf1d3b5c5a1838fad3cff5d3d25682032dc1
+  P6_v2_L2:
+    config_sha256: 7a0fb8350258fcb490a66d26db850f130d6a76b6703b0540ffd65a666ee74300
+    split_manifest_sha256: c47f88b92011d6d9893927b4811e15bb99290b74ec827a86f7038f3c7e7b9aec
+    seed_selection_manifest_sha256: 5e1045f5807a0a8d855195cf993abf1d3b5c5a1838fad3cff5d3d25682032dc1
+  P6_v2_L3:
+    config_sha256: 81ca98ee727cc5ce214e24dc668a835c41b3b42af30df35b00f831919ab415a9
+    split_manifest_sha256: c47f88b92011d6d9893927b4811e15bb99290b74ec827a86f7038f3c7e7b9aec
+    seed_selection_manifest_sha256: 5e1045f5807a0a8d855195cf993abf1d3b5c5a1838fad3cff5d3d25682032dc1
+  P7_v2_T20:
+    config_sha256: e4e3557eec37aa15fc6c667f595c0abeca6f958c7516dd05a0f6060039bcd98b
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: f574ad318f1e99aa241eb14e796d8843ead4a2764f7e69a85e7836efff562a42
+  P7_v2_T40:
+    config_sha256: 61956a75753fa14a2396def460bf260980ddfdc038049329a2a44729aaafc221
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: f574ad318f1e99aa241eb14e796d8843ead4a2764f7e69a85e7836efff562a42
+  P7_v2_T60:
+    config_sha256: 9667bab7e7f2b063ef9c1f84c6e8064aaf462959eabc5ff6ede6f92616356525
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: f574ad318f1e99aa241eb14e796d8843ead4a2764f7e69a85e7836efff562a42
+  P7_v2_T80:
+    config_sha256: 86670097753d00c98a5c432a50a780c775a6c7df79062292648d93c6e3d46eb3
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: f574ad318f1e99aa241eb14e796d8843ead4a2764f7e69a85e7836efff562a42
