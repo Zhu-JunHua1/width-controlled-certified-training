@@ -49,10 +49,11 @@ not informative about schedule differences.
 
 ## Step-node soundness
 
-The derivative of ReLU is represented by a step node. Stable-sign intervals are exact (`[0,0]` or
-`[1,1]`); an interval crossing zero uses the sound constant box `[0,1]`, including all subgradients at
-zero. Other supported operators follow auto_LiRPA's sound IBP/CROWN propagation. IC intersects the two
-sound results and cannot be looser than either input bound coordinate-wise.
+The derivative of ReLU is represented by a step-like node. Stable-sign intervals are exact (`[0,0]` or
+`[1,1]`); an interval containing zero uses the constant box `[0,1]`, including every derivative choice
+permitted by the ReLU subdifferential at the kink. We do not call these values ``subgradients of the
+discontinuous step function.'' In real arithmetic, the supported local IBP/CROWN relaxations enclose their
+exact operators, and IC intersects the two enclosures without being looser than either input coordinate.
 
 Floating-point kernels may produce a numerical inconsistency between the two enclosures. On every affected
 coordinate IC conservatively falls back to the IBP bound, regardless of gap size. The implementation logs
