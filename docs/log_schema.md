@@ -31,7 +31,11 @@ method and perturbation radius shares exactly the same accepted starts.
 
 `summary.json` stores the calibration-selected epoch, final frozen-test evaluations, timing, structured
 calibration result, and IC floating-intersection diagnostics. Timing separates the
-fixed pre-run, adaptive continuation, actual executed updates, and reported horizon. `status.json` is a
+fixed pre-run, adaptive continuation, actual executed updates, and reported horizon. In particular,
+`wall_seconds_per_reported_epoch` is the complete training-pipeline time divided by `T`, whereas
+`seconds_per_executed_update` uses the number of interval updates actually evaluated. The former charges
+two-stage calibration overhead; the latter isolates update cost. Frozen-test time is recorded separately.
+`status.json` is a
 small terminal-state record intended for sweep orchestration and interrupted-run recovery; it includes the
 last observed certified accuracy even when `cert_at_T` is null.
 

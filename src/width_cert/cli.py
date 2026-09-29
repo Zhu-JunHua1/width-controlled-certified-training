@@ -11,6 +11,7 @@ from .analysis import (
     audit_same_box,
     analyze_checkpoint,
     export_report,
+    export_runtime_report,
     summarize_results,
     validate_small_network_grid,
 )
@@ -84,6 +85,14 @@ def main(argv=None) -> int:
         action="store_true",
         help="count a diverged arm as cert@T=0 while retaining its observed peak",
     )
+    runtime_parser = subparsers.add_parser(
+        "runtime-report",
+        help="aggregate total and per-update runtime from public summary.json files",
+    )
+    runtime_parser.add_argument(
+        "results_root", help="root containing public per-run summary.json files"
+    )
+    runtime_parser.add_argument("output_dir", help="directory for the runtime report")
     lipschitz_parser = subparsers.add_parser(
         "analyze-lipschitz",
         help="run a sampled (non-certified) Lipschitz-margin checkpoint diagnostic",
@@ -177,6 +186,11 @@ def main(argv=None) -> int:
         )
         print(f"summary written to {summary}")
         print(f"manifest written to {manifest}")
+        return 0
+    if args.command == "runtime-report":
+        report, manifest = export_runtime_report(args.results_root, args.output_dir)
+        print(f"runtime report written to {report}")
+        print(f"runtime manifest written to {manifest}")
         return 0
     if args.command == "analyze-lipschitz":
         report, cdf = analyze_checkpoint(

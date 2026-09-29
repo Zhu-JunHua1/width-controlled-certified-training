@@ -149,14 +149,43 @@ not an independent-test guarantee. The positive-`lambda` theorem, the
 `lambda=0` identity branch, real-arithmetic enclosure proof, and finite-precision
 implementation checks are explicitly separated.
 
-## Stage C/D — frozen representative and full experiments (not started)
+## Stage C/D — frozen primary experiments (P1/P2 complete)
 
-The prospective choices for endpoints, four primary hypotheses, Holm-corrected
-paired tests, common-certifier comparisons, same-box claims, and the
-development-population schedule target are recorded in
-[`final_study_design_draft.md`](final_study_design_draft.md). These stages begin
-only after the remaining split manifests and resolved configuration hashes are
-complete and the study lock is committed.
+The study lock was committed at `2f3a37d` before final-test access.  P1
+(TwoMoons, radius 0.01) and P2 (MNIST 1/7, radius 0.001) were each executed
+once under the frozen protocol.  Each experiment contains 10 selected starts,
+10 declared training methods, two frozen test certifiers (IBP and IC), and
+exactly 200 result rows.  The output records one lock hash, one resolved-config
+hash, one data-split hash, and the locked code commit.  Completed trajectories
+retain non-null selected and terminal test fields; diverged trajectories keep
+their raw terminal fields null rather than silently converting the run into a
+completed zero endpoint.
+
+All four preregistered primary comparisons reject their one-sided null after
+Holm correction:
+
+- P1 IC vs IBP at the calibration-selected checkpoint under the common IBP
+  test certifier: +11.38 percentage points, 95% bootstrap CI [4.72, 17.78],
+  Holm-adjusted p=0.03515625.
+- P2 IC vs IBP under the same endpoint/certifier policy: +0.38 points,
+  95% CI [0.14, 0.70], Holm-adjusted p=0.03125.
+- P1 IC+IWAU vs IC at the terminal endpoint under the common IC certifier and
+  preregistered diverged-as-zero policy: +65.24 points, 95% CI [59.06, 71.12],
+  Holm-adjusted p=0.00390625.
+- P2 IC+IWAU vs IC under the same terminal policy: +71.22 points, 95% CI
+  [60.04, 81.40], Holm-adjusted p=0.00390625.
+
+The frozen raw outputs remain unchanged.  A portable paired-statistics CSV and
+content-hashed aggregate reports are generated as derived artifacts.  The
+public runtime reporter now distinguishes total training-pipeline time,
+wall-clock seconds per reported epoch, and seconds per actually executed
+interval update.  This separation is necessary because IWAU and the matched
+two-stage controls charge their fixed pre-run to total cost.
+
+P3--P7 remain frozen secondary/exploratory families. P6 is currently running
+from an isolated worktree at the locked commit; the other families remain
+pending. Their legacy results are not substitutes for the protocol-v2
+evaluations.
 
 ## Protocol-v2 primary candidates (test still sealed)
 

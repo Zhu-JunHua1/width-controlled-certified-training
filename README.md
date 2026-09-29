@@ -166,6 +166,21 @@ This writes `protocol_summary.csv` and `report_manifest.json`. The manifest reco
 input paths and SHA-256 hashes, never absolute workstation paths. Plotting and typesetting can consume the
 portable summary without importing the training implementation or private spreadsheets.
 
+Export total and normalized runtime from the public per-run summaries with:
+
+```bash
+width-cert runtime-report results public-runtime-report
+```
+
+This writes `runtime_summary.csv` and a content-hash manifest.  The report keeps
+two denominators separate. `wall_seconds_per_reported_epoch` charges the fixed
+pre-run and continuation to the manuscript horizon `T`, and therefore reflects
+the deployable pipeline cost. `seconds_per_executed_update` divides by the
+actual number of interval bound/update evaluations, including the pre-run, and
+therefore distinguishes a slower update from a method that performs more
+updates. Frozen-test evaluation time is reported separately and is not folded
+into either training-time denominator.
+
 The supplementary Lipschitz--margin diagnostic can be run on a binary checkpoint:
 
 ```bash
@@ -252,7 +267,7 @@ and the raw run status is `diverged`; other missing data fail closed.
 | `data/` | Dataset registry for TwoMoons, MNIST pairs, and synthetic multi-class data |
 | `experiments/` | Configuration schema, pretraining, environment capture, and unified runner |
 | `logging/` | Structured state/update records, terminal output, JSON/CSV files, and checkpoints |
-| `analysis/` | Aggregation, path-safe report export, and checkpoint-level mechanism audits |
+| `analysis/` | Aggregation, path-safe endpoint/runtime reports, and checkpoint-level mechanism audits |
 | `configs/paper/` | Reproducible paper protocol files |
 | `tests/` | CPU regression tests for indexing, calibration, capping, status, and logging |
 
