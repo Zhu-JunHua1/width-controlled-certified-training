@@ -307,7 +307,9 @@ fallback, final-test isolation, non-silent divergence, and the logging schema.
 
 Paper protocols and result mappings are documented in [`docs/protocols.md`](docs/protocols.md), and
 representative reference-cell checks are reported in
-[`docs/reference_validation.md`](docs/reference_validation.md). GitHub
+[`docs/reference_validation.md`](docs/reference_validation.md). The frozen
+secondary-run and same-box-audit sequence is recorded in
+[`docs/protocol_v2_followup_execution.md`](docs/protocol_v2_followup_execution.md). GitHub
 reads [`CITATION.cff`](CITATION.cff) and exposes a **Cite this repository** action. An archival DOI will be
 added after the public release is frozen.
 
