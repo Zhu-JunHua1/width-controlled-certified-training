@@ -1,0 +1,25 @@
+name: P5_v3_synthetic3_corrected
+output_dir: results/protocol_v3_multiclass/P5_synthetic3
+data:
+  dataset: synthetic:3
+  train_size: 100
+  calibration_size: 300
+  test_size: 300
+  seed: 3800286124
+  calibration_seed: 2283187574
+  test_seed: 967886480
+  strategy: shared_generator_split
+model: {hidden_layers: 1, hidden_width: 20}
+pretraining: {enabled: false}
+training: {horizon: 30, base_step: 0.1, retention: 0.8}
+evaluation:
+  input_domain: same_as_training
+  selection_bound_method: IC
+  bound_methods: [IBP, IC]
+  test_access: frozen_final
+  analysis_tier: exploratory
+  study_lock: study_locks/protocol_v3_multiclass_frozen.yaml
+radii: [0.005, 0.01, 0.02, 0.05]
+seed_selection: {start: 0, stop: 10, count: 10}
+methods: [IBP, IC, IC+IWAU]
+echo_epochs: false

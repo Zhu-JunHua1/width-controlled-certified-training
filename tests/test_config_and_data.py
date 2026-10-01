@@ -436,5 +436,87 @@ def test_synthetic_combined_split_preserves_legacy_single_seed_behavior():
     assert torch.equal(first.test_inputs, changed_unused_seeds.test_inputs)
 
 
+def test_synthetic_shared_generator_uses_one_problem_and_disjoint_stratified_splits(
+    monkeypatch,
+):
+    from width_cert.data import registry
+
+    calls = []
+    original = registry.make_classification
+
+    def recording_generator(**kwargs):
+        calls.append(kwargs)
+        return original(**kwargs)
+
+    monkeypatch.setattr(registry, "make_classification", recording_generator)
+    bundle = build_dataset(
+        "synthetic:4",
+        train_size=100,
+        calibration_size=300,
+        test_size=300,
+        seed=11,
+        calibration_seed=22,
+        test_seed=33,
+        strategy="shared_generator_split",
+    )
+    assert len(calls) == 1
+    assert calls[0]["n_samples"] == 700
+    assert calls[0]["random_state"] == 11
+
+    partitions = (
+        (bundle.train_inputs, bundle.train_targets),
+        (bundle.calibration_inputs, bundle.calibration_targets),
+        (bundle.test_inputs, bundle.test_targets),
+    )
+    identities = []
+    for inputs, targets in partitions:
+        assert set(targets.tolist()) == {0, 1, 2, 3}
+        identities.append({tuple(row.tolist()) for row in inputs})
+    assert not (identities[0] & identities[1])
+    assert not (identities[0] & identities[2])
+    assert not (identities[1] & identities[2])
+
+    repeated = build_dataset(
+        "synthetic:4",
+        train_size=100,
+        calibration_size=300,
+        test_size=300,
+        seed=11,
+        calibration_seed=22,
+        test_seed=33,
+        strategy="shared_generator_split",
+    )
+    assert torch.equal(bundle.train_inputs, repeated.train_inputs)
+    assert torch.equal(bundle.calibration_inputs, repeated.calibration_inputs)
+    assert torch.equal(bundle.test_inputs, repeated.test_inputs)
+
+
+def test_corrected_multiclass_protocols_use_shared_generator_and_new_outputs():
+    expected = {
+        3: (3800286124, 2283187574, 967886480),
+        4: (1521359939, 3812246727, 39450130),
+    }
+    for classes, seeds in expected.items():
+        config = load_config(
+            ROOT
+            / "configs"
+            / "protocol_v3_frozen"
+            / f"P5_synthetic{classes}_corrected.yaml"
+        )
+        assert config.data.dataset == f"synthetic:{classes}"
+        assert config.data.strategy == "shared_generator_split"
+        assert (
+            config.data.seed,
+            config.data.calibration_seed,
+            config.data.test_seed,
+        ) == seeds
+        assert config.evaluation.test_access == "frozen_final"
+        assert config.evaluation.analysis_tier == "exploratory"
+        assert config.evaluation.bound_methods == ("IBP", "IC")
+        assert config.output_dir.startswith("results/protocol_v3_multiclass/")
+        assert config.radii == (0.005, 0.01, 0.02, 0.05)
+        assert config.methods == ("IBP", "IC", "IC+IWAU")
+
+
 def test_log_schema_version_reflects_frozen_study_provenance():
     assert SCHEMA_VERSION == "2.2"

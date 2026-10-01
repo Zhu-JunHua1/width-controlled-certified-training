@@ -250,6 +250,31 @@ def _synthetic(
         calibration_targets = targets[train_size:calibration_end]
         test_inputs = inputs[calibration_end:calibration_end + test_size]
         test_targets = targets[calibration_end:calibration_end + test_size]
+    elif strategy == "shared_generator_split":
+        # A single call fixes the class clusters, feature transform, and label
+        # geometry before independent, stratified partitioning.  Calling
+        # make_classification once per split would generate three different
+        # classification problems rather than three samples from one problem.
+        inputs, targets = generate(
+            train_size + calibration_size + test_size,
+            seed,
+        )
+        train_inputs, holdout_inputs, train_targets, holdout_targets = train_test_split(
+            inputs,
+            targets,
+            train_size=train_size,
+            test_size=calibration_size + test_size,
+            random_state=calibration_seed,
+            stratify=targets,
+        )
+        calibration_inputs, test_inputs, calibration_targets, test_targets = train_test_split(
+            holdout_inputs,
+            holdout_targets,
+            train_size=calibration_size,
+            test_size=test_size,
+            random_state=test_seed,
+            stratify=holdout_targets,
+        )
     elif strategy == "separate":
         train_inputs, train_targets = generate(train_size, seed)
         calibration_inputs, calibration_targets = generate(
