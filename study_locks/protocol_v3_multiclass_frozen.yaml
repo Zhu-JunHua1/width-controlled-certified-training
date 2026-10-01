@@ -1,0 +1,76 @@
+schema_version: "1.0"
+status: frozen
+study_id: protocol-v3-multiclass-correction
+target_venue: IJAR
+
+# Post-hoc repair of P5-v2's different-generator split defect. The P1/P2
+# primary hypotheses and all protocol-v2 files and results remain unchanged.
+code:
+  git_commit: ac66d9bb795aff0d867363881b80eddef12faab9
+  dependency_lock_sha256: 27d62072557620999fb58d533ef30fb4fb1121c5c7b507dcf53a48db02365df1
+  auto_lirpa_source_sha256: 6a8d960cdd013cbd63cc814d2e21e30ab2f3f23bada889eaf4a91f4be3994c73
+
+data:
+  split_policy: one_generator_then_stratified_train_calibration_test
+  split_hash_manifest:
+    synthetic_generated_data: generator_and_partition_seeds_frozen_in_resolved_configs
+  development_test_results_used_for_design: true
+  retired_test_seeds: [42, 223818976, 1881035452]
+  final_generator_seeds:
+    synthetic3: 3800286124
+    synthetic4: 1521359939
+  final_calibration_seeds:
+    synthetic3: 2283187574
+    synthetic4: 3812246727
+  final_test_seeds:
+    synthetic3: 967886480
+    synthetic4: 39450130
+
+selection:
+  split: calibration
+  checkpoint_rule: first_argmax_calibration_certified_accuracy
+  retention: 0.8
+  tie_breaking: earliest_epoch
+  test_access: after_checkpoint_and_schedule_freeze_only
+
+endpoints:
+  primary: test_cert_at_calibration_selected_checkpoint
+  secondary: test_cert_at_T
+  safety_cost:
+    - test_clean_at_selected
+    - test_clean_at_T
+    - total_wall_time
+    - peak_device_memory
+    - numerical_intersection_fallbacks
+  mechanism_calibration_only:
+    - parameter_interval_width
+    - gradient_bound_width
+    - effective_step
+
+evaluation:
+  test_certifiers: [IBP, IC]
+  require_common_test_samples: true
+  require_common_checkpoint_rule: true
+  interpretation: exploratory_post_hoc_protocol_repair
+
+update_budget:
+  common_prefix: same_method_fixed_pre_run_through_calibration_selected_t_p
+  continuation_updates: equal_within_protocol
+  coordinate_rule: eta_base_over_1_plus_lambda_omega_i
+  complete_cost_includes_fixed_pre_run: true
+
+statistics:
+  hypotheses: [descriptive_multiclass_repair]
+  sidedness: descriptive_only
+  multiple_comparison_family: exploratory_not_confirmatory
+  correction: not_applicable
+
+protocols:
+  P5_v3_synthetic3_corrected:
+    config_sha256: 94fdc3bfec55657e7d04f6ad55045c6b821340eb584916dee116806d6393124a
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: not_applicable
+  P5_v3_synthetic4_corrected:
+    config_sha256: dc56b4cef9f3ce7cb377590f7ad717f876f9725706fd8ff6251a939b5dbfd575
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: not_applicable
