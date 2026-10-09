@@ -35,7 +35,7 @@ test set as confirmation:
 
 ## Equal-budget scalar search
 
-Each task evaluates exactly nine candidates on the same three accepted starts:
+The initial search evaluated nine candidates on the same three accepted starts:
 
 - inverse-time, cosine, and step-decay;
 - final-step targets `0.04`, `0.06`, and `0.08`;
@@ -47,6 +47,17 @@ their cost. The winner maximizes mean calibration `cert@T`; a non-completed run
 contributes zero. Ties are resolved by mean calibration peak, elapsed time,
 family name, and target step in that order. Candidate deletion after observing
 results is prohibited.
+
+Before any blind-test access, the initial MNIST search returned zero
+calibration `cert@T` for all nine candidates, and the best TwoMoons candidate
+retained only 2.87 percentage points on average. This showed that the original
+range did not establish a strong scalar control. The development protocol was
+therefore prospectively extended, symmetrically for both tasks, with nine
+additional candidates: the same three families at final-step targets `0.005`,
+`0.01`, and `0.02`. The initial candidates and their negative results remain
+part of the record. Final selection is performed once over all 18 candidates
+using the unchanged metric, failure policy, and tie-breaking rules. No blind
+test metric was accessed before this extension was fixed.
 
 ## Cumulative-step comparator
 

@@ -109,6 +109,12 @@ Protocol-v4 schedule-fairness preparation:
   an empty `test_evaluations` list. These are implementation checks, not paper
   results.
 - Full CPU regression suite: 86 passed.
+- The initial nine-candidate search completed without test access. P1 selected
+  inverse-time/0.04 with mean calibration `cert@T=2.87%`; all nine P2
+  candidates ended at zero. Before blind-test access, the search was therefore
+  extended symmetrically on both tasks with final-step targets
+  `0.005/0.01/0.02`. Both initial and extension results remain reportable, and
+  the final selector will rank all 18 candidates under the unchanged rule.
 
 Representative seeds only; no final test claims. Bound validity, non-vacuous
 calibration behavior, exact common-prefix reuse, and compute feasibility have
