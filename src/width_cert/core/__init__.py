@@ -13,6 +13,7 @@ from .fairness import (
     BudgetRecord,
     budget_record,
     continue_from_fixed_prefix,
+    cumulative_matched_cosine_rule,
     final_continuation_step,
     matched_final_step_rules,
 )
@@ -49,6 +50,7 @@ __all__ = [
     "clone_state",
     "continue_from_fixed_prefix",
     "continue_with_iwau",
+    "cumulative_matched_cosine_rule",
     "final_continuation_step",
     "matched_final_step_rules",
 ]

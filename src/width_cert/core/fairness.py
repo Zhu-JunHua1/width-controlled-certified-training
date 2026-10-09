@@ -126,6 +126,43 @@ def matched_final_step_rules(
     }
 
 
+def cumulative_matched_cosine_rule(
+    *,
+    base_step: float,
+    target_mean_step: float,
+    start_epoch: int,
+    total_steps: int,
+) -> CosineDecayUpdate:
+    """Build a cosine rule with a declared mean continuation step.
+
+    The target is fixed from development/calibration data, never from the
+    future test trajectory or the paired final-run IWAU trajectory.  For the
+    one-based cosine schedule used here, ``sum(cos(pi*k/n), k=1..n)=-1``;
+    hence the mean is affine in the unknown minimum step and can be matched
+    exactly whenever the requested target is feasible.
+    """
+
+    if total_steps <= 0:
+        raise ValueError("total_steps must be positive")
+    if not 0.0 < target_mean_step <= base_step:
+        raise ValueError("target_mean_step must lie in (0, base_step]")
+    base_weight = 0.5 * (1.0 - 1.0 / total_steps)
+    minimum_weight = 1.0 - base_weight
+    minimum_step = (target_mean_step - base_weight * base_step) / minimum_weight
+    if not -1e-12 <= minimum_step <= base_step + 1e-12:
+        minimum_feasible = base_weight * base_step
+        raise ValueError(
+            "target_mean_step is infeasible for the cosine family: "
+            f"expected [{minimum_feasible}, {base_step}]"
+        )
+    return CosineDecayUpdate(
+        base_step=base_step,
+        minimum_step=max(0.0, min(base_step, minimum_step)),
+        start_epoch=start_epoch,
+        total_steps=total_steps,
+    )
+
+
 def final_continuation_step(run: TrainingRun, *, start_epoch: int) -> float:
     """Return the last logged mean step after the common prefix."""
 

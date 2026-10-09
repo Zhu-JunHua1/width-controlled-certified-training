@@ -72,16 +72,17 @@ operator has a local enclosure:
   enclosure;
 - forward ReLU: standard CROWN affine lower and upper relaxations;
 - BCE loss derivative: monotone interval evaluation of `sigmoid(z)-y`;
-- ReLU derivative: `[0,0]` on a negative stable interval, `[1,1]` on a positive
-  stable interval, and the constant box `[0,1]` when the interval crosses zero;
+- ReLU derivative: the point rule is `1{z > 0}`; its enclosure is `[0,0]` when
+  the upper endpoint is non-positive, `[1,1]` when the lower endpoint is
+  positive, and `[0,1]` when the interval crosses zero;
 - matrix products and parameter-gradient outer products: sound bilinear
   relaxation (McCormick in the CROWN branch, four-corner interval arithmetic in
   the interval branch); and
 - sums and reshapes: exact linear propagation.
 
-At `z=0`, `[0,1]` covers the permitted derivative choices / the ReLU
-subdifferential.  It is not described as a subgradient of the discontinuous
-step function itself.
+At `z=0`, the implemented point derivative is zero. The crossing-interval box
+`[0,1]` covers all point-rule values on that interval. It is not described as a
+subgradient of the discontinuous step function.
 
 Composing locally sound, inclusion-preserving relaxations on the explicit
 gradient graph encloses every real gradient represented by the input and

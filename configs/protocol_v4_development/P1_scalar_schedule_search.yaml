@@ -1,0 +1,78 @@
+base:
+  name: P1_v4_scalar_search_base
+  output_dir: results/protocol_v4_development/P1_scalar_search/base
+  data:
+    dataset: twomoons
+    train_size: 100
+    calibration_size: 500
+    test_size: 500
+    seed: 2268034632
+    calibration_seed: 2931978507
+    test_seed: 2695485613
+    strategy: separate
+  model: {hidden_layers: 2, hidden_width: 20}
+  pretraining:
+    enabled: true
+    target_accuracy: 0.50
+    maximum_initial_accuracy: 0.505
+    maximum_final_accuracy: 0.52
+    step_size: 0.02
+    maximum_epochs: 4000
+    optimizer: sgd
+  training:
+    horizon: 40
+    base_step: 0.1
+    retention: 0.8
+    gradient_batch_size: 4
+    max_gradient_width: 50.0
+    tuned_schedule_family: cosine
+    tuned_schedule_target_final_step: 0.06
+    tuned_step_decay_milestone_fraction: 0.5
+  evaluation:
+    input_domain: same_as_training
+    selection_bound_method: IC
+    bound_methods: [IC]
+    test_access: disabled
+    analysis_tier: development
+  radii: [0.01]
+  seed_selection: {start: 0, stop: 25, count: 3}
+  methods: [IC+TunedScalar]
+  echo_epochs: false
+
+variants:
+  - overrides:
+      name: P1_v4_search_inverse_004
+      output_dir: results/protocol_v4_development/P1_scalar_search/inverse_004
+      training: {tuned_schedule_family: inverse_time, tuned_schedule_target_final_step: 0.04}
+  - overrides:
+      name: P1_v4_search_inverse_006
+      output_dir: results/protocol_v4_development/P1_scalar_search/inverse_006
+      training: {tuned_schedule_family: inverse_time, tuned_schedule_target_final_step: 0.06}
+  - overrides:
+      name: P1_v4_search_inverse_008
+      output_dir: results/protocol_v4_development/P1_scalar_search/inverse_008
+      training: {tuned_schedule_family: inverse_time, tuned_schedule_target_final_step: 0.08}
+  - overrides:
+      name: P1_v4_search_cosine_004
+      output_dir: results/protocol_v4_development/P1_scalar_search/cosine_004
+      training: {tuned_schedule_family: cosine, tuned_schedule_target_final_step: 0.04}
+  - overrides:
+      name: P1_v4_search_cosine_006
+      output_dir: results/protocol_v4_development/P1_scalar_search/cosine_006
+      training: {tuned_schedule_family: cosine, tuned_schedule_target_final_step: 0.06}
+  - overrides:
+      name: P1_v4_search_cosine_008
+      output_dir: results/protocol_v4_development/P1_scalar_search/cosine_008
+      training: {tuned_schedule_family: cosine, tuned_schedule_target_final_step: 0.08}
+  - overrides:
+      name: P1_v4_search_step_004
+      output_dir: results/protocol_v4_development/P1_scalar_search/step_004
+      training: {tuned_schedule_family: step_decay, tuned_schedule_target_final_step: 0.04}
+  - overrides:
+      name: P1_v4_search_step_006
+      output_dir: results/protocol_v4_development/P1_scalar_search/step_006
+      training: {tuned_schedule_family: step_decay, tuned_schedule_target_final_step: 0.06}
+  - overrides:
+      name: P1_v4_search_step_008
+      output_dir: results/protocol_v4_development/P1_scalar_search/step_008
+      training: {tuned_schedule_family: step_decay, tuned_schedule_target_final_step: 0.08}

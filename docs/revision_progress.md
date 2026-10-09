@@ -88,6 +88,28 @@ Implemented fairness infrastructure:
 
 ## Stage B — development gates (in progress)
 
+Protocol-v4 schedule-fairness preparation:
+
+- Added a calibration-only nine-candidate scalar-schedule search for each
+  primary task and a fail-closed selector with explicit candidate/start counts.
+- Added a prospective cumulative-step-matched cosine control. Its task-level
+  target is frozen from previously exposed development trajectories, not from
+  a paired blind-test IWAU trajectory.
+- Generated `blind_mnist17_protocol_v4.json` (file SHA-256
+  `3efdea77d8a697e618e00842e038df5a08f84f21295f4a4b3de2a28652a43791`).
+  It contains 100/500/500 train/calibration/test indices, train and calibration
+  are disjoint, and overlap with protocol-v2 is zero in each corresponding
+  official MNIST namespace.
+- Corrected scalar-control execution so that a `lambda=0` IWAU calibration does
+  not suppress an independently specified scalar schedule. IWAU and
+  GlobalIWAU alone retain the `not_required` fixed-update branch.
+- A one-start development smoke run exercised both new rules from the same
+  epoch-12 prefix. The cumulative cosine realized mean step
+  `0.05886784227532821` for target `0.0588678422753282`; both summaries contain
+  an empty `test_evaluations` list. These are implementation checks, not paper
+  results.
+- Full CPU regression suite: 86 passed.
+
 Representative seeds only; no final test claims. Bound validity, non-vacuous
 calibration behavior, exact common-prefix reuse, and compute feasibility have
 passed. Before freezing the final study, the update-budget comparison still
@@ -263,3 +285,34 @@ The complete 25-configuration frozen family is staged under
 study-lock path, and shared-start manifests are now themselves content-hashed
 by the lock verifier. Final test access remains impossible until the frozen
 lock is populated with the committed code and configuration hashes.
+# 2026-10-08: A0 implementation-authenticity gate
+
+The full-gradient CROWN execution path was audited before beginning the new
+schedule-fairness study. Representative binary networks with one, two, and
+three hidden layers and a four-class one-vs-all BCE network all satisfied the
+following checks:
+
+- every weight and bias input was marked perturbed;
+- `BoundLinear.bound_backward_with_weight` executed;
+- the doubly perturbed `BoundMul` path executed;
+- the upstream ReLU and sigmoid relaxations executed; and
+- the custom zero-slope Step box executed inside back-substitution.
+
+The generated graph inventory and call trace are stored under
+`artifacts/audit/a0_full_crown/`. A dense one-hidden-unit grid checked 10,080
+method--coordinate inclusions without a violation; this remains an
+implementation diagnostic rather than a proof. The complete Python test suite
+passes (80 tests).
+
+The audit also found a provenance mismatch that had to be disclosed. The
+historical runtime auto_LiRPA tree hash is `6a8d960...`, whereas the recognized
+upstream `9d100ec` tree hash is `2bc6390...`; three files differ. The four A0
+graphs produced byte-identical IBP and CROWN endpoints under both trees, but
+the repository no longer describes the historical dependency as unmodified.
+Exact clean-room dependency packaging remains a release gate.
+
+The manuscript appendix now states the actual Step convention (`1{z>0}`), the
+two McCormick planes selected by the default non-optimized path, the
+positive/negative-coefficient substitution rule, and an operator-to-code map.
+The proof claim remains limited to exact real arithmetic; ordinary floating
+point is path-audited and numerically tested but not outward-rounded.

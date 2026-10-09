@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import platform
 from pathlib import Path
+import subprocess
 
 import torch
 
@@ -34,6 +35,28 @@ def package_tree_sha256(package_file: str | Path) -> str:
     return digest.hexdigest()
 
 
+def repository_metadata(start: str | Path | None = None) -> dict[str, object]:
+    """Return Git provenance without exposing an absolute checkout path."""
+
+    root = Path(start).resolve() if start is not None else Path(__file__).resolve().parents[3]
+    try:
+        commit = subprocess.run(
+            ["git", "-C", str(root), "rev-parse", "HEAD"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        status = subprocess.run(
+            ["git", "-C", str(root), "status", "--porcelain", "--untracked-files=normal"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return {"git_commit": None, "git_dirty": None}
+    return {"git_commit": commit, "git_dirty": bool(status.strip())}
+
+
 def environment_metadata() -> dict[str, object]:
     try:
         import auto_LiRPA
@@ -56,4 +79,5 @@ def environment_metadata() -> dict[str, object]:
             else None
         ),
         "auto_lirpa_python_tree_sha256": lirpa_hash,
+        **repository_metadata(),
     }

@@ -37,6 +37,7 @@ from ..core import (
     calibrate_iwau,
     continue_from_fixed_prefix,
     continue_with_iwau,
+    cumulative_matched_cosine_rule,
     matched_final_step_rules,
 )
 from ..data import DatasetBundle, build_dataset
@@ -651,7 +652,9 @@ def run_experiment(config: ExperimentConfig) -> Path:
                     },
                     "environment": environment_metadata(),
                 }
+                run_environment = resolved_run_config["environment"]
                 logger.write_config(resolved_run_config)
+                continued_from_prefix = False
                 try:
                     if two_stage:
                         if fixed_name not in fixed_runs:
@@ -717,7 +720,20 @@ def run_experiment(config: ExperimentConfig) -> Path:
                             raise RuntimeError(
                                 f"invalid shared-prefix calibration: {calibration.reason}"
                             )
-                        if not calibration.iwau_effective:
+                        total_steps = (
+                            config.training.horizon - calibration.peak_epoch
+                        )
+                        adaptive_kinds = {"IWAU", "GlobalIWAU"}
+                        if total_steps <= 0:
+                            run = fixed_runs[fixed_name]
+                        elif (
+                            update_kind in adaptive_kinds
+                            and not calibration.iwau_effective
+                        ):
+                            # Lambda=0 means that width adaptation is not
+                            # required.  This rule is specific to the IWAU
+                            # family; scalar fairness controls still run from
+                            # the same B_tp prefix independently.
                             run = fixed_runs[fixed_name]
                         elif update_kind == "IWAU":
                             result = continue_with_iwau(
@@ -729,10 +745,8 @@ def run_experiment(config: ExperimentConfig) -> Path:
                             )
                             run = result.run
                             calibration = result.calibration
+                            continued_from_prefix = True
                         else:
-                            total_steps = (
-                                config.training.horizon - calibration.peak_epoch
-                            )
                             if update_kind == "GlobalIWAU":
                                 update_rule = GlobalWidthAdaptiveUpdate(
                                     base_step=config.training.base_step,
@@ -741,6 +755,37 @@ def run_experiment(config: ExperimentConfig) -> Path:
                                         * config.training.coefficient_scale
                                     ),
                                 )
+                            elif update_kind == "CumulativeCosine":
+                                target_mean = config.training.cumulative_target_mean_step
+                                if target_mean is None:
+                                    raise RuntimeError(
+                                        "cumulative schedule requires cumulative_target_mean_step"
+                                    )
+                                update_rule = cumulative_matched_cosine_rule(
+                                    base_step=config.training.base_step,
+                                    target_mean_step=target_mean,
+                                    start_epoch=calibration.peak_epoch,
+                                    total_steps=total_steps,
+                                )
+                            elif update_kind == "TunedScalar":
+                                target_step = (
+                                    config.training.tuned_schedule_target_final_step
+                                )
+                                family = config.training.tuned_schedule_family
+                                if target_step is None or family is None:
+                                    raise RuntimeError(
+                                        "tuned scalar schedule is not fully configured"
+                                    )
+                                rules = matched_final_step_rules(
+                                    base_step=config.training.base_step,
+                                    target_final_step=target_step,
+                                    start_epoch=calibration.peak_epoch,
+                                    total_steps=total_steps,
+                                    step_milestone_fraction=(
+                                        config.training.tuned_step_decay_milestone_fraction
+                                    ),
+                                )
+                                update_rule = rules[family]
                             else:
                                 target_step = (
                                     config.training.schedule_target_final_step
@@ -770,6 +815,7 @@ def run_experiment(config: ExperimentConfig) -> Path:
                                 start_epoch=calibration.peak_epoch,
                                 update_rule=update_rule,
                             )
+                            continued_from_prefix = True
                         _synchronize(device)
                         continuation_seconds = time.perf_counter() - continuation_start
                         continuation_peak_memory = _peak_memory(device)
@@ -790,14 +836,29 @@ def run_experiment(config: ExperimentConfig) -> Path:
                             "reference_epoch": calibration.reference_epoch,
                             "iwau_effective": (
                                 calibration.iwau_effective
-                                and update_kind in {"IWAU", "GlobalIWAU"}
+                                and update_kind in adaptive_kinds
                             ),
-                            "update_effective": calibration.iwau_effective,
+                            "update_effective": continued_from_prefix,
                             "update_rule": update_kind,
                             "matched_final_mean_step": (
                                 config.training.schedule_target_final_step
                                 if update_kind
                                 in {"InverseTime", "Cosine", "StepDecay"}
+                                else None
+                            ),
+                            "matched_cumulative_mean_step": (
+                                config.training.cumulative_target_mean_step
+                                if update_kind == "CumulativeCosine"
+                                else None
+                            ),
+                            "tuned_schedule_family": (
+                                config.training.tuned_schedule_family
+                                if update_kind == "TunedScalar"
+                                else None
+                            ),
+                            "tuned_schedule_target_final_step": (
+                                config.training.tuned_schedule_target_final_step
+                                if update_kind == "TunedScalar"
                                 else None
                             ),
                         }
@@ -898,6 +959,9 @@ def run_experiment(config: ExperimentConfig) -> Path:
                                 "test_clean_at_T": None,
                             }
                         ]
+                    summary_test_evaluations = (
+                        test_evaluations if final_test_enabled else []
+                    )
                     complete_elapsed_seconds = elapsed + test_seconds
                     peak_device_memory = _maximum_memory(
                         pre_run_peak_memory,
@@ -946,8 +1010,9 @@ def run_experiment(config: ExperimentConfig) -> Path:
                                 "code_commit": (
                                     study_lock_payload["code"]["git_commit"]
                                     if study_lock_payload is not None
-                                    else None
+                                    else run_environment.get("git_commit")
                                 ),
+                                "code_dirty": run_environment.get("git_dirty"),
                                 "resolved_config_sha256": resolved_config_hash,
                                 "data_split_sha256": (
                                     protocol_lock.get("split_manifest_sha256")
@@ -967,7 +1032,28 @@ def run_experiment(config: ExperimentConfig) -> Path:
                             }
                         )
 
-                    if two_stage and calibration.iwau_effective:
+                    continuation_origin = calibration.peak_epoch if two_stage else 0
+                    continuation_step_values = (
+                        [
+                            update.effective_step_mean
+                            for update in run.updates
+                            if update.epoch >= continuation_origin
+                        ]
+                        if two_stage and continued_from_prefix
+                        else []
+                    )
+                    realized_continuation_step_sum = sum(continuation_step_values)
+                    realized_continuation_step_mean = (
+                        realized_continuation_step_sum / len(continuation_step_values)
+                        if continuation_step_values
+                        else None
+                    )
+                    realized_continuation_final_step = (
+                        continuation_step_values[-1]
+                        if continuation_step_values
+                        else None
+                    )
+                    if two_stage and continued_from_prefix:
                         budget = budget_record(
                             fixed_runs[fixed_name],
                             run,
@@ -997,6 +1083,19 @@ def run_experiment(config: ExperimentConfig) -> Path:
                             / max(executed_updates, 1),
                             "wall_seconds_per_reported_epoch": elapsed
                             / max(config.training.horizon, 1),
+                            "continuation_origin_epoch": continuation_origin,
+                            "realized_continuation_updates": len(
+                                continuation_step_values
+                            ),
+                            "realized_continuation_step_sum": (
+                                realized_continuation_step_sum
+                            ),
+                            "realized_continuation_step_mean": (
+                                realized_continuation_step_mean
+                            ),
+                            "realized_continuation_final_step": (
+                                realized_continuation_final_step
+                            ),
                             "primary_endpoint": (
                                 "test_cert_at_calibration_selected_checkpoint"
                                 if final_test_enabled
@@ -1012,15 +1111,16 @@ def run_experiment(config: ExperimentConfig) -> Path:
                             "code_commit": (
                                 study_lock_payload["code"]["git_commit"]
                                 if study_lock_payload is not None
-                                else None
+                                else run_environment.get("git_commit")
                             ),
+                            "code_dirty": run_environment.get("git_dirty"),
                             "resolved_config_sha256": resolved_config_hash,
                             "data_split_sha256": (
                                 protocol_lock.get("split_manifest_sha256")
                                 if protocol_lock is not None
                                 else None
                             ),
-                            "test_evaluations": test_evaluations,
+                            "test_evaluations": summary_test_evaluations,
                             "intersection_diagnostics": {
                                 "fixed_pre_run": {
                                     key: value.as_dict()

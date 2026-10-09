@@ -52,6 +52,10 @@ class TrainingConfig:
     max_gradient_width: float = 50.0
     schedule_target_final_step: float | None = None
     step_decay_milestone_fraction: float = 0.5
+    cumulative_target_mean_step: float | None = None
+    tuned_schedule_family: str | None = None
+    tuned_schedule_target_final_step: float | None = None
+    tuned_step_decay_milestone_fraction: float = 0.5
 
 
 @dataclass(frozen=True)
@@ -140,7 +144,15 @@ class ExperimentConfig:
 
     def validate(self) -> None:
         bases = {"IBP", "AGT-Hybrid", "CROWN", "IC"}
-        suffixes = {"IWAU", "GlobalIWAU", "InverseTime", "Cosine", "StepDecay"}
+        suffixes = {
+            "IWAU",
+            "GlobalIWAU",
+            "InverseTime",
+            "Cosine",
+            "StepDecay",
+            "CumulativeCosine",
+            "TunedScalar",
+        }
         allowed = bases | {f"{base}+{suffix}" for base in bases for suffix in suffixes}
         unknown = set(self.methods) - allowed
         if unknown:
@@ -172,6 +184,30 @@ class ExperimentConfig:
         if not 0.0 < self.training.step_decay_milestone_fraction <= 1.0:
             raise ValueError(
                 "training.step_decay_milestone_fraction must lie in (0, 1]"
+            )
+        if any(method.endswith("+CumulativeCosine") for method in self.methods):
+            cumulative_target = self.training.cumulative_target_mean_step
+            if cumulative_target is None or not 0.0 < cumulative_target <= self.training.base_step:
+                raise ValueError(
+                    "IC+CumulativeCosine requires training.cumulative_target_mean_step "
+                    "in (0, base_step]"
+                )
+        if any(method.endswith("+TunedScalar") for method in self.methods):
+            family = self.training.tuned_schedule_family
+            tuned_target = self.training.tuned_schedule_target_final_step
+            if family not in {"inverse_time", "cosine", "step_decay"}:
+                raise ValueError(
+                    "IC+TunedScalar requires tuned_schedule_family to be "
+                    "inverse_time, cosine, or step_decay"
+                )
+            if tuned_target is None or not 0.0 < tuned_target <= self.training.base_step:
+                raise ValueError(
+                    "IC+TunedScalar requires tuned_schedule_target_final_step "
+                    "in (0, base_step]"
+                )
+        if not 0.0 < self.training.tuned_step_decay_milestone_fraction <= 1.0:
+            raise ValueError(
+                "training.tuned_step_decay_milestone_fraction must lie in (0, 1]"
             )
         if min(
             self.data.train_size,

@@ -12,8 +12,11 @@ The repository contains the final direct-`t_p` algorithm and excludes private pa
 
 ## Installation
 
-The reference environment used Python 3.10, PyTorch 2.8, CUDA 12.8, auto_LiRPA 0.7.0 at commit
-`9d100ec070868440b48d34e2f1dd21b97aab9172`, and an NVIDIA GeForce RTX 5070. Install PyTorch for the
+The reference environment used Python 3.10, PyTorch 2.8, CUDA 12.8, an auto_LiRPA 0.7.0 source tree,
+and an NVIDIA GeForce RTX 5070. The historical frozen runs record the exact auto_LiRPA Python-tree
+SHA-256 `6a8d960cdd013cbd63cc814d2e21e30ab2f3f23bada889eaf4a91f4be3994c73`. That tree contains three
+local file changes relative to upstream commit `9d100ec070868440b48d34e2f1dd21b97aab9172`; see
+[`docs/full_crown_execution_audit.md`](docs/full_crown_execution_audit.md). Install PyTorch for the
 target CPU/CUDA platform, install the pinned
 [auto_LiRPA](https://github.com/Verified-Intelligence/auto_LiRPA) source, then install this package:
 
@@ -28,10 +31,12 @@ pip install -e .
 The `--no-deps` flag avoids obsolete upstream dependency pins; install a compatible PyTorch build first,
 as described above.
 
-auto_LiRPA is an external dependency and is not vendored or modified here. Its version, recognized source
-commit, and Python-source-tree SHA-256 are recorded in every run configuration; absolute installation paths
-are deliberately omitted. The pinned upstream commit was checked against the public CPU test suite and a
-certified-training smoke run under Python 3.10 and PyTorch 2.8.
+auto_LiRPA is an external dependency and is not vendored here. Its version and Python-source-tree SHA-256
+are recorded in every frozen run; a source commit is reported only when the complete Python tree matches the
+recognized upstream tree. Absolute installation paths are deliberately omitted. The official upstream
+commit and the historical runtime tree both pass the A0 full-gradient execution-path audit, but they are not
+represented as byte-identical dependencies. A release artifact for exact clean-room reproduction remains a
+required publication step.
 
 ## Unified experiment entry point
 

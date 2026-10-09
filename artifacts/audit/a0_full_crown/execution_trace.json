@@ -1,0 +1,258 @@
+{
+  "bound_options": {
+    "override_dependent_operations": true
+  },
+  "cases": {
+    "binary_l1": {
+      "all_parameter_inputs_perturbed": true,
+      "call_counts": {
+        "BoundLinear.bound_backward_with_weight": 5,
+        "BoundMatMul.bound_backward": 5,
+        "BoundMul.bound_backward": 1,
+        "BoundMul.bound_backward_both_perturbed": 1,
+        "BoundRelu.bound_backward": 1,
+        "BoundSigmoid.bound_relax": 1,
+        "BoundStepActivation.bound_relax": 1
+      },
+      "dimensions": [
+        2,
+        3,
+        1
+      ],
+      "node_count": 53,
+      "outputs": {
+        "crown_finite": true,
+        "crown_lower": {
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "sha256": "c409fd196254f9240b652ee12a0110fa67355d81b0725a403666bb1cd283c7b5"
+        },
+        "crown_ordered": true,
+        "crown_upper": {
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "sha256": "c409fd196254f9240b652ee12a0110fa67355d81b0725a403666bb1cd283c7b5"
+        },
+        "ibp_finite": true,
+        "ibp_lower": {
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "sha256": "c409fd196254f9240b652ee12a0110fa67355d81b0725a403666bb1cd283c7b5"
+        },
+        "ibp_ordered": true,
+        "ibp_upper": {
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "sha256": "c409fd196254f9240b652ee12a0110fa67355d81b0725a403666bb1cd283c7b5"
+        },
+        "shape": [
+          1,
+          13
+        ]
+      }
+    },
+    "binary_l2": {
+      "all_parameter_inputs_perturbed": true,
+      "call_counts": {
+        "BoundLinear.bound_backward_with_weight": 8,
+        "BoundMatMul.bound_backward": 8,
+        "BoundMul.bound_backward": 2,
+        "BoundMul.bound_backward_both_perturbed": 2,
+        "BoundRelu.bound_backward": 2,
+        "BoundSigmoid.bound_relax": 1,
+        "BoundStepActivation.bound_relax": 2
+      },
+      "dimensions": [
+        2,
+        3,
+        3,
+        1
+      ],
+      "node_count": 76,
+      "outputs": {
+        "crown_finite": true,
+        "crown_lower": {
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "sha256": "00677d3ce66e45c7310e8a38b83028d18190db2cb2e131457386c67166fce604"
+        },
+        "crown_ordered": true,
+        "crown_upper": {
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "sha256": "00677d3ce66e45c7310e8a38b83028d18190db2cb2e131457386c67166fce604"
+        },
+        "ibp_finite": true,
+        "ibp_lower": {
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "sha256": "00677d3ce66e45c7310e8a38b83028d18190db2cb2e131457386c67166fce604"
+        },
+        "ibp_ordered": true,
+        "ibp_upper": {
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "sha256": "00677d3ce66e45c7310e8a38b83028d18190db2cb2e131457386c67166fce604"
+        },
+        "shape": [
+          1,
+          25
+        ]
+      }
+    },
+    "binary_l3": {
+      "all_parameter_inputs_perturbed": true,
+      "call_counts": {
+        "BoundLinear.bound_backward_with_weight": 11,
+        "BoundMatMul.bound_backward": 11,
+        "BoundMul.bound_backward": 3,
+        "BoundMul.bound_backward_both_perturbed": 3,
+        "BoundRelu.bound_backward": 3,
+        "BoundSigmoid.bound_relax": 1,
+        "BoundStepActivation.bound_relax": 3
+      },
+      "dimensions": [
+        2,
+        3,
+        3,
+        3,
+        1
+      ],
+      "node_count": 99,
+      "outputs": {
+        "crown_finite": true,
+        "crown_lower": {
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "sha256": "9be3181f311783720d943e99b4907eeccfe77fde66c3bf401ae94a4bb06d3a26"
+        },
+        "crown_ordered": true,
+        "crown_upper": {
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "sha256": "9be3181f311783720d943e99b4907eeccfe77fde66c3bf401ae94a4bb06d3a26"
+        },
+        "ibp_finite": true,
+        "ibp_lower": {
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "sha256": "9be3181f311783720d943e99b4907eeccfe77fde66c3bf401ae94a4bb06d3a26"
+        },
+        "ibp_ordered": true,
+        "ibp_upper": {
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "sha256": "9be3181f311783720d943e99b4907eeccfe77fde66c3bf401ae94a4bb06d3a26"
+        },
+        "shape": [
+          1,
+          37
+        ]
+      }
+    },
+    "multiclass_k4": {
+      "all_parameter_inputs_perturbed": true,
+      "call_counts": {
+        "BoundLinear.bound_backward_with_weight": 5,
+        "BoundMatMul.bound_backward": 5,
+        "BoundMul.bound_backward": 1,
+        "BoundMul.bound_backward_both_perturbed": 1,
+        "BoundRelu.bound_backward": 1,
+        "BoundSigmoid.bound_relax": 1,
+        "BoundStepActivation.bound_relax": 1
+      },
+      "dimensions": [
+        6,
+        3,
+        4
+      ],
+      "node_count": 53,
+      "outputs": {
+        "crown_finite": true,
+        "crown_lower": {
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "sha256": "67ccb141b6d6fe1486621e74d84df9fc106c8c302b300e9aac8a17bd19771b05"
+        },
+        "crown_ordered": true,
+        "crown_upper": {
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "sha256": "67ccb141b6d6fe1486621e74d84df9fc106c8c302b300e9aac8a17bd19771b05"
+        },
+        "ibp_finite": true,
+        "ibp_lower": {
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "sha256": "67ccb141b6d6fe1486621e74d84df9fc106c8c302b300e9aac8a17bd19771b05"
+        },
+        "ibp_ordered": true,
+        "ibp_upper": {
+          "maximum": 0.5,
+          "minimum": 0.0,
+          "sha256": "67ccb141b6d6fe1486621e74d84df9fc106c8c302b300e9aac8a17bd19771b05"
+        },
+        "shape": [
+          1,
+          37
+        ]
+      }
+    }
+  },
+  "environment": {
+    "auto_lirpa_module": "auto_LiRPA",
+    "auto_lirpa_python_tree_sha256": "6a8d960cdd013cbd63cc814d2e21e30ab2f3f23bada889eaf4a91f4be3994c73",
+    "auto_lirpa_source_commit": null,
+    "auto_lirpa_version": "0.7.0",
+    "cuda_runtime": "12.8",
+    "cudnn": 91002,
+    "gpu": "NVIDIA GeForce RTX 5070",
+    "python": "3.10.20",
+    "torch": "2.8.0+cu128"
+  },
+  "purpose": "implementation trace; not a soundness proof",
+  "traced_sources": [
+    {
+      "method": "bound_backward",
+      "owner": "BoundMatMul",
+      "source_line": 975,
+      "source_module": "auto_LiRPA.operators.linear"
+    },
+    {
+      "method": "bound_backward_with_weight",
+      "owner": "BoundLinear",
+      "source_line": 524,
+      "source_module": "auto_LiRPA.operators.linear"
+    },
+    {
+      "method": "bound_backward",
+      "owner": "BoundMul",
+      "source_line": 237,
+      "source_module": "auto_LiRPA.operators.bivariate"
+    },
+    {
+      "method": "bound_backward_both_perturbed",
+      "owner": "BoundMul",
+      "source_line": 247,
+      "source_module": "auto_LiRPA.operators.bivariate"
+    },
+    {
+      "method": "bound_backward",
+      "owner": "BoundRelu",
+      "source_line": 247,
+      "source_module": "auto_LiRPA.operators.relu"
+    },
+    {
+      "method": "bound_relax",
+      "owner": "BoundSigmoid",
+      "source_line": 494,
+      "source_module": "auto_LiRPA.operators.s_shaped"
+    },
+    {
+      "method": "bound_relax",
+      "owner": "BoundStepActivation",
+      "source_line": 62,
+      "source_module": "width_cert.bounds.operators"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "changed_files": [
+    {
+      "path": "bound_ops.py",
+      "reference_sha256": "7223bf59d723a30f41e6f08555936c319c9b71a129410b0bbf639ed79a1e56c7",
+      "runtime_sha256": "760344b0072cd998507ad2317eff318f20848a69e16b7f03e9d76b637baef6ce",
+      "status": "modified"
+    },
+    {
+      "path": "forward_bound.py",
+      "reference_sha256": "c8c62738c7cd25a13dfba17e0db1b92efe4c1a9af7d61be5b29f12e0200f4aaa",
+      "runtime_sha256": "71d7bb3a7c9fb86c05b27901ece93f8aad572a1df2d281eff14dff00223bf13f",
+      "status": "modified"
+    },
+    {
+      "path": "operators/linear.py",
+      "reference_sha256": "bd9cad35141faaeac7045177ac2323b655610a456e99656c92672d85adce710e",
+      "runtime_sha256": "a40803c0523da021333daedcd094ca02a952302499853ad05a0735dab2f29952",
+      "status": "modified"
+    }
+  ],
+  "purpose": "dependency provenance comparison; not a soundness proof",
+  "reference_python_files": 62,
+  "reference_python_tree_sha256": "2bc6390a98d9e88df4c8a2460c9e1cd2e4d7e7e7b058970f665bf7379febff2f",
+  "runtime_python_files": 62,
+  "runtime_python_tree_sha256": "6a8d960cdd013cbd63cc814d2e21e30ab2f3f23bada889eaf4a91f4be3994c73"
+}

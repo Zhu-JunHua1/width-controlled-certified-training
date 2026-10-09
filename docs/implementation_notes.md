@@ -49,11 +49,12 @@ not informative about schedule differences.
 
 ## Step-node soundness
 
-The derivative of ReLU is represented by a step-like node. Stable-sign intervals are exact (`[0,0]` or
-`[1,1]`); an interval containing zero uses the constant box `[0,1]`, including every derivative choice
-permitted by the ReLU subdifferential at the kink. We do not call these values ``subgradients of the
-discontinuous step function.'' In real arithmetic, the supported local IBP/CROWN relaxations enclose their
-exact operators, and IC intersects the two enclosures without being looser than either input coordinate.
+The derivative of ReLU is represented by a step-like node whose implemented point rule is
+`1{z > 0}`, including value zero at the kink. Stable-sign intervals are exact (`[0,0]` when the upper
+endpoint is non-positive and `[1,1]` when the lower endpoint is positive); an interval crossing zero uses
+the constant box `[0,1]`. We do not call these values ``subgradients of the discontinuous step function.''
+In real arithmetic, the supported local IBP/CROWN relaxations enclose their exact operators, and IC
+intersects the two enclosures without being looser than either input coordinate.
 
 Floating-point kernels may produce a numerical inconsistency between the two enclosures. On every affected
 coordinate IC conservatively falls back to the IBP bound, regardless of gap size. The implementation logs
@@ -93,8 +94,9 @@ checkpoint-free.  It uses a `[1,1,1]` binary MLP and enumerates the lower
 endpoint, midpoint, and upper endpoint of every input and parameter interval.
 Its reference BCE gradients are computed by an independent analytic formula.
 When the hidden preactivation is exactly zero, the check evaluates both
-derivative endpoint choices, 0 and 1, so the implementation is tested against
-the complete constant step box used by the mathematical construction.  The
+endpoints 0 and 1. The implemented point derivative is 0; including 1 is an
+additional stress test of the complete constant step box used on crossing
+intervals. The
 default cases also vary the sign of the downstream weight to exercise the
 bilinear backward products.  This remains a finite implementation diagnostic,
 not a substitute for the real-arithmetic compositional proof.

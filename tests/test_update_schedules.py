@@ -16,6 +16,7 @@ from width_cert.core import (
     StepDecayUpdate,
     budget_record,
     continue_from_fixed_prefix,
+    cumulative_matched_cosine_rule,
     final_continuation_step,
     matched_final_step_rules,
 )
@@ -77,6 +78,35 @@ def test_matched_scalar_schedules_share_the_requested_final_mean_step():
     for rule in rules.values():
         decision = rule.decide(LOWER, UPPER, WIDTH, epoch=7)
         assert math.isclose(decision.effective_step_mean, 0.02, rel_tol=1e-6)
+
+
+def test_cumulative_cosine_matches_declared_mean_step():
+    target = 0.06
+    rule = cumulative_matched_cosine_rule(
+        base_step=0.1,
+        target_mean_step=target,
+        start_epoch=3,
+        total_steps=8,
+    )
+    realized = [
+        rule.decide(LOWER, UPPER, WIDTH, epoch).effective_step_mean
+        for epoch in range(3, 11)
+    ]
+    assert math.isclose(sum(realized) / len(realized), target, rel_tol=1e-12)
+
+
+def test_cumulative_cosine_rejects_infeasible_target():
+    try:
+        cumulative_matched_cosine_rule(
+            base_step=0.1,
+            target_mean_step=0.01,
+            start_epoch=0,
+            total_steps=20,
+        )
+    except ValueError as error:
+        assert "infeasible" in str(error)
+    else:
+        raise AssertionError("infeasible cumulative target was accepted")
 
 
 def test_common_prefix_continuation_and_budget_are_exact():

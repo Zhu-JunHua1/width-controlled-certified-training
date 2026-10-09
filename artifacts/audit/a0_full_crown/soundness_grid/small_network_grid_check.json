@@ -1,0 +1,56 @@
+{
+  "admitted_gradient_evaluations": 504,
+  "cases": 1,
+  "check_type": "deterministic_dense_grid_implementation_diagnostic",
+  "grid_values_per_interval_variable": 3,
+  "intersection_diagnostics": {
+    "a0_crossing_relu/target=0": {
+      "Full-IC": {
+        "calls": 1,
+        "fallback_calls": 0,
+        "fallback_coordinates": 0,
+        "maximum_gap": 0.0
+      },
+      "Hybrid-IC": {
+        "calls": 1,
+        "fallback_calls": 0,
+        "fallback_coordinates": 0,
+        "maximum_gap": 0.0
+      }
+    },
+    "a0_crossing_relu/target=1": {
+      "Full-IC": {
+        "calls": 1,
+        "fallback_calls": 0,
+        "fallback_coordinates": 0,
+        "maximum_gap": 0.0
+      },
+      "Hybrid-IC": {
+        "calls": 1,
+        "fallback_calls": 0,
+        "fallback_coordinates": 0,
+        "maximum_gap": 0.0
+      }
+    }
+  },
+  "is_real_arithmetic_soundness_proof": false,
+  "limitations": "Finite endpoint/midpoint enumeration can reveal implementation errors but cannot replace the operator-wise real-arithmetic proof.",
+  "loss": "binary_cross_entropy_with_logits",
+  "network_dimensions": [
+    1,
+    1,
+    1
+  ],
+  "parameter_and_input_grid_points": 486,
+  "passed": true,
+  "relu_kink_derivative_choices": [
+    0.0,
+    1.0
+  ],
+  "relu_kink_points": 18,
+  "schema_version": "1.0",
+  "targets_per_case": 2,
+  "tolerance": 1e-05,
+  "total_checked_coordinates_across_methods": 10080,
+  "total_violations": 0
+}
