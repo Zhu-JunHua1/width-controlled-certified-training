@@ -1,0 +1,122 @@
+schema_version: "1.0"
+status: frozen
+study_id: protocol-v4-schedule-confirmation
+target_venue: IJAR
+
+code:
+  # This commit contains the executable code, final configurations, frozen
+  # start manifests, and hypothesis specification.  The present lock is the
+  # subsequent metadata-only freeze commit.
+  git_commit: 18190d1f85234631f7d9511c41db80773fc191a4
+  dependency_lock_sha256: 27d62072557620999fb58d533ef30fb4fb1121c5c7b507dcf53a48db02365df1
+  auto_lirpa_source_sha256: 6a8d960cdd013cbd63cc814d2e21e30ab2f3f23bada889eaf4a91f4be3994c73
+
+data:
+  split_policy: explicit_train_calibration_blind_test
+  prior_protocol_results_excluded_from_confirmation: true
+  blind_test_opened: false
+  twomoons:
+    train_seed: 2268034632
+    calibration_seed: 2931978507
+    blind_test_seed: 2695485613
+  mnist17:
+    train_seed: 1951381023
+    calibration_seed: 1408693209
+    blind_test_seed: 1127648377
+    split_manifest_sha256: 3392c6b7cba031c204d7aa529cb9ca141c89d62e32ef505898ff520bdc5eaa8c
+    overlap_with_protocol_v2: zero_by_official_namespace
+
+selection:
+  split: calibration
+  checkpoint_rule: first_argmax_calibration_certified_accuracy
+  selection_certifier: IC
+  retention: 0.8
+  tie_breaking: earliest_epoch
+  terminal_failure_policy: non_completed_raw_value_null_analysis_value_zero
+  scalar_search:
+    split: calibration_only
+    starts: 3
+    candidate_families: [inverse_time, cosine, step_decay]
+    target_final_steps: [0.005, 0.01, 0.02, 0.04, 0.06, 0.08]
+    primary_metric: mean_calibration_cert_at_T
+    winner_twomoons: {family: inverse_time, target_final_step: 0.005}
+    winner_mnist17: {family: inverse_time, target_final_step: 0.005}
+    test_metrics_accessed: false
+
+development_selection_artifacts:
+  P1_candidate_table_sha256: 34f91458d80c496f8ced3a5c336b123a6776f6e7eaad85e3f06224b9d2347443
+  P1_selection_manifest_sha256: e775fb7fb977d931884e6fe3855931a3f943386c99278158542901c37979b1e7
+  P2_candidate_table_sha256: 4508bcba20262ef67295489cb34aac88fd8333f3f4387cafdff9a33a60367ea6
+  P2_selection_manifest_sha256: 2d9ff09ceacddaf70bcab752c46e6a6b855da4e41c3648903546ce47efcde63a
+
+endpoints:
+  primary: IC_certified_blind_test_accuracy_at_T
+  secondary:
+    - IC_certified_blind_test_accuracy_at_calibration_selected_checkpoint
+    - IBP_certified_blind_test_accuracy_at_T
+    - trajectory_certified_accuracy_AUC
+    - first_collapse_epoch
+  safety_cost:
+    - blind_test_clean_accuracy_at_selected
+    - blind_test_clean_accuracy_at_T
+    - complete_wall_time_including_fixed_pre_run
+    - seconds_per_executed_update
+    - peak_device_memory
+    - numerical_intersection_fallbacks
+  mechanism_calibration_only:
+    - parameter_interval_width
+    - gradient_bound_width
+    - realized_step_sum_mean_and_final
+
+evaluation:
+  test_certifiers: [IBP, IC]
+  primary_test_certifier: IC
+  require_common_test_samples: true
+  require_common_checkpoint_rule: true
+  evaluate_blind_test_once_after_freeze: true
+
+update_budget:
+  methods:
+    - IC
+    - IC+IWAU
+    - IC+GlobalIWAU
+    - IC+TunedScalar
+    - IC+CumulativeCosine
+  common_prefix: fixed_IC_update_through_calibration_selected_t_p
+  continuation_updates: equal_within_protocol
+  tuned_scalar: {family: inverse_time, target_final_step: 0.005}
+  cumulative_cosine_target_mean_step:
+    twomoons: 0.0588678422753282
+    mnist17: 0.0559918078835364
+  cumulative_target_source: exposed_development_calibration_trajectories
+  cumulative_target_uses_blind_test: false
+  global_width_rule: eta_base_over_1_plus_lambda_mean_omega
+  coordinate_rule: eta_base_over_1_plus_lambda_omega_i
+  complete_cost_includes_fixed_pre_run: true
+  report_realized_update_and_compute_budgets: true
+
+statistics:
+  hypothesis_spec_sha256: e9c10481d766eff50bc54b3867f30f5ba051f5e215a81990e07995854e1b7893
+  hypotheses:
+    - S1_TwoMoons_IWAU_vs_tuned_scalar
+    - S1_MNIST17_IWAU_vs_tuned_scalar
+    - S2_TwoMoons_IWAU_vs_cumulative_cosine
+    - S2_MNIST17_IWAU_vs_cumulative_cosine
+    - S3_TwoMoons_coordinate_vs_global_IWAU
+    - S3_MNIST17_coordinate_vs_global_IWAU
+  endpoint: IC_certified_blind_test_accuracy_at_T
+  sidedness: one-sided
+  multiple_comparison_family: six_schedule_hypotheses
+  correction: Holm
+  bootstrap_samples: 50000
+  bootstrap_seed: 20261010
+
+protocols:
+  P1_twomoons_schedule_protocol_v4:
+    config_sha256: af14973e962022879cc874d5c86962ea868e740d100d4d20985e9df8aa1fe3a1
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: afbbb7bdc629bdbc0a21cee22986ed7e1c1dc703ded32667f76f1c34aee9d34a
+  P2_mnist17_schedule_protocol_v4:
+    config_sha256: 5fcda358ec2919bd4464200b6d008ca63508b9c791863748cbc267d84035d401
+    split_manifest_sha256: 3392c6b7cba031c204d7aa529cb9ca141c89d62e32ef505898ff520bdc5eaa8c
+    seed_selection_manifest_sha256: 6e36e264be65b2dc49690bfc1023a6056686742dad03b1cb2bad9817473b1a00

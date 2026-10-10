@@ -1,0 +1,23 @@
+{
+  "candidates": 18,
+  "failure_policy": "non-completed run contributes zero cert_at_T",
+  "primary_selection_metric": "mean_calibration_cert_at_T",
+  "schema_version": "1.0",
+  "selection_split": "calibration_only",
+  "test_metrics_accessed": false,
+  "tie_breaking": [
+    "mean_peak_calibration_cert_descending",
+    "mean_elapsed_seconds_ascending",
+    "family_lexicographic",
+    "target_final_step_ascending"
+  ],
+  "winner": {
+    "completed": 3,
+    "family": "inverse_time",
+    "mean_calibration_cert_at_T": 28.133333333333333,
+    "mean_elapsed_seconds": 356.82029953335103,
+    "mean_peak_calibration_cert": 71.86666666666667,
+    "starts": 3,
+    "target_final_step": 0.005
+  }
+}
