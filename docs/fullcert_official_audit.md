@@ -66,6 +66,21 @@ common evaluator. It must not reconstruct a box from its centre or radius after 
 | Common IBP/IC test evaluator | Not implemented by official FullCert | Conditional on verified box conversion into the public evaluator |
 | Runtime and peak memory | Runtime can be measured externally; peak memory needs adapter instrumentation | Feasible |
 
+### Full-batch learning-rate semantics
+
+The development adapter audit found an additional normalization detail that is
+not visible from the command-line interface. `BinaryCrossEntropyLoss.backwards`
+divides the logit derivative by the batch size, and `LinearLayer.backwards`
+divides each parameter gradient by the batch size again. Consequently, the
+raw FullCert API update is `1/N` of the usual mean-BCE gradient update for a
+full batch of size `N`. A point-valued one-step parity test confirms that an
+API learning-rate argument of `N * eta` reproduces the mathematical SGD step
+of size `eta` without changing any official forward, backward, or update
+operator. The matched adapter must therefore record both values explicitly;
+for the paper protocol, `N=100`, `eta=0.1`, and the official API argument
+is 10.0. A result using the raw argument 0.1 would instead be external-context
+evidence because its effective update budget would differ by a factor of 100.
+
 The CLI flags `--train-size` and `--test-size` are not passed through for the TwoMoons loader, whose
 defaults are 1000 training and 200 validation/test examples. Therefore the official CLI cannot be
 used as-is for the matched experiment. This is a protocol-interface limitation, not a limitation of
@@ -100,6 +115,8 @@ Before freezing a final comparison, all of the following must pass:
    selection.
 6. Provenance capture for the FullCert commit, adapter commit, environment, frozen configuration,
    split manifest, and result hashes.
+7. Explicit full-batch normalization compensation, with the paper step and the
+   raw FullCert API argument both preserved in the result metadata.
 
 ## Decision
 
