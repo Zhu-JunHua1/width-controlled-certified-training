@@ -469,6 +469,43 @@ def test_protocol_v5_seed_selection_audit_cannot_contain_certified_or_test_metri
     assert "test_cert" not in serialized
 
 
+def test_protocol_v5_frozen_main_is_fail_closed_and_matches_the_declared_grid():
+    config = load_config(
+        ROOT
+        / "configs"
+        / "protocol_v5_frozen"
+        / "P1_twomoons_multiradius_main.yaml"
+    )
+    manifest = json.loads(
+        (ROOT / "study_locks" / "candidate_audits" / "protocol_v5_P1_main_seeds.json")
+        .read_text(encoding="utf-8")
+    )["groups"]["main"]
+    assert config.name == "P1_twomoons_multiradius_protocol_v5"
+    assert config.data.test_seed == 2729766939
+    assert config.data.test_seed not in {0, config.data.seed, config.data.calibration_seed}
+    assert config.evaluation.test_access == "frozen_final"
+    assert config.evaluation.analysis_tier == "primary"
+    assert config.evaluation.study_lock == "study_locks/protocol_v5_main_frozen.yaml"
+    assert config.seed_selection.manifest == (
+        "study_locks/candidate_audits/protocol_v5_P1_main_seeds.json"
+    )
+    assert config.seed_selection.group == "main"
+    assert manifest["test_metrics_read"] is False
+    assert manifest["selection_rule"] == "first_candidates_accepted_by_every_member"
+    assert len(manifest["selected_seeds"]) == len(set(manifest["selected_seeds"])) == 10
+    assert config.radii == pytest.approx((0.0001, 0.001, 0.01))
+    assert config.methods == ("IBP", "IBP+IWAU", "IC", "IC+IWAU")
+    assert config.evaluation.bound_methods == ("IBP", "IC")
+    assert len(config.radii) * len(manifest["selected_seeds"]) * len(config.methods) == 120
+    assert (
+        len(config.radii)
+        * len(manifest["selected_seeds"])
+        * len(config.methods)
+        * len(config.evaluation.bound_methods)
+        == 240
+    )
+
+
 def test_synthetic_separate_strategy_uses_all_three_split_seeds():
     first = build_dataset(
         "synthetic:3",

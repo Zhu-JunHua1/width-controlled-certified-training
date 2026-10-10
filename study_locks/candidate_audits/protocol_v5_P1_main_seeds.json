@@ -1,0 +1,197 @@
+{
+  "groups": {
+    "main": {
+      "candidate_range": {
+        "count": 10,
+        "group": null,
+        "manifest": null,
+        "start": 0,
+        "stop": 50
+      },
+      "candidates_evaluated": [
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_twomoons_multiradius_protocol_v5_candidate": {
+              "accepted": true,
+              "initial_accuracy": 0.49400001764297485,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 21
+            }
+          },
+          "seed": 0
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P1_twomoons_multiradius_protocol_v5_candidate": {
+              "accepted": false,
+              "accuracy": 0.5360000133514404,
+              "reason": "prepared_accuracy_above_maximum"
+            }
+          },
+          "seed": 1
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P1_twomoons_multiradius_protocol_v5_candidate": {
+              "accepted": false,
+              "accuracy": 0.7560000419616699,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 2
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P1_twomoons_multiradius_protocol_v5_candidate": {
+              "accepted": false,
+              "accuracy": 0.7980000376701355,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 3
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_twomoons_multiradius_protocol_v5_candidate": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 4
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_twomoons_multiradius_protocol_v5_candidate": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 5
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_twomoons_multiradius_protocol_v5_candidate": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 6
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_twomoons_multiradius_protocol_v5_candidate": {
+              "accepted": true,
+              "initial_accuracy": 0.46800002455711365,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 6
+            }
+          },
+          "seed": 7
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P1_twomoons_multiradius_protocol_v5_candidate": {
+              "accepted": false,
+              "accuracy": 0.796000063419342,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 8
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_twomoons_multiradius_protocol_v5_candidate": {
+              "accepted": true,
+              "initial_accuracy": 0.3920000195503235,
+              "pretraining_accuracy": 0.5060000419616699,
+              "pretraining_epochs": 45
+            }
+          },
+          "seed": 9
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_twomoons_multiradius_protocol_v5_candidate": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 10
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_twomoons_multiradius_protocol_v5_candidate": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 11
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_twomoons_multiradius_protocol_v5_candidate": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 12
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_twomoons_multiradius_protocol_v5_candidate": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 13
+        }
+      ],
+      "members": [
+        "P1_twomoons_multiradius_protocol_v5_candidate"
+      ],
+      "selected_seeds": [
+        0,
+        4,
+        5,
+        6,
+        7,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "selection_rule": "first_candidates_accepted_by_every_member",
+      "test_metrics_read": false
+    }
+  },
+  "schema_version": "1.0"
+}

@@ -1,0 +1,42 @@
+name: P1_twomoons_multiradius_protocol_v5
+output_dir: results/protocol_v5_final/P1_twomoons_multiradius
+data:
+  dataset: twomoons
+  train_size: 100
+  calibration_size: 500
+  test_size: 500
+  seed: 20261011
+  calibration_seed: 20261012
+  test_seed: 2729766939
+  strategy: separate
+model: {hidden_layers: 2, hidden_width: 20}
+pretraining:
+  enabled: true
+  target_accuracy: 0.50
+  maximum_initial_accuracy: 0.505
+  maximum_final_accuracy: 0.52
+  step_size: 0.02
+  maximum_epochs: 4000
+  optimizer: sgd
+training:
+  horizon: 40
+  base_step: 0.1
+  retention: 0.8
+  gradient_batch_size: 4
+  max_gradient_width: 50.0
+evaluation:
+  input_domain: same_as_training
+  selection_bound_method: IC
+  bound_methods: [IBP, IC]
+  test_access: frozen_final
+  analysis_tier: primary
+  study_lock: study_locks/protocol_v5_main_frozen.yaml
+radii: [0.0001, 0.001, 0.01]
+seed_selection:
+  start: 0
+  stop: 50
+  count: 10
+  manifest: study_locks/candidate_audits/protocol_v5_P1_main_seeds.json
+  group: main
+methods: [IBP, IBP+IWAU, IC, IC+IWAU]
+echo_epochs: false
