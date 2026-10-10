@@ -1,0 +1,13 @@
+{
+  "endpoint_policy": "diverged_as_zero",
+  "schema_version": "2.0",
+  "sources": [
+    {
+      "aggregate_rows": 24,
+      "sha256": "55cc623db107416e7d88323a79cf3663b91a4d6d4913755569e0791d83e32101",
+      "source": "results.csv"
+    }
+  ],
+  "summary": "protocol_summary.csv",
+  "summary_sha256": "1a20bb6d875d3f88b26e850e339b9c9671a3b66f6fa7702b17593ab77e8b05fa"
+}

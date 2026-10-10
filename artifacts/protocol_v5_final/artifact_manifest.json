@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "study_id": "protocol-v5-twomoons-multiradius-main",
+  "frozen_config_sha256": "5a0b8b8cc939afe12432646c06905505588c8f2331ec1d56855b51c6167add87",
+  "frozen_lock_sha256": "5407dae1f7fdd3ec2300c919b281d5812d3e95f0a032c473112c3fdebb528c7f",
+  "executable_commit": "3dceb438daf9ad04b8eb1b78596958beef428809",
+  "summary_cells": 120,
+  "evaluator_rows": 240,
+  "endpoint_policy": "diverged terminal values are zero only in derived aggregate; raw fields remain null",
+  "files": [
+    {
+      "path": "aggregate/protocol_summary.csv",
+      "sha256": "1a20bb6d875d3f88b26e850e339b9c9671a3b66f6fa7702b17593ab77e8b05fa"
+    },
+    {
+      "path": "aggregate/report_manifest.json",
+      "sha256": "3cf21ef1075b6a576999e1a19721685c95d776ee6c7f866befec45b83ad164c2"
+    },
+    {
+      "path": "appendix/full_evaluator_per_start.csv",
+      "sha256": "55cc623db107416e7d88323a79cf3663b91a4d6d4913755569e0791d83e32101"
+    },
+    {
+      "path": "appendix/per_run_safety_cost.csv",
+      "sha256": "90d67636f7520f6a183ae7c55fe37e71b137f749bbfc639c2095b6e013c73556"
+    },
+    {
+      "path": "main_table.csv",
+      "sha256": "e2065e54b5840e5026ef309c3df35f3fa6235d1783908650fbd364bd5c96ddf6"
+    },
+    {
+      "path": "runtime/runtime_manifest.json",
+      "sha256": "44f0e288d709d1a87021844054bfd88dd995690dae926790da789989445a2260"
+    },
+    {
+      "path": "runtime/runtime_summary.csv",
+      "sha256": "5a091472f34ac7fa893f675961b358ce128be2c5ab1a81bd7126ce7783eb13f1"
+    }
+  ]
+}
