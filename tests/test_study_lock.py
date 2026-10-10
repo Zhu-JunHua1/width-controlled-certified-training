@@ -8,6 +8,8 @@ import pytest
 import yaml
 
 from width_cert.experiments.study_lock import verify_frozen_study_lock
+from width_cert.experiments import load_config
+from width_cert.experiments.study_lock import experiment_config_sha256
 
 
 OUTPUT = Path(__file__).parent / ".test-output" / "study-lock"
@@ -126,3 +128,24 @@ def test_frozen_lock_rejects_a_changed_seed_selection_manifest():
             config_sha256="resolved",
             seed_selection_manifest=manifest,
         )
+
+
+def test_protocol_v5_main_lock_authorizes_only_the_committed_grid():
+    root = Path(__file__).resolve().parents[1]
+    config = load_config(
+        root / "configs" / "protocol_v5_frozen" / "P1_twomoons_multiradius_main.yaml"
+    )
+    payload = verify_frozen_study_lock(
+        root / "study_locks" / "protocol_v5_main_frozen.yaml",
+        protocol_name=config.name,
+        config_sha256=experiment_config_sha256(config),
+        seed_selection_manifest=(
+            root / "study_locks" / "candidate_audits" / "protocol_v5_P1_main_seeds.json"
+        ),
+    )
+    assert payload["code"]["git_commit"] == (
+        "3dceb438daf9ad04b8eb1b78596958beef428809"
+    )
+    assert payload["data"]["blind_test_opened"] is False
+    assert payload["evaluation"]["expected_summary_rows"] == 120
+    assert payload["evaluation"]["expected_evaluator_rows"] == 240

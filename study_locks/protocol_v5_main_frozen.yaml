@@ -1,0 +1,83 @@
+schema_version: "1.0"
+status: frozen
+study_id: protocol-v5-twomoons-multiradius-main
+target_venue: IJAR
+
+code:
+  # This is the executable-input commit. This lock is committed separately as
+  # metadata so that its own commit does not create a circular hash dependency.
+  git_commit: 3dceb438daf9ad04b8eb1b78596958beef428809
+  dependency_lock_sha256: 27d62072557620999fb58d533ef30fb4fb1121c5c7b507dcf53a48db02365df1
+  auto_lirpa_source_sha256: 6a8d960cdd013cbd63cc814d2e21e30ab2f3f23bada889eaf4a91f4be3994c73
+
+data:
+  split_policy: independent_generators_for_train_calibration_blind_test
+  blind_test_opened: false
+  dataset: twomoons
+  train_size: 100
+  calibration_size: 500
+  blind_test_size: 500
+  train_seed: 20261011
+  calibration_seed: 20261012
+  blind_test_seed: 2729766939
+  blind_test_seed_novelty_checked_against_workspace_and_git_history: true
+
+selection:
+  start_selection_rule: first_candidates_accepted_by_every_member
+  start_selection_uses_certified_accuracy: false
+  start_selection_uses_test_metrics: false
+  checkpoint_split: calibration
+  checkpoint_rule: first_argmax_calibration_certified_accuracy
+  selection_certifier: IC
+  tie_breaking: earliest_epoch
+  retention: 0.8
+  iwau_dependency: same_bound_fixed_pre_run_only
+  terminal_failure_policy: non_completed_raw_value_null_analysis_value_zero
+
+endpoints:
+  primary: IC_certified_blind_test_accuracy_at_calibration_selected_checkpoint
+  secondary:
+    - IC_certified_blind_test_accuracy_at_T
+    - IBP_certified_blind_test_accuracy_at_calibration_selected_checkpoint
+    - IBP_certified_blind_test_accuracy_at_T
+  safety_cost:
+    - blind_test_clean_accuracy_at_selected
+    - blind_test_clean_accuracy_at_T
+    - complete_wall_time_including_fixed_pre_run
+    - seconds_per_executed_update
+    - peak_device_memory
+
+evaluation:
+  test_certifiers: [IBP, IC]
+  primary_test_certifier: IC
+  input_domain: same_as_training
+  require_common_test_samples: true
+  require_common_checkpoint_rule: true
+  evaluate_blind_test_once_after_freeze: true
+  expected_summary_rows: 120
+  expected_evaluator_rows: 240
+
+update_budget:
+  methods: [IBP, IBP+IWAU, IC, IC+IWAU]
+  horizon: 40
+  base_step: 0.1
+  radii: [0.0001, 0.001, 0.01]
+  shared_starts: 10
+  adaptive_rule: coordinatewise_interval_gradient_width_feedback
+  complete_cost_includes_fixed_pre_run: true
+
+statistics:
+  hypotheses: [prespecified_blind_multiradius_descriptive_replication]
+  sidedness: not_applicable_descriptive
+  multiple_comparison_family: not_applicable_descriptive
+  correction: not_applicable_descriptive
+
+analysis:
+  result_grid_validator: src/width_cert/analysis/integrity.py
+  result_grid_validator_sha256: 7ca80ebd492fe7667b5dfefdbae4168e7745550be30b60e5f07289207442cab1
+
+protocols:
+  P1_twomoons_multiradius_protocol_v5:
+    config_sha256: 5a0b8b8cc939afe12432646c06905505588c8f2331ec1d56855b51c6167add87
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 7905269cc5feb2e82d588216e8d225c5e5be3d6a0efa4f1e2a25c53d333e4ff0
