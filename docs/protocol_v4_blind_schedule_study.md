@@ -2,9 +2,11 @@
 
 ## Status
 
-`development-design`: implementation and calibration search are allowed; blind
-test evaluation is not. This protocol does not modify or overwrite protocol-v2
-or protocol-v3 artifacts.
+`freeze-ready`: the calibration-only search and seed selection are complete;
+blind-test evaluation has not started.  The final configurations, hypotheses,
+and provenance must be committed and recorded in the frozen study lock before
+the one-time blind run.  This protocol does not modify or overwrite
+protocol-v2 or protocol-v3 artifacts.
 
 ## Purpose
 
@@ -59,6 +61,12 @@ part of the record. Final selection is performed once over all 18 candidates
 using the unchanged metric, failure policy, and tie-breaking rules. No blind
 test metric was accessed before this extension was fixed.
 
+Across all 18 candidates, both tasks selected inverse-time decay with target
+final step `0.005`.  Mean calibration `cert@T` was `53.67%` on TwoMoons and
+`28.13%` on MNIST 1/7.  All initial and extension candidates remain in the
+development record.  These values select the comparator; they are not
+blind-test performance claims.
+
 ## Cumulative-step comparator
 
 `IC+CumulativeCosine` uses the same prefix and continuation count as IWAU. Its
@@ -91,3 +99,19 @@ checkpoint, clean accuracy, trajectory AUC, first collapse epoch, complete
 time, and peak memory. Paired effect sizes and confidence intervals accompany
 the paired tests. All configured methods, failures, and zero effects are
 reported.
+
+The six directional paired comparisons are frozen before test access: IWAU
+versus the tuned inverse-time comparator, cumulative-step-matched cosine, and
+GlobalIWAU on each task.  Holm correction is applied across this six-test
+family.  A numerically diverged terminal trajectory contributes zero only in
+the declared endpoint analysis; raw terminal fields remain null.
+
+## Frozen starts
+
+Starts are selected solely from training and calibration data.  The complete
+accept/reject records are stored in the protocol-v4 candidate-audit manifests.
+
+- TwoMoons: `0, 4, 5, 6, 7, 9, 10, 11, 12, 13`;
+- MNIST 1/7: `0, 1, 3, 4, 5, 6, 8, 9, 10, 12`.
+
+Both manifests explicitly record `test_metrics_read: false`.

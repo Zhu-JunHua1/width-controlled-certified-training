@@ -1,0 +1,197 @@
+{
+  "groups": {
+    "schedule": {
+      "candidate_range": {
+        "count": 10,
+        "group": null,
+        "manifest": null,
+        "start": 0,
+        "stop": 25
+      },
+      "candidates_evaluated": [
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_v4_seed_selection": {
+              "accepted": true,
+              "initial_accuracy": 0.4820000231266022,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 10
+            }
+          },
+          "seed": 0
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P1_v4_seed_selection": {
+              "accepted": false,
+              "accuracy": 0.527999997138977,
+              "reason": "prepared_accuracy_above_maximum"
+            }
+          },
+          "seed": 1
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P1_v4_seed_selection": {
+              "accepted": false,
+              "accuracy": 0.7440000176429749,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 2
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P1_v4_seed_selection": {
+              "accepted": false,
+              "accuracy": 0.8020000457763672,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 3
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_v4_seed_selection": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 4
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_v4_seed_selection": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 5
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_v4_seed_selection": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 6
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_v4_seed_selection": {
+              "accepted": true,
+              "initial_accuracy": 0.45000001788139343,
+              "pretraining_accuracy": 0.5020000338554382,
+              "pretraining_epochs": 9
+            }
+          },
+          "seed": 7
+        },
+        {
+          "accepted_by_all": false,
+          "outcomes": {
+            "P1_v4_seed_selection": {
+              "accepted": false,
+              "accuracy": 0.7900000214576721,
+              "reason": "initial_accuracy_above_maximum"
+            }
+          },
+          "seed": 8
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_v4_seed_selection": {
+              "accepted": true,
+              "initial_accuracy": 0.3880000114440918,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 42
+            }
+          },
+          "seed": 9
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_v4_seed_selection": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 10
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_v4_seed_selection": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 11
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_v4_seed_selection": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 12
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "P1_v4_seed_selection": {
+              "accepted": true,
+              "initial_accuracy": 0.4960000216960907,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 1
+            }
+          },
+          "seed": 13
+        }
+      ],
+      "members": [
+        "P1_v4_seed_selection"
+      ],
+      "selected_seeds": [
+        0,
+        4,
+        5,
+        6,
+        7,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "selection_rule": "first_candidates_accepted_by_every_member",
+      "test_metrics_read": false
+    }
+  },
+  "schema_version": "1.0"
+}

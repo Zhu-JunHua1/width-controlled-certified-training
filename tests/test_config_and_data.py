@@ -380,6 +380,43 @@ def test_every_frozen_protocol_v2_config_is_fail_closed_by_one_lock():
     assert by_name["P2_mnist17_protocol_v2"].evaluation.analysis_tier == "primary"
 
 
+def test_protocol_v4_schedule_configs_freeze_the_reviewed_controls():
+    root = Path(__file__).resolve().parents[1] / "configs" / "protocol_v4_frozen"
+    configs = {
+        config.name: config
+        for path in sorted(root.glob("*.yaml"))
+        for config in load_configs(path)
+    }
+    assert set(configs) == {
+        "P1_twomoons_schedule_protocol_v4",
+        "P2_mnist17_schedule_protocol_v4",
+    }
+    for config in configs.values():
+        assert config.evaluation.test_access == "frozen_final"
+        assert config.evaluation.analysis_tier == "secondary"
+        assert config.evaluation.study_lock == "study_locks/protocol_v4_schedule_frozen.yaml"
+        assert config.evaluation.selection_bound_method == "IC"
+        assert config.evaluation.bound_methods == ("IBP", "IC")
+        assert config.methods == (
+            "IC",
+            "IC+IWAU",
+            "IC+GlobalIWAU",
+            "IC+TunedScalar",
+            "IC+CumulativeCosine",
+        )
+        assert config.training.tuned_schedule_family == "inverse_time"
+        assert config.training.tuned_schedule_target_final_step == pytest.approx(0.005)
+        assert config.seed_selection.count == 10
+        assert config.seed_selection.manifest is not None
+        assert config.seed_selection.group == "schedule"
+    assert configs["P1_twomoons_schedule_protocol_v4"].training.cumulative_target_mean_step == pytest.approx(
+        0.0588678422753282
+    )
+    p2 = configs["P2_mnist17_schedule_protocol_v4"]
+    assert p2.training.cumulative_target_mean_step == pytest.approx(0.0559918078835364)
+    assert p2.data.split_manifest == "data_splits/blind_mnist17_protocol_v4.json"
+
+
 def test_synthetic_separate_strategy_uses_all_three_split_seeds():
     first = build_dataset(
         "synthetic:3",

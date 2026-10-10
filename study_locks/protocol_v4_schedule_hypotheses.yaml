@@ -1,0 +1,75 @@
+schema_version: "1.0"
+family: protocol_v4_schedule_confirmation
+correction: Holm
+bootstrap:
+  samples: 50000
+  seed: 20261010
+
+# Paths are relative to results/protocol_v4_final.
+# All comparisons use the common IC test certifier and the terminal endpoint.
+hypotheses:
+  - id: S1_TwoMoons_IWAU_vs_tuned_scalar
+    results: P1_twomoons_schedule/results.csv
+    radius: 0.01
+    method_a: IC+TunedScalar
+    method_b: IC+IWAU
+    evaluation_method: IC
+    endpoint: test_cert_at_T
+    alternative: greater
+    missing_as_zero: true
+    expected_pairs: 10
+
+  - id: S1_MNIST17_IWAU_vs_tuned_scalar
+    results: P2_mnist17_schedule/results.csv
+    radius: 0.001
+    method_a: IC+TunedScalar
+    method_b: IC+IWAU
+    evaluation_method: IC
+    endpoint: test_cert_at_T
+    alternative: greater
+    missing_as_zero: true
+    expected_pairs: 10
+
+  - id: S2_TwoMoons_IWAU_vs_cumulative_cosine
+    results: P1_twomoons_schedule/results.csv
+    radius: 0.01
+    method_a: IC+CumulativeCosine
+    method_b: IC+IWAU
+    evaluation_method: IC
+    endpoint: test_cert_at_T
+    alternative: greater
+    missing_as_zero: true
+    expected_pairs: 10
+
+  - id: S2_MNIST17_IWAU_vs_cumulative_cosine
+    results: P2_mnist17_schedule/results.csv
+    radius: 0.001
+    method_a: IC+CumulativeCosine
+    method_b: IC+IWAU
+    evaluation_method: IC
+    endpoint: test_cert_at_T
+    alternative: greater
+    missing_as_zero: true
+    expected_pairs: 10
+
+  - id: S3_TwoMoons_coordinate_vs_global_IWAU
+    results: P1_twomoons_schedule/results.csv
+    radius: 0.01
+    method_a: IC+GlobalIWAU
+    method_b: IC+IWAU
+    evaluation_method: IC
+    endpoint: test_cert_at_T
+    alternative: greater
+    missing_as_zero: true
+    expected_pairs: 10
+
+  - id: S3_MNIST17_coordinate_vs_global_IWAU
+    results: P2_mnist17_schedule/results.csv
+    radius: 0.001
+    method_a: IC+GlobalIWAU
+    method_b: IC+IWAU
+    evaluation_method: IC
+    endpoint: test_cert_at_T
+    alternative: greater
+    missing_as_zero: true
+    expected_pairs: 10
