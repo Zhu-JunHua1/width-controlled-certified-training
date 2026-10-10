@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 
 from width_cert.data import build_dataset, canonical_json_sha256, select_mnist_indices
 from width_cert.data.registry import _load_mnist_indices
-from width_cert.experiments import load_config, load_configs
+from width_cert.experiments import load_config, load_configs, select_seeds
 from width_cert.experiments.environment import environment_metadata
 from width_cert.logging.records import SCHEMA_VERSION
 
@@ -415,6 +415,58 @@ def test_protocol_v4_schedule_configs_freeze_the_reviewed_controls():
     p2 = configs["P2_mnist17_schedule_protocol_v4"]
     assert p2.training.cumulative_target_mean_step == pytest.approx(0.0559918078835364)
     assert p2.data.split_manifest == "data_splits/blind_mnist17_protocol_v4.json"
+
+
+def test_protocol_v5_main_candidate_is_sealed_and_matches_the_declared_grid():
+    root = Path(__file__).resolve().parents[1]
+    config = load_config(
+        root
+        / "configs"
+        / "protocol_v5_candidates"
+        / "P1_twomoons_multiradius_main.yaml"
+    )
+    assert config.data.dataset == "twomoons"
+    assert (
+        config.data.train_size,
+        config.data.calibration_size,
+        config.data.test_size,
+    ) == (100, 500, 500)
+    assert config.data.strategy == "separate"
+    assert config.data.test_seed == 0  # development-only placeholder
+    assert (config.model.hidden_layers, config.model.hidden_width) == (2, 20)
+    assert config.training.horizon == 40
+    assert config.training.base_step == pytest.approx(0.1)
+    assert config.radii == pytest.approx((0.0001, 0.001, 0.01))
+    assert config.methods == ("IBP", "IBP+IWAU", "IC", "IC+IWAU")
+    assert config.evaluation.selection_bound_method == "IC"
+    assert config.evaluation.bound_methods == ("IBP", "IC")
+    assert config.evaluation.test_access == "disabled"
+    assert config.evaluation.study_lock is None
+    assert config.evaluation.analysis_tier == "development"
+    assert config.seed_selection.count == 10
+    assert config.seed_selection.manifest is None
+    assert len(config.radii) * config.seed_selection.count * len(config.methods) == 120
+    assert (
+        len(config.radii)
+        * config.seed_selection.count
+        * len(config.methods)
+        * len(config.evaluation.bound_methods)
+        == 240
+    )
+
+
+def test_protocol_v5_seed_selection_audit_cannot_contain_certified_or_test_metrics(
+    tmp_path,
+):
+    root = Path(__file__).resolve().parents[1]
+    config = load_config(root / "configs" / "development" / "protocol_v5_main_smoke.yaml")
+    audit = select_seeds(config, tmp_path / "selection")
+    payload = json.loads(audit.read_text(encoding="utf-8"))
+    assert payload["selected_seeds"] == [0]
+    serialized = json.dumps(payload, sort_keys=True).lower()
+    assert "certified_accuracy" not in serialized
+    assert "test_accuracy" not in serialized
+    assert "test_cert" not in serialized
 
 
 def test_synthetic_separate_strategy_uses_all_three_split_seeds():

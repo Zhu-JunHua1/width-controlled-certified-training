@@ -1,0 +1,7 @@
+hypothesis,radius,method_a,method_b,evaluation_method,endpoint,seeds,positive,zero,negative,mean_difference,ci95_lower,ci95_upper,p_value,holm_adjusted_p
+S1_TwoMoons_IWAU_vs_tuned_scalar,0.01,IC+TunedScalar,IC+IWAU,IC,test_cert_at_T,10,8,1,1,4.520000000000001,0.9399999999999998,10.38,0.01953125,0.01953125
+S1_MNIST17_IWAU_vs_tuned_scalar,0.001,IC+TunedScalar,IC+IWAU,IC,test_cert_at_T,10,10,0,0,42.4,31.13950000000002,53.1,0.0009765625,0.005859375
+S2_TwoMoons_IWAU_vs_cumulative_cosine,0.01,IC+CumulativeCosine,IC+IWAU,IC,test_cert_at_T,10,10,0,0,63.86,56.92,70.91999999999999,0.0009765625,0.005859375
+S2_MNIST17_IWAU_vs_cumulative_cosine,0.001,IC+CumulativeCosine,IC+IWAU,IC,test_cert_at_T,10,10,0,0,74.28,66.85999999999999,80.64000000000001,0.0009765625,0.005859375
+S3_TwoMoons_coordinate_vs_global_IWAU,0.01,IC+GlobalIWAU,IC+IWAU,IC,test_cert_at_T,10,10,0,0,9.879999999999999,7.719500000000017,11.84,0.0009765625,0.005859375
+S3_MNIST17_coordinate_vs_global_IWAU,0.001,IC+GlobalIWAU,IC+IWAU,IC,test_cert_at_T,10,10,0,0,24.040000000000003,19.840000000000003,28.68,0.0009765625,0.005859375

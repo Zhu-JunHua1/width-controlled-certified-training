@@ -1,0 +1,410 @@
+{
+  "executed_update_denominator": "actual interval bound/update evaluations, including a required pre-run",
+  "report": "runtime_summary.csv",
+  "report_sha256": "19c455b2aee7900897e6d5551b32b2f478de58cd6e64bdb0664964b8f197347c",
+  "reported_epoch_denominator": "manuscript horizon T; fixed pre-run cost remains in the numerator",
+  "schema_version": "1.0",
+  "sources": [
+    {
+      "sha256": "f9738c17140874031c443e5b9d801795d90543fdbb5be0cc0887e7618b0098e9",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_0/IC/summary.json"
+    },
+    {
+      "sha256": "c238adf09b0f717dfaf4adc036d8ba80a06938c3254f6b96c2e9027ea300e255",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_0/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "1234e918193c36d613775953d34d2e0a4ba3dae3d441ccb19eb2337a5959d7d3",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_0/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "70849e219d2bd2522d577bc9c0ded0f11e7c462405dfc0032ae64eb69a4c76eb",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_0/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "0d448680e1c2d7eeb35d6084a492abc8b46b6970da811264a8d3194afd77d0ce",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_0/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "48366a101bd8dcde14dd849079d9037acc26e9f5fbf6639efc65b45f00780e97",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_10/IC/summary.json"
+    },
+    {
+      "sha256": "f0381a19604f9e680bea7236259e0a28e2270d642152b0cd4c11a81ed43f51b8",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_10/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "732215617cf01ca35050a2e7f6d5daa46530db61c06e249e082fda536813f661",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_10/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "c0be71b044861922b57b84da64230f7eafbfc663b7c1de2b2a317339e8df273b",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_10/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "e525c46d52e93ea9e8139d124d1901d9323306dea080090abbdf68ce7012a83c",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_10/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "2c84bfd35c8670de981a363e3836cee5f6a6487f899e4d1332d9632d01374813",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_11/IC/summary.json"
+    },
+    {
+      "sha256": "99e95e54c02d472220089dd38549ccc111781e0d1236b300e83284f8eb04554a",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_11/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "6e0eb10a0739b6c8d57367467262c5ec343aa68879a3d7c6f942b95810f8d76e",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_11/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "8e331bc98fbc0e26b29583ccc06a48736fe69e03b4a716b93a27ff7c116a5eb1",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_11/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "3a22d12d2ee2ada95162be948bc6b552ccd2f25cda82671da81a4f7e2b885e05",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_11/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "d4fcacb4647d0d60c6e5981cd2f2dbb6404fa82ae44c901f15ae01acd195827f",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_12/IC/summary.json"
+    },
+    {
+      "sha256": "7c005e61677d66bc80e95be21d62d6a29e13b858e1e687059f529f5f6a4560bf",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_12/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "ecdf468a4aa6d573298bf3d6f0cfa162c80078fbb14527d326e4267878f2bb27",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_12/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "768efb2596fc674bb8734e80d1e851e67a904f89bb563c6e60437f0e95f9e35e",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_12/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "9b009986ae289491bab141bde036ae47f33335486c49a349e9dafec038b10e4e",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_12/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "b09607f8f2a80fc2cab4a02c97f8d12cab8d97512e9cd9bf7b36885607169ee4",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_13/IC/summary.json"
+    },
+    {
+      "sha256": "120d5cd7b7dbd7ad19e9716cda7a9a10fea092bf50a3139f63239ea7e303617e",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_13/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "e1a0a47e6c05eeb39c0f5034bd76f10af87bf652963206fb80b1794d136078e6",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_13/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "dbbed7e2a67d3a8ecbc966e97cbae6f028bdbbd66ffd72f9176f1b7a95b28f05",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_13/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "2da368ab3c323a7162f5f991c6fc78496e4e1a60be69526149ddddfdaa0ce608",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_13/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "5c072e9243d80fb3c021f50efb1b710ae0a205fc370c082044337699eb1b1e6f",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_4/IC/summary.json"
+    },
+    {
+      "sha256": "fcfe32b8219bae51295fff5c062417b22337a128a0c502693a273e0967539421",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_4/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "970a490e83b4764f0571d62e1a760631e3f62ae8515c43f6ce7aa5c5b684bd52",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_4/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "23a7b11b9e7dadbaa6c4118bd3acf453ebcc3ab36b9a001956c3b2b7f77e7ced",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_4/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "b47ad6d8f1b9f40b50ff2f1bec0c61bb4fda9378c259541885ae2f2aad8c3df5",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_4/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "b0eeb8641804c17bffc4be4518a6660f544d76700766f8d6795482d7cb13c112",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_5/IC/summary.json"
+    },
+    {
+      "sha256": "080f6b8bbbc0e80b05a39732a8ffe0278ed3f78ffbdd00713d8359b851581847",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_5/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "85eb012547539fe5a71eee143e333fec7625ff83ac553ddb87ed3a8417379521",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_5/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "98f99e98da1c0d25ddb5da6bc9d1f441e11b8796b89f0b238cc7cd9d1c3a8551",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_5/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "40aadd53073f5c23e8a85ab2a53172ff37401aa4448162419b008df662d6df4f",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_5/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "69aa635d0a39ab7db77bcbf8a989bcf5dba65e42f415e84a8687218b647029dd",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_6/IC/summary.json"
+    },
+    {
+      "sha256": "5318fc75a0029d74d24e0847ac5b026cb2076a703349cffbef1bb601def7d354",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_6/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "638580456b3cf887db40973030b0ea4b6d1fe0b1ae115552bda41c5457910401",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_6/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "e798e776119bba4aaee8b411ca3c10c3febb8626e49ddf9aefa4c0762746dff7",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_6/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "47bea5b806d1c742fe06b604184ddaf47d65ff0839b34252dd5ebff350115847",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_6/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "866f56a2bc549639925efdf75cbe5c35184bacc1cb9c68ce9cb1e0d2ecc6024e",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_7/IC/summary.json"
+    },
+    {
+      "sha256": "279f3b6c28c542371a3310358d4e728b93ba7189e92ad16a6d04593d53d8fa75",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_7/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "5ee3999638bca9fc7bf23dcfdc8ddd191d33ef144494a06884c7209a5384a0ee",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_7/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "66e22953ecb388eb3f55ff44c9493483751341f4d10f3dc241463fba27ed9a36",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_7/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "0ebd0295a0a6b0118728696a4eae3ff8838522276396a427100cc963c212a154",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_7/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "b118e1d9c1283fd62aa5b366a3cec48165d7fe4abb12ed146b8d8c4ba3e52914",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_9/IC/summary.json"
+    },
+    {
+      "sha256": "9893ae98abf3582bf3af33260f8047f6bc7ca9cb827d75163796efce17639d3d",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_9/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "1042ef76239bb6be37b007dd2ea9ac162d09cac6d822a2b1e707de48a63ee7d4",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_9/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "c4d741509536bd6189cbbff4419d807a8c7a6e324e2c98d55e74b478f9504d80",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_9/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "9e952c74fb139d85cb055c21e09e68b52bcf2d3314a432f65173bfd534787c64",
+      "source": "P1_twomoons_schedule/eps_0.01/seed_9/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "219bf3a0dbc0e7c3180fc1c2485ee24e27eac699d9ccd7552ab5650a8e3da913",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_0/IC/summary.json"
+    },
+    {
+      "sha256": "51971dca42ee42825338fe457d6154f5a28c57cbf18f38be3aeb2449083d3c71",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_0/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "d2a718a675ca91c1d5f19cbf37a650f1f70034eae1e295c21270c4a76a9a5d9f",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_0/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "7c9411994721e3531698e171cfd2ba3df499daab123a781458932285fb7a6767",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_0/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "1ae45ca0a8b609115110bcea246d446141706a8f257d4657a551cf45190c449c",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_0/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "890982940848e9d6c4eca57f5dd3a7f8e1ae4bec0c6ee78bf118d9f4c0288241",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_1/IC/summary.json"
+    },
+    {
+      "sha256": "fc0a5430e82c0cb5d758fda9cda235fec6d4023cb37d029a20f7b746b6d6d74f",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_1/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "7a869ffe6008381f4c17aec66bef45d9660a7285f5b1ab14d1e0b3bbb2893559",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_1/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "b956df218b603f79a2f203f050f39cd83cba74a6914463ab01f7675ced63975c",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_1/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "6d480597105ea99c38c974bf11d6d5eea55219e0cab0178920da40574cc51cea",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_1/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "10e31baf48fdbea2cbe954fcd4ac148a303bd547264567cf9403d92bd5424c22",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_10/IC/summary.json"
+    },
+    {
+      "sha256": "8f0f0f6bbb49c67c5e6276dacbb36b10db0766e557eb7437f6fa1a9c0cc7a765",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_10/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "aa9bb59e09c30901148b22fe53d745aeeedb1839b60d097f8acb36120a5df128",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_10/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "7d628a9dc629e8a9a4e9d115036c016c8b8deef272db839e210aa4096a22c229",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_10/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "4e46f508521f2e46bc79cde50431bfee59101464ef0cb797a790f1494cebcc92",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_10/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "60025ab20948dc7c39f4b7f6e87ad863d937fb5070bf751f6b07b09c6e786d91",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_12/IC/summary.json"
+    },
+    {
+      "sha256": "cb1d0dcbefd76800f88563fb66eb5b7b80c8f9a8883675fea7651f7353ea4501",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_12/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "68e246cfed41bac33fdf8349c06da1f0630c16d89d5a492b41c79a39c30181ae",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_12/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "d7699a3b29f3509bdce1c71453c7afcce490e9343c15942da9e376372be6943d",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_12/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "7215d75ad427ead33e26db81e96d0505423d290880022e79d393f1600a5c326f",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_12/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "35e2287fd705a0ad70a155b8ff4a3b1565100a38f417ff1380456b46a12f5cc0",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_3/IC/summary.json"
+    },
+    {
+      "sha256": "4cd9f9cc6149ad57f2133e7cc207e223e97d31f6f7559b249bd193104741c062",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_3/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "4b8d4e050917d800567737a3d4ef3972060e8856fc31b9ae8230c5590a543722",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_3/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "ca599e2099c8d3f755f8e7ab65accd4f4717f923a1d6fe735bae8e431dfe174b",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_3/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "0f049f1ae76abd1c3363097f9a266f7f9b2d6bcd47d88dd3428d59314443f5d1",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_3/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "bcaf1b7508c59525653e303b1039112d38fba3b11d68dbfe7ac59db5d9eb7f47",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_4/IC/summary.json"
+    },
+    {
+      "sha256": "1e70edea27ab0c2137e7e31f7ad1d56d677c866ff21e8262cce28adc4777fc95",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_4/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "f8e0f227a3789beca96f4ad89711ab798d243f61715af37eff4ded5fd7998c34",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_4/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "a480a67537e143b362ee073d3493cae5a42987687c93a583bd2f7ade43f92deb",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_4/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "6e476e7a6076850b84b78762aff224de5c0fe16029a45bdb66132f2a3d3af341",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_4/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "1c887a6be126ef6e6c57ca2fe2b25fddf76c4ebf273ce4542079b3aa39797a6b",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_5/IC/summary.json"
+    },
+    {
+      "sha256": "ff106fe4921266da18e229acc799ad8d4412abd4c0aa786dcd2b46be1a459ad5",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_5/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "848db41e1062df5b674011c9f6ce83f08fe7466bd4743e2fe616def5753de13b",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_5/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "0e1095610fb94fce84c0c414e210ed668eac822a1f9aa225d1a146bc2b3e02ef",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_5/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "555c0e64a26798792a10590286706c311da644c50f5e75ab26c88043480c638c",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_5/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "da1dd91ebce96e17860b1e7cd210730aaf1247b86d7fefb1f53ea04a5b2186a3",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_6/IC/summary.json"
+    },
+    {
+      "sha256": "1ed6e0c412703b6009cd7b51081dc14885deef5fe8a7b9659db11787415341d1",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_6/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "1316cc9901a22c3d2f06cb86f35c2c89fcbf9c7a8fac901e5fbf5028c662de7d",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_6/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "7ed754bc467f09b1d176f1df34617b62fd69abdb7681d7a58d5c1ac010c3d2d7",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_6/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "800b1346b923b39da6ffaa8f2cda329ad69f291cb95ed750c19581a222576e01",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_6/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "052052e3cd871ce8f9d6f624793520cf540f69e6b6ff8d3d8d578fa227d54299",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_8/IC/summary.json"
+    },
+    {
+      "sha256": "09a44ce4276e77b990637c2f04a50bfd6135d303ba1cbbf89829e03adfa32e1c",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_8/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "8f50f304a71b43031bb75cd904bea07dd23edbf1214d5572126b8991a89aac82",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_8/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "4e06beb190f0b7474f1fc82bf5bf9a6825e8ac545727abb74d73f1869f56baf1",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_8/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "29e98ab42c6c2027e53f0d8b8614655aeca2a90886053d872ba0b62a637b272e",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_8/IC_TunedScalar/summary.json"
+    },
+    {
+      "sha256": "0452ac39cc8396f34b816e8a6b1493bf6ba4ff7a0b4a9736f69245ab795f8d94",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_9/IC/summary.json"
+    },
+    {
+      "sha256": "0999ee3d3c4496345fe529718bbdfe228f8eab2b8c60582567e2a8dcae99e146",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_9/IC_CumulativeCosine/summary.json"
+    },
+    {
+      "sha256": "d1e62831aed5a48d4500d6c5254be475f264dcfa9f1c3167c32194cf9e766941",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_9/IC_GlobalIWAU/summary.json"
+    },
+    {
+      "sha256": "ac9f9481717e299b7ba595313bfde5cd0fd5e3a89ecfb71f27383618e94c1244",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_9/IC_IWAU/summary.json"
+    },
+    {
+      "sha256": "61035a1d242bb693d9f0c981b523960a242eb50a69ca1f1808376b33af8455ed",
+      "source": "P2_mnist17_schedule/eps_0.001/seed_9/IC_TunedScalar/summary.json"
+    }
+  ],
+  "training_time_scope": "fixed pre-run plus continuation; excludes frozen-test evaluation"
+}
