@@ -6,6 +6,11 @@ from pathlib import Path
 
 import yaml
 
+from width_cert.experiments.study_lock import (
+    canonical_mapping_sha256,
+    verify_frozen_study_lock,
+)
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -94,3 +99,18 @@ def test_frozen_fullcert_extension_binds_runner_and_adapter_hashes():
     for path_key, hash_key in (("adapter", "adapter_sha256"), ("runner", "runner_sha256")):
         path = ROOT / source[path_key]
         assert hashlib.sha256(path.read_bytes()).hexdigest() == source[hash_key]
+
+
+def test_frozen_fullcert_extension_matches_its_metadata_lock():
+    config = _frozen()
+    config_hash = canonical_mapping_sha256(config)
+    payload = verify_frozen_study_lock(
+        ROOT / config["study_lock"],
+        protocol_name=config["protocol_name"],
+        config_sha256=config_hash,
+        seed_selection_manifest=ROOT / config["starts"]["manifest"],
+    )
+    assert payload["code"]["git_commit"] == (
+        "290371124e3314cdb42ba02a77e1e72d3370df3c"
+    )
+    assert payload["data"]["test_set_already_opened_by_protocol_v5"] is True

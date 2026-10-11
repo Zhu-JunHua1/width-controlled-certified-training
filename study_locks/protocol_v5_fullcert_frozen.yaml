@@ -1,0 +1,88 @@
+schema_version: "1.0"
+status: frozen
+study_id: protocol-v5-official-fullcert-extension
+analysis_tier: posthoc_secondary_matched_external_baseline
+
+code:
+  # Executable inputs are fixed by this parent commit. This metadata lock is
+  # committed separately to avoid a circular commit-hash dependency.
+  git_commit: 290371124e3314cdb42ba02a77e1e72d3370df3c
+  dependency_lock_sha256: 27d62072557620999fb58d533ef30fb4fb1121c5c7b507dcf53a48db02365df1
+  auto_lirpa_source_sha256: 6a8d960cdd013cbd63cc814d2e21e30ab2f3f23bada889eaf4a91f4be3994c73
+  adapter_sha256: 12675380357b6915f2e59b985953e81a5923e5019902b5cec109911ef3b50e90
+  runner_sha256: f2396551854ba8e4d89d089629ad6ea37e8f4370f2b4f0634ddb954257775314
+
+official_source:
+  repository: https://github.com/t-lorenz/FullCert
+  commit: 3387a8af3ab143fae238b5d3a3f5b24fa815cca6
+  tree: 23067f06288ab25cdfd748bc160534e6a54b9a34
+  license: MIT
+  checkout_must_be_clean: true
+
+data:
+  split_policy: independent_generators_for_train_calibration_test
+  dataset: twomoons
+  train_size: 100
+  calibration_size: 500
+  test_size: 500
+  train_seed: 20261011
+  calibration_seed: 20261012
+  test_seed: 2729766939
+  test_set_already_opened_by_protocol_v5: true
+  test_outcomes_used_to_design_this_adapter: false
+
+selection:
+  shared_starts: [0, 4, 5, 6, 7, 9, 10, 11, 12, 13]
+  start_selection_uses_certified_accuracy: false
+  start_selection_uses_test_metrics: false
+  checkpoint_split: calibration
+  checkpoint_rule: first_argmax_calibration_certified_accuracy
+  selection_certifier: IC
+  tie_breaking: earliest_epoch
+  terminal_failure_policy: non_completed_raw_value_null_analysis_value_zero
+
+endpoints:
+  primary_descriptive: IC_certified_test_accuracy_at_calibration_selected_checkpoint
+  secondary:
+    - IC_certified_test_accuracy_at_T
+    - IBP_certified_test_accuracy_at_calibration_selected_checkpoint
+    - IBP_certified_test_accuracy_at_T
+  safety_cost:
+    - test_clean_accuracy_at_selected
+    - test_clean_accuracy_at_T
+    - wall_time
+    - seconds_per_executed_update
+
+evaluation:
+  test_certifiers: [IBP, IC]
+  input_domain: same_as_training
+  require_common_test_samples: true
+  evaluate_test_once_after_this_lock: true
+  expected_summary_rows: 30
+  expected_evaluator_rows: 60
+
+update_budget:
+  method: FullCert-official
+  horizon: 40
+  early_stopping: false
+  paper_mean_gradient_step: 0.1
+  official_api_learning_rate: 10.0
+  official_double_mean_compensation_factor: 100
+  radii: [0.0001, 0.001, 0.01]
+  shared_starts: 10
+
+statistics:
+  hypotheses: [posthoc_external_baseline_descriptive_comparison]
+  sidedness: not_applicable_descriptive
+  multiple_comparison_family: not_applicable_descriptive
+  correction: not_applicable_descriptive
+
+analysis:
+  result_grid_validator: src/width_cert/analysis/integrity.py
+  result_grid_validator_sha256: 7ca80ebd492fe7667b5dfefdbae4168e7745550be30b60e5f07289207442cab1
+
+protocols:
+  P1_twomoons_official_fullcert_protocol_v5:
+    config_sha256: 1732df8eba1b8c875fc2be34d3614d12d622e34860962a270546085ab34f46bb
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 7905269cc5feb2e82d588216e8d225c5e5be3d6a0efa4f1e2a25c53d333e4ff0
