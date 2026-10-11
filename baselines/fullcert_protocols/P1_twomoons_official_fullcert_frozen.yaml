@@ -1,0 +1,79 @@
+schema_version: "1.0"
+status: frozen
+analysis_tier: posthoc_secondary_matched_external_baseline
+test_access: frozen_final
+study_id: protocol-v5-official-fullcert-extension
+protocol_name: P1_twomoons_official_fullcert_protocol_v5
+study_lock: study_locks/protocol_v5_fullcert_frozen.yaml
+output_dir: results/protocol_v5_fullcert_final/P1_twomoons_official_fullcert
+
+official_source:
+  repository: https://github.com/t-lorenz/FullCert
+  commit: 3387a8af3ab143fae238b5d3a3f5b24fa815cca6
+  tree: 23067f06288ab25cdfd748bc160534e6a54b9a34
+  license: MIT
+  adapter: src/width_cert/baselines/fullcert.py
+  adapter_sha256: 12675380357b6915f2e59b985953e81a5923e5019902b5cec109911ef3b50e90
+  runner: tools/run_fullcert_comparison.py
+  runner_sha256: f2396551854ba8e4d89d089629ad6ea37e8f4370f2b4f0634ddb954257775314
+
+data:
+  dataset: twomoons
+  strategy: separate
+  train_size: 100
+  calibration_size: 500
+  test_size: 500
+  train_seed: 20261011
+  calibration_seed: 20261012
+  test_seed: 2729766939
+  input_domain: same_as_training
+  test_set_already_opened_by_protocol_v5: true
+  test_outcomes_used_to_design_this_adapter: false
+
+starts:
+  manifest: study_locks/candidate_audits/protocol_v5_P1_main_seeds.json
+  group: main
+  expected: [0, 4, 5, 6, 7, 9, 10, 11, 12, 13]
+  selection_uses_test_metrics: false
+
+model:
+  dimensions: [2, 20, 20, 1]
+  loss: binary_cross_entropy_with_logits
+
+pretraining:
+  enabled: true
+  target_accuracy: 0.50
+  maximum_initial_accuracy: 0.505
+  maximum_final_accuracy: 0.52
+  step_size: 0.02
+  maximum_epochs: 4000
+  minimum_epochs: 0
+  minimum_accuracy_gain: 0.0
+  optimizer: sgd
+
+training:
+  radii: [0.0001, 0.001, 0.01]
+  horizon: 40
+  early_stopping: false
+  paper_mean_gradient_step: 0.1
+  full_batch_size: 100
+  official_api_learning_rate: 10.0
+  normalization_mapping: official_api_learning_rate=N_times_paper_mean_gradient_step
+
+selection:
+  split: calibration
+  certifier: IC
+  checkpoint_rule: first_argmax
+  tie_breaking: earliest_epoch
+
+evaluation:
+  common_test_certifiers: [IBP, IC]
+  primary_test_certifier: IC
+  endpoints: [selected_checkpoint, terminal_T]
+  expected_summaries: 30
+  expected_evaluator_rows: 60
+
+failure_policy:
+  preserve_status: true
+  non_completed_raw_terminal: null
+  analysis_terminal_value: 0.0

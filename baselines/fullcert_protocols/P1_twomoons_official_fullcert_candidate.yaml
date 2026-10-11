@@ -36,6 +36,17 @@ model:
   dimensions: [2, 20, 20, 1]
   loss: binary_cross_entropy_with_logits
 
+pretraining:
+  enabled: true
+  target_accuracy: 0.50
+  maximum_initial_accuracy: 0.505
+  maximum_final_accuracy: 0.52
+  step_size: 0.02
+  maximum_epochs: 4000
+  minimum_epochs: 0
+  minimum_accuracy_gain: 0.0
+  optimizer: sgd
+
 training:
   radii: [0.0001, 0.001, 0.01]
   horizon: 40
