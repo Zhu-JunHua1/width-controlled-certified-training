@@ -8,7 +8,25 @@ The package extends FullCert-style interval training with two sound components:
   `base_step / (1 + coefficient * gradient_width)` and starts from the state `B_tp` selected on a
   disjoint calibration split.
 
-The repository contains the final direct-`t_p` algorithm and excludes private paper-audit data.
+The repository contains the final direct-`t_p` algorithm, frozen study inputs, validation utilities,
+and portable aggregate artifacts used by the revised manuscript.
+
+## Paper evidence map
+
+The manuscript separates method comparison, update-rule controls, secondary analyses, and external
+context rather than treating every run as one undifferentiated benchmark:
+
+| Evidence | Protocol | Role |
+|---|---|---|
+| TwoMoons, three radii, four method arms | `protocol_v5_frozen` | Main prespecified blind descriptive comparison |
+| Tuned scalar, cumulative cosine, GlobalIWAU, and coordinate IWAU | `protocol_v4_frozen` | Blinded update-rule fairness study |
+| Depth, width, step, horizon, and MNIST studies | `protocol_v2_frozen` | Secondary robustness analyses |
+| Corrected synthetic multi-class study | `protocol_v3_frozen` | Post-hoc exploratory extension |
+
+The protocol-v5 main table and appendix-ready aggregates are under
+[`artifacts/protocol_v5_final`](artifacts/protocol_v5_final). Protocol-v4 paired statistics are under
+[`artifacts/protocol_v4_final`](artifacts/protocol_v4_final). See
+[`docs/protocols.md`](docs/protocols.md) for the complete mapping and reporting scope.
 
 ## Installation
 
@@ -17,26 +35,30 @@ and an NVIDIA GeForce RTX 5070. The historical frozen runs record the exact auto
 SHA-256 `6a8d960cdd013cbd63cc814d2e21e30ab2f3f23bada889eaf4a91f4be3994c73`. That tree contains three
 local file changes relative to upstream commit `9d100ec070868440b48d34e2f1dd21b97aab9172`; see
 [`docs/full_crown_execution_audit.md`](docs/full_crown_execution_audit.md). Install PyTorch for the
-target CPU/CUDA platform, install the pinned
-[auto_LiRPA](https://github.com/Verified-Intelligence/auto_LiRPA) source, then install this package:
+target CPU/CUDA platform, prepare the pinned
+[auto_LiRPA](https://github.com/Verified-Intelligence/auto_LiRPA) source with the published patch, then
+install this package:
 
 ```bash
 python -m venv .venv
 # Activate .venv for your platform.
 pip install -r requirements.txt
-pip install "git+https://github.com/Verified-Intelligence/auto_LiRPA.git@9d100ec070868440b48d34e2f1dd21b97aab9172" --no-deps
+git -c core.autocrlf=false clone https://github.com/Verified-Intelligence/auto_LiRPA.git ../auto_LiRPA
+git -C ../auto_LiRPA checkout 9d100ec070868440b48d34e2f1dd21b97aab9172
+python tools/prepare_autolirpa.py --source ../auto_LiRPA
+pip install -e ../auto_LiRPA --no-deps
 pip install -e .
 ```
 
 The `--no-deps` flag avoids obsolete upstream dependency pins; install a compatible PyTorch build first,
 as described above.
 
-auto_LiRPA is an external dependency and is not vendored here. Its version and Python-source-tree SHA-256
-are recorded in every frozen run; a source commit is reported only when the complete Python tree matches the
-recognized upstream tree. Absolute installation paths are deliberately omitted. The official upstream
-commit and the historical runtime tree both pass the A0 full-gradient execution-path audit, but they are not
-represented as byte-identical dependencies. A release artifact for exact clean-room reproduction remains a
-required publication step.
+auto_LiRPA remains an external dependency rather than a vendored fork. The exact three-file patch, upstream
+BSD 3-Clause license, preparation command, and expected tree hash are published under
+[`third_party/auto_lirpa`](third_party/auto_lirpa). Its version and Python-source-tree SHA-256 are recorded in
+every frozen run; absolute installation paths are deliberately omitted. The patched historical tree passes
+the A0 full-gradient execution-path audit documented in
+[`docs/full_crown_execution_audit.md`](docs/full_crown_execution_audit.md).
 
 ## Unified experiment entry point
 
@@ -60,6 +82,12 @@ width-cert run configs/paper/P1_twomoons_ablation.yaml
 # Equivalent:
 width-cert run --config-file configs/paper/P1_twomoons_ablation.yaml
 ```
+
+Frozen-final configurations are immutable provenance records. They are published for inspection and
+clean-room reproduction, not for retuning or repeated blind evaluation. The current main-study input is
+`configs/protocol_v5_frozen/P1_twomoons_multiradius_main.yaml`, bound to
+`study_locks/protocol_v5_main_frozen.yaml`. Reproduction should use a new output directory and preserve
+the original files and hashes.
 
 `run` always performs shared-start seed selection internally before certified training, so no preparation
 command is required. The following commands are optional diagnostics only:
@@ -214,6 +242,12 @@ which endpoints the intersections retain.  Its finite random sampling is an
 implementation check only; it is explicitly marked as not being a soundness
 proof.  The AGT-inspired arm is a controlled ablation implemented in this
 repository, not a claim of bitwise equivalence to the AGT software.
+
+The paper's `IBP-fixed` arm is likewise a local FullCert-style implementation using this repository's
+bound stack; it is not the official FullCert software. A constrained adapter to the official MIT-licensed
+FullCert source passed development parity gates, but the one-time frozen matched extension stopped on a
+non-finite interval before completing its declared grid. No official FullCert aggregate is reported.
+See [`docs/fullcert_official_audit.md`](docs/fullcert_official_audit.md).
 
 For a deterministic implementation check that does not require a trained
 checkpoint, run:

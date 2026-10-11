@@ -1,58 +1,89 @@
-# Paper protocols and result mapping
+# Paper protocols and evidence hierarchy
 
-This file describes the pre-revision task grid. Final protocol-v2 values will be frozen in a versioned
-study lock before independent test evaluation. All protocols use full-batch interval SGD with 100 training samples and 10 reported seeds. The reported
-seeds are not manually enumerated: each YAML file defines a deterministic candidate range and retains the
-first 10 starts satisfying its pretraining criterion. Selection precedes all certified methods and radii.
-For from-scratch P4/P5, every candidate is accepted. P1--P3 and P5--P7 use end-to-end certification. P4
-uses clean test inputs to align its evaluation domain with MIBP-Cert Table 2; its epsilon applies to the
-training-data perturbation only.
+This document maps the revised manuscript to the executable configurations and derived artifacts in
+this repository. It supersedes the earlier pre-revision protocol overview.
 
-The executable YAML files are in `configs/paper/`. P3 is a 13-variant sweep; P5 and P6 use one file per
-class count or depth so that each run directory remains self-describing.
+## Evidence hierarchy
 
-| ID | Task | Architecture | Start | Epsilon | T | Main evidence |
-|---|---|---|---|---|---:|---|
-| P1 | TwoMoons | `[2,20,20,1]` | pretrain about 50% | `1e-3,1e-2` | 40 | 2x2 ablation and trajectories |
-| P2 | MNIST 1/7 | `[784,10,1]` | pretrain about 50% | `1e-3,2e-3` | 30 | 2x2 ablation |
-| P3 | TwoMoons | depth/width/base-step axes | pretrain about 50% | `1e-3` | 40 | robustness across hyperparameters |
-| P4 | TwoMoons | `[2,20,1]` | from scratch | `1e-4,1e-3,1e-2` | 20 | external baseline table |
-| P5 | synthetic 3/4-class | `[6,20,K]` | from scratch | `0.005,0.01,0.02,0.05` | 30 | multi-class extension |
-| P6 | MNIST 1/7 | `[784,10,...,1]`, L=1/2/3 | pretrain about 50% | `1e-4,1e-3` | 40 | real-image depth scaling |
-| P7 | TwoMoons | `[2,20,20,1]` | pretrain about 50% | `1e-3` | `20,40,60,80` | IWAU stability across training length |
+| Tier | Protocol family | Purpose | Status |
+|---|---|---|---|
+| Main descriptive study | P1-v5 TwoMoons multi-radius | Compare IBP-fixed, IBP+IWAU, IC-fixed, and IC+IWAU across `1e-4`, `1e-3`, and `1e-2` | Frozen blind run complete |
+| Update-rule controls | P1/P2-v4 | Compare coordinate IWAU with fixed IC, GlobalIWAU, a calibration-tuned scalar schedule, and a cumulative-step-matched cosine schedule | Frozen blind runs complete |
+| Earlier component tests | P1/P2-v2 | Paired IC-vs-IBP selected-checkpoint test and IC+IWAU-vs-IC terminal test | Frozen, reported in appendix |
+| Secondary robustness | P3/P6/P7-v2 | Depth, width, base-step, radius, and horizon sensitivity | Frozen, complete |
+| Multi-class extension | P5-v3 | Corrected shared-generator split for synthetic 3/4-class tasks | Post-hoc exploratory |
+| External context | P4-v2 | Clean-input comparison with local AGT-inspired and IC systems | Exploratory; not numerically pooled with the main study |
+| Official FullCert extension | protocol-v5 FullCert | Matched official-source comparison through a constrained adapter | Attempted once; incomplete, no aggregate reported |
 
-Candidate ranges are `[0,25)` for P1, P6 L=2/3, and P7, `[0,100)` for P3, `[0,15)` for P2 and P6 L=1,
-and `[0,10)` for from-scratch P4/P5. All pretrained protocols use the 50% shared-start target. P3 additionally requires a
-minimum 0.2-point calibration-accuracy gain (one example on its 500-sample calibration set) and rejects prepared starts
-above 52%. These rules prevent unchanged chance-level starts and large first-crossing overshoots. TwoMoons pretraining uses
-SGD, whereas MNIST pretraining uses Adam, both explicitly
-encoded in YAML. The exact accepted and rejected candidates are written to `seed_selection.json`.
+## Main P1-v5 protocol
 
-Every executable YAML now specifies train, calibration, and test sizes and independent split seeds. Seed
-acceptance, pretraining stopping, IWAU calibration, and checkpoint selection use calibration data only.
-Test data are evaluated only after those decisions are frozen.
+- Configuration: `configs/protocol_v5_frozen/P1_twomoons_multiradius_main.yaml`
+- Study lock: `study_locks/protocol_v5_main_frozen.yaml`
+- Accepted starts: `study_locks/candidate_audits/protocol_v5_P1_main_seeds.json`
+- Architecture: `[2,20,20,1]`
+- Data roles: 100 training, 500 calibration, and 500 frozen-test examples
+- Radii: `1e-4`, `1e-3`, and `1e-2`
+- Horizon: `T=40`
+- Methods: `IBP`, `IBP+IWAU`, `IC`, and `IC+IWAU`
+- Checkpoint rule: first maximum of IC-certified calibration accuracy
+- Test certifiers: IC primary, IBP secondary
+- Expected grid: 120 training summaries and 240 evaluator rows
 
-## Important reporting rules
+The run completed with the exact frozen grid. The manuscript's main table is generated from
+`artifacts/protocol_v5_final/main_table.csv`; the complete evaluator matrix, per-start rows, clean
+accuracy, runtime, seconds per update, and memory are retained under
+`artifacts/protocol_v5_final/appendix` and `artifacts/protocol_v5_final/runtime`.
 
-- **Primary endpoint:** `test cert@calibration-selected checkpoint` under paired seeds.
-- **Stability:** the secondary endpoint `test cert@T`; calibration trajectories explain the mechanism.
-- **Training/evaluator separation:** every frozen checkpoint is evaluated by both IBP and IC.
-- External rows copied from MIBP-Cert are not treated as directly comparable to local reproductions.
-- P4 uses clean evaluation, base step 2.0, and reports the full cost of the same-method pre-run plus
-  IWAU continuation.
-- P4 generates 300 TwoMoons samples per seed and then applies the fixed train/test split used by the
-  aligned baseline harness (`strategy: combined_split`).
-- Binary certified training optimizes BCE with logits. Synthetic multi-class certified training uses
-  one-vs-all BCE on the explicit gradient graph; its from-scratch point initialization requires no
-  pretraining loss. When pretraining a multi-class model, the runner uses cross-entropy and records both
-  loss definitions in `config.json`.
+The terminal aggregate uses the prespecified `diverged_as_zero` policy only for a missing endpoint whose
+raw status is `diverged`. Raw terminal fields remain null, so a diverged trajectory is never rewritten as
+a completed zero-certification run.
 
-## Result generation
+## Update-rule controls
 
-Raw runs are intentionally excluded from source control. The public `width-cert export-report` command
-consumes the structured result directories produced by these YAML files and writes an aggregate CSV plus a
-machine-readable provenance manifest. Paper tables and figures should consume those structured outputs
-rather than values copied from rounded PDF tables.
+The protocol-v4 family evaluates five IC-trained systems on disjoint blind data:
 
-The old peak-based figures and tables are development evidence only and are not final protocol-v2 test
-results. They must not be copied into a revised manuscript without an explicit legacy label.
+- fixed IC;
+- coordinate-wise IWAU;
+- GlobalIWAU;
+- a calibration-tuned scalar inverse-time schedule; and
+- a cumulative-step-matched cosine schedule.
+
+The scalar search used development/calibration data only. Final choices were frozen before test access.
+The six paired comparisons and Holm-adjusted sign tests are in
+`artifacts/protocol_v4_final/paired_statistics.csv`; cost summaries are in
+`artifacts/protocol_v4_final/runtime`.
+
+## Secondary and exploratory protocols
+
+P3, P6, and P7 retain the protocol-v2 frozen code, split, seed, evaluator, and failure policies. P3
+varies TwoMoons depth, width, and base step; P6 varies MNIST 1/7 depth at two radii; P7 varies
+`T in {20,40,60,80}` for a two-hidden-layer TwoMoons model. These analyses are descriptive and are not
+added to the multiplicity family of the earlier P1/P2 hypotheses.
+
+P5-v3 corrects the synthetic multi-class generator so that train, calibration, and test data share one
+generator distribution while remaining disjoint. Because the correction followed inspection of the
+legacy P5-v2 result, P5-v3 is labelled post-hoc exploratory evidence.
+
+P4 uses clean test inputs, `T=20`, a different base step, and seed-specific data splits to align with an
+external reporting context. It is not directly comparable with P1-v5.
+
+## Baseline labels
+
+- `IBP-fixed` is this repository's FullCert-style interval-SGD implementation with auto_LiRPA bounds.
+  It must not be called an official FullCert reproduction.
+- `Hybrid-fixed` is the local AGT-inspired forward-CROWN/backward-IBP arm. It is not a bitwise AGT
+  reproduction.
+- `IC+IWAU` is the complete proposed system.
+
+The official FullCert source was audited separately. The constrained adapter passed conversion,
+one-step parity, split-isolation, trajectory-export, and common-evaluator development gates. Its one-time
+frozen extension stopped before the declared grid completed because an interval update became non-finite.
+Partial cells are excluded from means and paired comparisons; see `docs/fullcert_official_audit.md`.
+
+## Reproduction rules
+
+Frozen files and raw result trees are immutable. Do not modify a lock, configuration, seed manifest, or
+analysis hypothesis after seeing blind results, and do not rerun a completed blind protocol to select a
+more favorable outcome. Clean-room reproductions should use a new output root while preserving the
+published inputs. Paper tables and figures should be regenerated from the structured CSV/JSON artifacts,
+not transcribed from rounded PDF values.

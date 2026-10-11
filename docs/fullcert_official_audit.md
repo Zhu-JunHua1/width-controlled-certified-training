@@ -1,8 +1,8 @@
 # Official FullCert source audit
 
 Audit date: 2026-10-10  
-Audit status: source path verified; matched comparison is conditionally feasible through a thin adapter  
-Final comparison status: not run
+Audit status: source path and constrained adapter gates verified
+Final comparison status: attempted once under the frozen extension; incomplete, with no aggregate reported
 
 ## Source identity
 
@@ -118,10 +118,18 @@ Before freezing a final comparison, all of the following must pass:
 7. Explicit full-batch normalization compensation, with the paper step and the
    raw FullCert API argument both preserved in the result metadata.
 
-## Decision
+## Frozen extension outcome
 
-An exactly matched comparison appears feasible, but only through the constrained adapter above; it
-is not valid to invoke the repository's stock CLI and call that result matched. The final comparison
-remains blocked until the conversion, one-step parity, trajectory export, and common-evaluator gates
-pass. Failure of any gate will downgrade the official result to a separately labelled
-external-context comparison.
+The constrained adapter passed conversion, initialization, one-step update, trajectory-export,
+split-isolation, and common-evaluator development gates. A separate immutable configuration and study
+lock were then frozen before opening the comparison.
+
+The extension was attempted once and stopped after 4 of 30 declared cells. For start 4 at radius
+`1e-3`, the last finite box was saved at epoch 38; the next official interval update raised
+`ValueError: Lower bound contains non-finite numbers!` before epoch 39. The official execution path did
+not encode this cell as diverged and continue to the remaining grid. Frozen files and partial outputs
+were preserved without retuning or rerunning the study.
+
+The four completed partial cells are excluded from means and paired comparisons. Consequently, the paper
+reports no official FullCert aggregate and does not infer a general FullCert failure from this extension.
+The local `IBP-fixed` arm remains explicitly labelled FullCert-style rather than official FullCert.

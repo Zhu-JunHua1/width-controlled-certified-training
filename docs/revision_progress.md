@@ -4,6 +4,21 @@ This file records implementation milestones for the post-review protocol.  A
 completed implementation milestone is not a final experimental result; final
 test values require a frozen study lock.
 
+## Current publication status (protocols v4--v5 complete)
+
+- The protocol-v4 blinded update-rule study is complete. Its six prespecified paired comparisons and
+  runtime summaries are published under `artifacts/protocol_v4_final/`.
+- The protocol-v5 TwoMoons multi-radius main study is complete: 120 training summaries and 240 common-
+  evaluator rows across three radii, ten starts, four methods, and two test certifiers. The manuscript
+  table and appendix artifacts are under `artifacts/protocol_v5_final/`.
+- P3/P6/P7 remain secondary robustness evidence; corrected P5-v3 remains post-hoc exploratory evidence.
+- The constrained official FullCert adapter passed development gates. Its one-time frozen extension
+  stopped after 4 of 30 cells on a non-finite interval update, so no official FullCert aggregate is
+  reported and the local `IBP-fixed` arm remains labelled FullCert-style.
+
+See `docs/protocols.md` for the current evidence hierarchy. The sections below are retained as a
+chronological development record and must not be interpreted as the current run status.
+
 ## Stage A1 — evaluation firewall (complete)
 
 - Added explicit, disjoint train/calibration/test splits to every public task.
@@ -308,14 +323,16 @@ The generated graph inventory and call trace are stored under
 `artifacts/audit/a0_full_crown/`. A dense one-hidden-unit grid checked 10,080
 method--coordinate inclusions without a violation; this remains an
 implementation diagnostic rather than a proof. The complete Python test suite
-passes (80 tests).
+passed at audit time.
 
 The audit also found a provenance mismatch that had to be disclosed. The
 historical runtime auto_LiRPA tree hash is `6a8d960...`, whereas the recognized
 upstream `9d100ec` tree hash is `2bc6390...`; three files differ. The four A0
 graphs produced byte-identical IBP and CROWN endpoints under both trees, but
 the repository no longer describes the historical dependency as unmodified.
-Exact clean-room dependency packaging remains a release gate.
+The exact three-file patch, upstream BSD license, preparation command, and
+expected tree hash are now published under `third_party/auto_lirpa`; applying
+the patch to the pinned upstream commit reproduces the historical hash.
 
 The manuscript appendix now states the actual Step convention (`1{z>0}`), the
 two McCormick planes selected by the default non-optimized path, the

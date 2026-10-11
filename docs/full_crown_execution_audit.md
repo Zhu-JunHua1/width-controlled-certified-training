@@ -92,15 +92,19 @@ arithmetic. No directed outward rounding is implemented. Consequently:
 3. the implementation must not be called a formally rounding-certified
    floating-point verifier.
 
-## Required next actions
+## Release status and remaining actions
 
-1. Preserve and publish the exact dependency delta, or rerun the final results
-   against an immutable, publicly installable dependency tree. Until then,
-   exact clean-room reproduction of the historical locks is incomplete.
-2. Prove the actual sign-dependent backward substitution used by
+The exact three-file dependency delta is now published as
+`third_party/auto_lirpa/historical_runtime.patch`, together with the upstream
+BSD license and `tools/prepare_autolirpa.py`. Applying it to the pinned upstream
+commit reproduces the historical Python-tree hash recorded by the frozen runs.
+
+Remaining actions are:
+
+1. Prove the actual sign-dependent backward substitution used by
    `BoundLinear`/`BoundMatMul` and `BoundMul`, then connect that induction to the
    custom Step box and the final concretization operation.
-3. Run the small-network reference solver and property tests against the exact
+2. Run the small-network reference solver and property tests against the exact
    dependency artifact selected for release.
-4. Keep the floating-point limitation explicit unless outward rounding or a
+3. Keep the floating-point limitation explicit unless outward rounding or a
    justified error inflation scheme is implemented.

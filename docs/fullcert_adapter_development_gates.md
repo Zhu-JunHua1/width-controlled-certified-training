@@ -3,7 +3,7 @@
 Audit date: 2026-10-11  
 Analysis tier: development only  
 Blind-test metrics read: no  
-Final official comparison: not run
+Final official comparison: attempted once after freezing; incomplete, no aggregate reported
 
 ## Frozen external source
 
@@ -75,11 +75,16 @@ have a 100-times smaller mean-gradient update and must be labelled
 external-context. Runtime reporting must also separate official BoundFlow
 training from post-hoc common-evaluator checkpoint selection.
 
-## Gate decision
+## Gate decision and frozen extension
 
-The constrained adapter gates pass. An official matched comparison is
-technically feasible, but no final run is authorized by this document. Before
-opening any blind test, the comparison still requires a separate immutable
-configuration and study lock binding the accepted starts, radii, normalization
+The constrained adapter gates passed. A separate immutable configuration and
+study lock subsequently bound the accepted starts, radii, normalization
 mapping, external commit and tree, adapter commit, split seeds, evaluator,
 endpoints, failure policy, and row-count validator.
+
+The frozen extension was opened once. It stopped after 4 of 30 cells when the
+official interval update for start 4 at radius `1e-3` produced a non-finite
+lower bound before epoch 39. The execution path did not convert the event into
+a declared diverged cell and continue the grid. The partial output is retained
+for audit, but no mean, paired comparison, or official FullCert result is
+reported. The study was not modified or rerun after this outcome.
