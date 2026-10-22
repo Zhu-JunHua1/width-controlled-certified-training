@@ -60,3 +60,43 @@ completed and exited with code zero. The original T40 outputs remain untouched;
 the full-grid recovery uses
 `configs/development/train_size_nested_T40_recovery.yaml` and a separate result
 root. This recovery is still calibration-only and is not a blind-test result.
+
+## Clean T40 recovery outcome
+
+The recovery run at executable commit `d1ae63530b28a732a0fc6b022875635f48a99e3f`
+exited with code **0** and an empty stderr log. It wrote exactly 12 reported
+summaries and 12 `not_evaluated` development placeholder rows (four methods at
+each N). Every run completed. Each summary has `test_evaluations=[]` and
+`primary_endpoint=not_evaluated_in_development`; all held-out test result
+fields are empty. The run records a clean code tree and the
+`windows_cuda_jit_gpu_fusion_disabled` runtime policy. All 12 serialized
+initial parameter states are byte-identical. Regeneration verifies strict
+N=100/200/400 training prefixes and identical calibration tensors.
+
+The table below gives **one-start, calibration-only descriptive values**.
+`Total s` includes the same-bound fixed pre-run for each adaptive arm;
+`Seconds/T` divides that complete wall time by the declared 40 epochs and is
+not the cost of one unique gradient update. Memory is peak PyTorch-allocated
+GPU memory. These observations cannot establish statistical scaling or a
+blind-test certification benefit.
+
+| N | Method | IWAU active | Peak cal. cert. % | Cal. cert. at T % | Total s | Seconds/T | Peak MiB |
+|---:|:---|:---:|---:|---:|---:|---:|---:|
+| 100 | IBP | no | 62.8 | 0.0 | 19.4 | 0.48 | 60.3 |
+| 100 | IBP+IWAU | yes | 63.4 | 61.4 | 31.7 | 0.79 | 60.3 |
+| 100 | IC | no | 64.4 | 39.0 | 249.3 | 6.23 | 80.0 |
+| 100 | IC+IWAU | yes | 64.6 | 62.4 | 363.8 | 9.09 | 80.0 |
+| 200 | IBP | no | 69.8 | 4.0 | 34.3 | 0.86 | 60.9 |
+| 200 | IBP+IWAU | yes | 70.0 | 69.6 | 53.4 | 1.34 | 60.9 |
+| 200 | IC | no | 72.4 | 60.8 | 585.5 | 14.64 | 79.9 |
+| 200 | IC+IWAU | no | 72.4 | 60.8 | 585.5 | 14.64 | 79.9 |
+| 400 | IBP | no | 70.6 | 1.4 | 75.5 | 1.89 | 60.9 |
+| 400 | IBP+IWAU | yes | 72.0 | 72.0 | 117.1 | 2.93 | 60.9 |
+| 400 | IC | no | 73.4 | 54.2 | 1226.8 | 30.67 | 79.9 |
+| 400 | IC+IWAU | yes | 74.4 | 74.4 | 1711.9 | 42.80 | 79.9 |
+
+At N=200, IC+IWAU was `not_required`: its reference IC trajectory did not
+meet the declared trigger, so it made no adaptive continuation and retained
+the IC-fixed result and cost. Both the abnormal-exit run and this clean rerun
+show the same calibration certificate percentages, but runtimes differ
+substantially. Further resource-scaling claims require controlled repetitions.
