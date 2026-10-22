@@ -1,0 +1,104 @@
+schema_version: "1.0"
+status: frozen
+study_id: protocol-v6-twomoons-training-size-extension
+target_venue: TNNLS
+
+code:
+  # Executable-input commit; this metadata lock is committed separately.
+  git_commit: 42cb7665dbebfd633f6fd26db8848e1b1cb63fa6
+  dependency_lock_sha256: d2dc26efb80ee080ebeaf2228b168b8e569deaf3e64d651e3b623d8d040a7ded
+  auto_lirpa_source_sha256: 6a8d960cdd013cbd63cc814d2e21e30ab2f3f23bada889eaf4a91f4be3994c73
+
+data:
+  dataset: twomoons
+  split_policy: independent_generators_with_one_nested_training_pool
+  training_pool_size: 800
+  training_prefix_sizes: [100, 200, 400, 800]
+  calibration_size: 500
+  blind_test_size: 500
+  training_pool_seed: 3907119627
+  calibration_seed: 3785856782
+  blind_test_seed: 785260675
+  blind_test_seed_novelty_checked_against_current_files_and_git_history: true
+  blind_test_opened: false
+
+selection:
+  start_selection_rule: first_candidates_accepted_by_every_member
+  selected_starts: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  pretraining_enabled: false
+  start_selection_uses_certified_accuracy: false
+  start_selection_uses_test_metrics: false
+  checkpoint_split: calibration
+  checkpoint_rule: first_argmax_calibration_certified_accuracy
+  selection_certifier: IC
+  tie_breaking: earliest_epoch
+  retention: 0.8
+  iwau_dependency: same_bound_fixed_pre_run_only
+  terminal_failure_policy: non_completed_raw_value_null_analysis_value_zero
+
+endpoints:
+  primary: N800_IC_test_certification_at_T_IC_plus_IWAU_minus_IC_fixed
+  secondary:
+    - IC_certified_blind_test_accuracy_at_calibration_selected_checkpoint
+    - IC_certified_blind_test_accuracy_at_T_by_training_size
+    - IBP_certified_blind_test_accuracy_at_selected_and_T
+    - blind_test_clean_accuracy_at_selected_and_T
+  safety_cost:
+    - completed_diverged_and_iwau_not_required_counts
+    - complete_wall_time_including_fixed_pre_run
+    - seconds_per_executed_update
+    - wall_seconds_per_reported_epoch
+    - pre_run_seconds
+    - peak_pytorch_allocated_device_memory
+
+evaluation:
+  test_certifiers: [IBP, IC]
+  primary_test_certifier: IC
+  input_domain: same_as_training
+  require_common_test_samples: true
+  require_common_checkpoint_rule: true
+  evaluate_blind_test_once_after_freeze: true
+  expected_summary_rows: 160
+  expected_evaluator_rows: 320
+
+update_budget:
+  methods: [IBP, IBP+IWAU, IC, IC+IWAU]
+  horizon: 40
+  base_step: 0.1
+  radii: [0.001]
+  shared_starts: 10
+  adaptive_rule: coordinatewise_interval_gradient_width_feedback
+  complete_cost_includes_fixed_pre_run: true
+
+statistics:
+  hypotheses: [paired_terminal_IC_plus_IWAU_minus_IC_at_N800]
+  sidedness: two_sided
+  multiple_comparison_family: single_principal_contrast
+  correction: none_for_single_principal_contrast_Holm_if_secondary_p_values_used
+  test: exact_paired_sign_flip_on_mean_difference
+  confidence_interval: paired_bootstrap_percentile_10000_draws_seed_20261022
+
+analysis:
+  result_grid_validator: src/width_cert/analysis/integrity.py
+  result_grid_validator_sha256: 7ca80ebd492fe7667b5dfefdbae4168e7745550be30b60e5f07289207442cab1
+  report_script: tools/report_training_size_scale.py
+  report_script_sha256: 750bc7bb9f3bae93d745f590be7de28d8166b0be98d5f453ec99bd338ffc1371
+  frozen_config_file_sha256: cc5576b1b644ff2bc37a07a4310c2354292fd67efbfa7671fce51b3e7b7a9c65
+
+protocols:
+  P1_twomoons_train_size_N100_v6:
+    config_sha256: 99d58fbed8d192700c52a85add291b46ecc61838f83b056bd9ccc87da48ec2e5
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 7d04738ac1f55574c8b5b1aeb7abd6616b69941441ea83d0be74d4848c7aebf1
+  P1_twomoons_train_size_N200_v6:
+    config_sha256: 8abd5006b94aefdf4971bd6726557cdbfabbd66d5796922ecb846bb031f0a152
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 7d04738ac1f55574c8b5b1aeb7abd6616b69941441ea83d0be74d4848c7aebf1
+  P1_twomoons_train_size_N400_v6:
+    config_sha256: cc2268813aa14b42c997278e26ea5c8ef08e3097343217f06122d967ab58b61d
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 7d04738ac1f55574c8b5b1aeb7abd6616b69941441ea83d0be74d4848c7aebf1
+  P1_twomoons_train_size_N800_v6:
+    config_sha256: 6ce154a2c4694123faa72096af6e733c24edfb5b740b5bd46c54a798d1eef44c
+    split_manifest_sha256: not_applicable
+    seed_selection_manifest_sha256: 7d04738ac1f55574c8b5b1aeb7abd6616b69941441ea83d0be74d4848c7aebf1
