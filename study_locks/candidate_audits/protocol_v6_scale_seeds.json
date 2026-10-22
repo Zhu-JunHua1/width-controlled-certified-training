@@ -1,0 +1,336 @@
+{
+  "groups": {
+    "size_scale": {
+      "candidate_range": {
+        "count": 10,
+        "group": null,
+        "manifest": null,
+        "start": 0,
+        "stop": 10
+      },
+      "candidates_evaluated": [
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "train_size_v6_N100_development": {
+              "accepted": true,
+              "initial_accuracy": 0.4780000150203705,
+              "pretraining_accuracy": 0.4780000150203705,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N200_development": {
+              "accepted": true,
+              "initial_accuracy": 0.4780000150203705,
+              "pretraining_accuracy": 0.4780000150203705,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N400_development": {
+              "accepted": true,
+              "initial_accuracy": 0.4780000150203705,
+              "pretraining_accuracy": 0.4780000150203705,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N800_development": {
+              "accepted": true,
+              "initial_accuracy": 0.4780000150203705,
+              "pretraining_accuracy": 0.4780000150203705,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 0
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "train_size_v6_N100_development": {
+              "accepted": true,
+              "initial_accuracy": 0.30400002002716064,
+              "pretraining_accuracy": 0.30400002002716064,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N200_development": {
+              "accepted": true,
+              "initial_accuracy": 0.30400002002716064,
+              "pretraining_accuracy": 0.30400002002716064,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N400_development": {
+              "accepted": true,
+              "initial_accuracy": 0.30400002002716064,
+              "pretraining_accuracy": 0.30400002002716064,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N800_development": {
+              "accepted": true,
+              "initial_accuracy": 0.30400002002716064,
+              "pretraining_accuracy": 0.30400002002716064,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 1
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "train_size_v6_N100_development": {
+              "accepted": true,
+              "initial_accuracy": 0.7760000228881836,
+              "pretraining_accuracy": 0.7760000228881836,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N200_development": {
+              "accepted": true,
+              "initial_accuracy": 0.7760000228881836,
+              "pretraining_accuracy": 0.7760000228881836,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N400_development": {
+              "accepted": true,
+              "initial_accuracy": 0.7760000228881836,
+              "pretraining_accuracy": 0.7760000228881836,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N800_development": {
+              "accepted": true,
+              "initial_accuracy": 0.7760000228881836,
+              "pretraining_accuracy": 0.7760000228881836,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 2
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "train_size_v6_N100_development": {
+              "accepted": true,
+              "initial_accuracy": 0.800000011920929,
+              "pretraining_accuracy": 0.800000011920929,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N200_development": {
+              "accepted": true,
+              "initial_accuracy": 0.800000011920929,
+              "pretraining_accuracy": 0.800000011920929,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N400_development": {
+              "accepted": true,
+              "initial_accuracy": 0.800000011920929,
+              "pretraining_accuracy": 0.800000011920929,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N800_development": {
+              "accepted": true,
+              "initial_accuracy": 0.800000011920929,
+              "pretraining_accuracy": 0.800000011920929,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 3
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "train_size_v6_N100_development": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N200_development": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N400_development": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N800_development": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 4
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "train_size_v6_N100_development": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N200_development": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N400_development": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N800_development": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 5
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "train_size_v6_N100_development": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N200_development": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N400_development": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N800_development": {
+              "accepted": true,
+              "initial_accuracy": 0.5,
+              "pretraining_accuracy": 0.5,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 6
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "train_size_v6_N100_development": {
+              "accepted": true,
+              "initial_accuracy": 0.46000000834465027,
+              "pretraining_accuracy": 0.46000000834465027,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N200_development": {
+              "accepted": true,
+              "initial_accuracy": 0.46000000834465027,
+              "pretraining_accuracy": 0.46000000834465027,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N400_development": {
+              "accepted": true,
+              "initial_accuracy": 0.46000000834465027,
+              "pretraining_accuracy": 0.46000000834465027,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N800_development": {
+              "accepted": true,
+              "initial_accuracy": 0.46000000834465027,
+              "pretraining_accuracy": 0.46000000834465027,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 7
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "train_size_v6_N100_development": {
+              "accepted": true,
+              "initial_accuracy": 0.8020000457763672,
+              "pretraining_accuracy": 0.8020000457763672,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N200_development": {
+              "accepted": true,
+              "initial_accuracy": 0.8020000457763672,
+              "pretraining_accuracy": 0.8020000457763672,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N400_development": {
+              "accepted": true,
+              "initial_accuracy": 0.8020000457763672,
+              "pretraining_accuracy": 0.8020000457763672,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N800_development": {
+              "accepted": true,
+              "initial_accuracy": 0.8020000457763672,
+              "pretraining_accuracy": 0.8020000457763672,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 8
+        },
+        {
+          "accepted_by_all": true,
+          "outcomes": {
+            "train_size_v6_N100_development": {
+              "accepted": true,
+              "initial_accuracy": 0.37400001287460327,
+              "pretraining_accuracy": 0.37400001287460327,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N200_development": {
+              "accepted": true,
+              "initial_accuracy": 0.37400001287460327,
+              "pretraining_accuracy": 0.37400001287460327,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N400_development": {
+              "accepted": true,
+              "initial_accuracy": 0.37400001287460327,
+              "pretraining_accuracy": 0.37400001287460327,
+              "pretraining_epochs": 0
+            },
+            "train_size_v6_N800_development": {
+              "accepted": true,
+              "initial_accuracy": 0.37400001287460327,
+              "pretraining_accuracy": 0.37400001287460327,
+              "pretraining_epochs": 0
+            }
+          },
+          "seed": 9
+        }
+      ],
+      "members": [
+        "train_size_v6_N100_development",
+        "train_size_v6_N200_development",
+        "train_size_v6_N400_development",
+        "train_size_v6_N800_development"
+      ],
+      "selected_seeds": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "selection_rule": "first_candidates_accepted_by_every_member",
+      "test_metrics_read": false
+    }
+  },
+  "schema_version": "1.0"
+}

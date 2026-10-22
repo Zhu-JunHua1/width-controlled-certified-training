@@ -78,3 +78,22 @@ available, failure status, and the host/toolchain/runtime policy. Disclose
 that N=200 did not trigger IC+IWAU in the one-start development run rather
 than selecting only effective continuations. Keep raw per-start rows and
 trajectories available for audit.
+
+## Resource-gate decision, 2026-10-22
+
+The N=800 development process began at 16:29:31 Asia/Shanghai and exited 0
+at approximately 17:25:55. Standard error was empty. It wrote four reported
+summaries and four `not_evaluated` placeholder rows, all with test access
+disabled and no test metrics. All four methods produced a recorded completed
+status, and the largest peak PyTorch-allocated device memory was about 75 MiB.
+The elapsed process time was about 56 minutes, under the prespecified four-hour
+gate. **N=800 passes the resource-only gate**; no calibration certification
+value was used in this decision. The four method `complete_elapsed_seconds`
+values must not be summed to estimate process time because adaptive entries
+include the same fixed pre-run already reported by a fixed arm.
+
+The forthcoming blind study therefore uses N=100/200/400/800, all drawn as
+strict prefixes of a newly seeded 800-example pool. Calibration-only common
+start selection accepted seeds 0 through 9 without certified-accuracy or
+test-metric filtering. Its audit is
+`study_locks/candidate_audits/protocol_v6_scale_seeds.json`.
