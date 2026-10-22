@@ -38,6 +38,7 @@ def _twomoons(
     calibration_seed: int,
     test_seed: int,
     strategy: str,
+    training_pool_size: int | None,
 ) -> DatasetBundle:
     if strategy == "combined_split":
         inputs, targets = make_moons(
@@ -72,9 +73,18 @@ def _twomoons(
             1,
             "TwoMoons",
         )
-    if strategy != "separate":
+    if strategy == "nested_train_pool":
+        if training_pool_size is None or training_pool_size < train_size:
+            raise ValueError("nested_train_pool requires training_pool_size >= train_size")
+        pool_x, pool_y = make_moons(
+            n_samples=training_pool_size, noise=0.1, random_state=seed
+        )
+        order = np.random.default_rng(seed).permutation(training_pool_size)
+        train_x, train_y = pool_x[order[:train_size]], pool_y[order[:train_size]]
+    elif strategy == "separate":
+        train_x, train_y = make_moons(n_samples=train_size, noise=0.1, random_state=seed)
+    else:
         raise ValueError(f"unknown TwoMoons data strategy: {strategy}")
-    train_x, train_y = make_moons(n_samples=train_size, noise=0.1, random_state=seed)
     calibration_x, calibration_y = make_moons(
         n_samples=calibration_size,
         noise=0.1,
@@ -312,7 +322,10 @@ def build_dataset(
     test_seed: int = 42,
     strategy: str = "separate",
     split_manifest: str | None = None,
+    training_pool_size: int | None = None,
 ) -> DatasetBundle:
+    if training_pool_size is not None and (spec != "twomoons" or strategy != "nested_train_pool"):
+        raise ValueError("training_pool_size is only valid for nested TwoMoons data")
     if spec == "twomoons":
         return _twomoons(
             train_size,
@@ -322,6 +335,7 @@ def build_dataset(
             calibration_seed,
             test_seed,
             strategy,
+            training_pool_size,
         )
     if spec.startswith("mnist:"):
         pair = tuple(int(item) for item in spec.split(":", 1)[1].split(","))

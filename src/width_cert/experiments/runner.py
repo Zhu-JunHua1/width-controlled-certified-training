@@ -44,7 +44,7 @@ from ..data import DatasetBundle, build_dataset
 from ..logging import ConsoleReporter, RunLogger, SCHEMA_VERSION
 from ..models import BinaryBCEGradientGraph, EvaluationGraph, PretrainingMLP, layer_dimensions
 from .config import ExperimentConfig
-from .environment import environment_metadata
+from .environment import configure_bound_runtime, environment_metadata
 from .evaluation import evaluate_frozen_checkpoints
 from .pretrain import PretrainingRejected, PretrainingResult, pretrain_to_accuracy
 from .study_lock import (
@@ -170,6 +170,7 @@ def _shared_bundle(config: ExperimentConfig) -> DatasetBundle | None:
         test_seed=config.data.test_seed,
         strategy=config.data.strategy,
         split_manifest=config.data.split_manifest,
+        training_pool_size=config.data.training_pool_size,
     )
 
 
@@ -189,6 +190,7 @@ def _prepare_candidate(
         test_seed=config.data.test_seed,
         strategy=config.data.strategy,
         split_manifest=config.data.split_manifest,
+        training_pool_size=config.data.training_pool_size,
     )
     train_inputs = bundle.train_inputs.to(device)
     train_targets = bundle.train_targets.to(device)
@@ -461,6 +463,7 @@ def run_experiment(config: ExperimentConfig) -> Path:
     output_root = Path(config.output_dir).resolve()
     output_root.mkdir(parents=True, exist_ok=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    runtime_policy = configure_bound_runtime(device)
     index_rows: list[dict[str, object]] = []
     reporter = ConsoleReporter(enabled=config.echo_epochs)
     total_cells = config.seed_selection.count * len(config.radii) * len(config.methods)
@@ -651,6 +654,7 @@ def run_experiment(config: ExperimentConfig) -> Path:
                         "certified_training": "one_vs_all_binary_cross_entropy" if bundle.output_dim > 1 else "binary_cross_entropy",
                     },
                     "environment": environment_metadata(),
+                    "bound_runtime_policy": runtime_policy,
                 }
                 run_environment = resolved_run_config["environment"]
                 logger.write_config(resolved_run_config)

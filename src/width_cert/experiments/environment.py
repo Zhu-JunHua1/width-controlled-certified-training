@@ -16,6 +16,26 @@ AUTO_LIRPA_REFERENCE_TREE_SHA256 = (
 )
 
 
+def configure_bound_runtime(device: torch.device) -> str:
+    """Avoid a Windows/CUDA TorchScript GPU-fuser shutdown crash.
+
+    This changes kernel fusion, not the IBP/CROWN bound formulas. PyTorch's
+    graph tracing and scripted functions remain enabled. The policy is applied
+    before constructing or evaluating any bounded graph.
+    """
+
+    if platform.system() != "Windows" or device.type != "cuda":
+        return "default"
+    disable = getattr(torch._C, "_jit_override_can_fuse_on_gpu", None)
+    can_fuse = getattr(torch._C, "_jit_can_fuse_on_gpu", None)
+    if disable is None or can_fuse is None:
+        raise RuntimeError("Windows CUDA bound runtime requires PyTorch GPU-fuser controls")
+    disable(False)
+    if can_fuse():
+        raise RuntimeError("failed to disable TorchScript GPU fusion")
+    return "windows_cuda_jit_gpu_fusion_disabled"
+
+
 def sha256(path: str | Path) -> str:
     digest = hashlib.sha256()
     with Path(path).open("rb") as handle:
@@ -69,6 +89,11 @@ def environment_metadata() -> dict[str, object]:
         "python": platform.python_version(),
         "torch": torch.__version__,
         "cuda_runtime": torch.version.cuda,
+        "jit_can_fuse_on_gpu": (
+            torch._C._jit_can_fuse_on_gpu()
+            if hasattr(torch._C, "_jit_can_fuse_on_gpu")
+            else None
+        ),
         "cudnn": torch.backends.cudnn.version(),
         "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
         "auto_lirpa_version": lirpa_version,

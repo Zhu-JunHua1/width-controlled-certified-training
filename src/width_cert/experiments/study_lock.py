@@ -26,8 +26,13 @@ def _is_unresolved(value: Any) -> bool:
 def experiment_config_sha256(config: Any) -> str:
     """Hash the complete resolved configuration used by one protocol."""
 
+    payload = asdict(config)
+    # This optional field was introduced after the v5 locks were committed.
+    # Preserve their canonical bytes while binding the value for new nested-pool runs.
+    if payload["data"].get("training_pool_size") is None:
+        payload["data"].pop("training_pool_size")
     encoded = json.dumps(
-        asdict(config),
+        payload,
         sort_keys=True,
         separators=(",", ":"),
         ensure_ascii=True,

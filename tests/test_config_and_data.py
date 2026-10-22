@@ -455,6 +455,47 @@ def test_protocol_v5_main_candidate_is_sealed_and_matches_the_declared_grid():
     )
 
 
+def test_nested_twomoons_training_pool_has_strict_prefix_and_shared_holdouts():
+    common = dict(
+        spec="twomoons",
+        calibration_size=500,
+        test_size=500,
+        seed=20261022,
+        calibration_seed=20261023,
+        test_seed=0,
+        strategy="nested_train_pool",
+        training_pool_size=800,
+    )
+    small = build_dataset(train_size=100, **common)
+    medium = build_dataset(train_size=200, **common)
+    large = build_dataset(train_size=400, **common)
+    assert torch.equal(small.train_inputs, medium.train_inputs[:100])
+    assert torch.equal(small.train_targets, medium.train_targets[:100])
+    assert torch.equal(medium.train_inputs, large.train_inputs[:200])
+    assert torch.equal(medium.train_targets, large.train_targets[:200])
+    for bundle in (medium, large):
+        assert torch.equal(small.calibration_inputs, bundle.calibration_inputs)
+        assert torch.equal(small.calibration_targets, bundle.calibration_targets)
+        assert torch.equal(small.test_inputs, bundle.test_inputs)
+        assert torch.equal(small.test_targets, bundle.test_targets)
+    assert 0 < small.train_targets.sum() < 100
+
+
+def test_nested_twomoons_pool_rejects_missing_or_too_small_pool():
+    common = dict(
+        spec="twomoons",
+        train_size=200,
+        calibration_size=10,
+        test_size=10,
+        seed=1,
+        strategy="nested_train_pool",
+    )
+    with pytest.raises(ValueError, match="training_pool_size"):
+        build_dataset(**common)
+    with pytest.raises(ValueError, match="training_pool_size"):
+        build_dataset(**common, training_pool_size=100)
+
+
 def test_protocol_v5_seed_selection_audit_cannot_contain_certified_or_test_metrics(
     tmp_path,
 ):

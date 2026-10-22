@@ -1,0 +1,38 @@
+# Development-only end-to-end check for the Windows CUDA JIT-fusion policy.
+name: train_size_fuser_smoke_v2
+output_dir: results/development/train_size_fuser_smoke_v2
+data:
+  dataset: twomoons
+  train_size: 100
+  calibration_size: 500
+  test_size: 500
+  seed: 20261022
+  calibration_seed: 20261023
+  test_seed: 0
+  strategy: nested_train_pool
+  training_pool_size: 400
+model: {hidden_layers: 2, hidden_width: 20}
+pretraining:
+  enabled: false
+  target_accuracy: 0.5
+  maximum_initial_accuracy: 1.0
+  maximum_final_accuracy: 1.0
+  step_size: 0.02
+  maximum_epochs: 1
+  optimizer: sgd
+training:
+  horizon: 2
+  base_step: 0.1
+  retention: 0.8
+  gradient_batch_size: 4
+  max_gradient_width: 50.0
+evaluation:
+  input_domain: same_as_training
+  selection_bound_method: IC
+  bound_methods: [IBP, IC]
+  test_access: disabled
+  analysis_tier: development
+radii: [0.001]
+seed_selection: {start: 0, stop: 1, count: 1}
+methods: [IBP, IBP+IWAU, IC, IC+IWAU]
+echo_epochs: false

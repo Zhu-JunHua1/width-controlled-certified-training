@@ -21,6 +21,7 @@ class DataConfig:
     per_training_seed: bool = False
     strategy: str = "separate"
     split_manifest: str | None = None
+    training_pool_size: int | None = None
 
 
 @dataclass(frozen=True)
@@ -217,6 +218,18 @@ class ExperimentConfig:
             raise ValueError(
                 "data train_size, calibration_size, and test_size must all be positive"
             )
+        if self.data.strategy == "nested_train_pool":
+            if self.data.dataset != "twomoons":
+                raise ValueError("nested_train_pool is supported only for TwoMoons")
+            if (
+                self.data.training_pool_size is None
+                or self.data.training_pool_size < self.data.train_size
+            ):
+                raise ValueError("nested_train_pool requires training_pool_size >= train_size")
+            if self.data.per_training_seed:
+                raise ValueError("nested_train_pool requires a shared training pool")
+        elif self.data.training_pool_size is not None:
+            raise ValueError("training_pool_size is only valid for nested_train_pool")
         if self.pretraining.optimizer not in {"sgd", "adam"}:
             raise ValueError("pretraining.optimizer must be 'sgd' or 'adam'")
         if (

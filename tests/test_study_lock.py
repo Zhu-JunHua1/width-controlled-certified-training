@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 import yaml
 
 from width_cert.experiments.study_lock import verify_frozen_study_lock
-from width_cert.experiments import load_config
+from width_cert.experiments import load_config, load_configs
 from width_cert.experiments.study_lock import experiment_config_sha256
 
 
@@ -149,3 +150,14 @@ def test_protocol_v5_main_lock_authorizes_only_the_committed_grid():
     assert payload["data"]["blind_test_opened"] is False
     assert payload["evaluation"]["expected_summary_rows"] == 120
     assert payload["evaluation"]["expected_evaluator_rows"] == 240
+
+
+def test_nested_pool_size_is_bound_without_changing_legacy_config_hash():
+    root = Path(__file__).resolve().parents[1]
+    old = load_config(root / "configs" / "protocol_v5_frozen" / "P1_twomoons_multiradius_main.yaml")
+    assert experiment_config_sha256(old) == (
+        "5a0b8b8cc939afe12432646c06905505588c8f2331ec1d56855b51c6167add87"
+    )
+    nested = load_configs(root / "configs" / "development" / "train_size_nested_T40.yaml")[0]
+    changed = replace(nested, data=replace(nested.data, training_pool_size=800))
+    assert experiment_config_sha256(nested) != experiment_config_sha256(changed)
