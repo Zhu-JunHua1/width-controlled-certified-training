@@ -18,13 +18,16 @@ experiments are small-scale, full-batch MLP studies; this repository does not cl
 | Evidence | Configuration family | Role |
 |---|---|---|
 | TwoMoons, three radii, IBP/IC with fixed/IWAU updates | `protocol_v5_frozen` | Main prespecified blind descriptive study |
+| Nested TwoMoons training sets, `N=100/200/400/800` | `protocol_v6_frozen` | Separate blind training-size extension |
 | Tuned scalar, cumulative cosine, GlobalIWAU, coordinate IWAU | `protocol_v4_frozen` | Blinded update-rule fairness study |
 | Depth, width, step, horizon, and MNIST studies | `protocol_v2_frozen` | Secondary robustness analyses |
 | Corrected synthetic multi-class study | `protocol_v3_frozen` | Post-hoc exploratory extension |
 
-Final aggregates are published in [`artifacts/protocol_v5_final`](artifacts/protocol_v5_final) and
-[`artifacts/protocol_v4_final`](artifacts/protocol_v4_final). The complete evidence map and reporting
-scope are in [`docs/protocols.md`](docs/protocols.md).
+Final aggregates are published in [`artifacts/protocol_v5_final`](artifacts/protocol_v5_final),
+[`artifacts/protocol_v6_scale_final`](artifacts/protocol_v6_scale_final), and
+[`artifacts/protocol_v4_final`](artifacts/protocol_v4_final). The size-extension directory also contains
+the [raw result archive](artifacts/protocol_v6_scale_final/raw_results.zip). The complete evidence map
+and reporting scope are in [`docs/protocols.md`](docs/protocols.md).
 
 ## Installation
 
@@ -142,7 +145,7 @@ pytest
 ```
 
 The test suite covers indexing, calibration windows, adaptive continuation, conservative intersection
-fallback, split isolation, status semantics, logging, and frozen-protocol validation.
+fallback, nested training pools, split isolation, status semantics, logging, and frozen-protocol validation.
 
 ## Citation and license
 

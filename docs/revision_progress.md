@@ -4,13 +4,17 @@ This file records implementation milestones for the post-review protocol.  A
 completed implementation milestone is not a final experimental result; final
 test values require a frozen study lock.
 
-## Current publication status (protocols v4--v5 complete)
+## Current publication status (protocols v4--v6 complete)
 
 - The protocol-v4 blinded update-rule study is complete. Its six prespecified paired comparisons and
   runtime summaries are published under `artifacts/protocol_v4_final/`.
 - The protocol-v5 TwoMoons multi-radius main study is complete: 120 training summaries and 240 common-
   evaluator rows across three radii, ten starts, four methods, and two test certifiers. The manuscript
   table and appendix artifacts are under `artifacts/protocol_v5_final/`.
+- The separately frozen protocol-v6 training-size extension is complete: 160 summaries and 320
+  evaluator rows across nested `N=100/200/400/800` TwoMoons training sets. Its aggregate, per-start,
+  runtime, statistical, and raw-output archive artifacts are under `artifacts/protocol_v6_scale_final/`.
+  It is not pooled with the multi-radius main study.
 - P3/P6/P7 remain secondary robustness evidence; corrected P5-v3 remains post-hoc exploratory evidence.
 - The constrained official FullCert adapter passed development gates. Its one-time frozen extension
   stopped after 4 of 30 cells on a non-finite interval update, so no official FullCert aggregate is

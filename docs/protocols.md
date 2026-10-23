@@ -8,6 +8,7 @@ this repository. It supersedes the earlier pre-revision protocol overview.
 | Tier | Protocol family | Purpose | Status |
 |---|---|---|---|
 | Main descriptive study | P1-v5 TwoMoons multi-radius | Compare IBP-fixed, IBP+IWAU, IC-fixed, and IC+IWAU across `1e-4`, `1e-3`, and `1e-2` | Frozen blind run complete |
+| Blind size extension | P1-v6 nested TwoMoons | Compare the same four methods as the jointly perturbed training pool grows from 100 to 800 examples at `1e-3` | Frozen blind run complete; design informed by earlier development data |
 | Update-rule controls | P1/P2-v4 | Compare coordinate IWAU with fixed IC, GlobalIWAU, a calibration-tuned scalar schedule, and a cumulative-step-matched cosine schedule | Frozen blind runs complete |
 | Earlier component tests | P1/P2-v2 | Paired IC-vs-IBP selected-checkpoint test and IC+IWAU-vs-IC terminal test | Frozen, reported in appendix |
 | Secondary robustness | P3/P6/P7-v2 | Depth, width, base-step, radius, and horizon sensitivity | Frozen, complete |
@@ -37,6 +38,50 @@ accuracy, runtime, seconds per update, and memory are retained under
 The terminal aggregate uses the prespecified `diverged_as_zero` policy only for a missing endpoint whose
 raw status is `diverged`. Raw terminal fields remain null, so a diverged trajectory is never rewritten as
 a completed zero-certification run.
+
+## Separate P1-v6 training-size extension
+
+- Frozen inputs: `configs/protocol_v6_frozen/P1_twomoons_training_size.yaml`,
+  `study_locks/protocol_v6_scale_frozen.yaml`, and
+  `study_locks/candidate_audits/protocol_v6_scale_seeds.json`.
+- Executable-input commit: `42cb7665dbebfd633f6fd26db8848e1b1cb63fa6`; metadata-lock commit:
+  `84ed449d22e0c197368212a73ff5a281890cd95f`.
+- Data: strict `N=100/200/400/800` prefixes of one new 800-example TwoMoons pool, plus one common
+  500-example calibration set and one new 500-example blind-test set. The `[2,20,20,1]` network,
+  `T=40`, `epsilon=0.001`, and full-training-set input perturbation are fixed. Ten consecutive
+  initialization seeds `0..9` are shared across sizes and methods; there is no pretraining.
+- Methods: `IBP`, `IBP+IWAU`, `IC`, and `IC+IWAU`; IC selects the first calibration maximum and is the
+  primary common test certifier, with IBP as a second evaluator. A required IWAU fixed pre-run is
+  charged in its end-to-end cost.
+- Prespecified principal contrast: `IC+IWAU` minus fixed `IC` on terminal IC test certification at
+  `N=800`. Missing raw terminal values from divergence remain null and contribute zero only in the
+  declared analysis. Other sizes and method contrasts are descriptive.
+
+The one-time blind run passed the exact 160-summary/320-evaluator-row grid and frozen provenance
+checks. Reports are in `artifacts/protocol_v6_scale_final/`: `size_method_summary.csv` contains all
+four methods and both evaluators; `per_start_evaluator_rows.csv` preserves the paired cells;
+`primary_paired_result.json` contains the exact sign-flip test and paired bootstrap interval;
+`runtime/` contains the cost report and content hashes. The
+[raw result archive](../artifacts/protocol_v6_scale_final/raw_results.zip) contains the original
+per-run summaries, state/update trajectories, and checkpoints. Its SHA-256 is
+`04b4d8b937ff186d35555ccb1c8e74688ca4d24a3c7b61bae73a03e7042a7851`.
+
+After extracting the archive as `results/protocol_v6_scale_final/` in the pinned environment, the
+frozen analysis can be regenerated without training or reopening the blind test:
+
+```bash
+python tools/report_training_size_scale.py \
+  configs/protocol_v6_frozen/P1_twomoons_training_size.yaml \
+  study_locks/protocol_v6_scale_frozen.yaml \
+  artifacts/protocol_v6_scale_final
+python -m width_cert.cli runtime-report \
+  results/protocol_v6_scale_final artifacts/protocol_v6_scale_final/runtime
+```
+
+This new study does not reuse the P1-v5 training pool, test set, or start-selection rule. In particular,
+the two `N=100` estimates must not be numerically pooled. The observed terminal effect through
+`N=800` is evidence for the tested shallow, full-batch setting, not a claim of large-network
+scalability. PyTorch peak allocated bytes are not whole-GPU memory use.
 
 ## Update-rule controls
 

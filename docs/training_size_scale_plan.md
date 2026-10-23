@@ -97,3 +97,19 @@ strict prefixes of a newly seeded 800-example pool. Calibration-only common
 start selection accepted seeds 0 through 9 without certified-accuracy or
 test-metric filtering. Its audit is
 `study_locks/candidate_audits/protocol_v6_scale_seeds.json`.
+
+## Completed blind-study record, 2026-10-23
+
+The frozen run launched once on 2026-10-22 and exited zero on 2026-10-23. It passed the committed
+four-size result-grid validator: 160 reported summaries, 320 evaluator rows, exact frozen cells,
+config/lock/code hashes, clean execution provenance, and completed/diverged terminal-field semantics.
+The original result tree was not modified or rerun. The prespecified analysis and runtime reports were
+committed under `artifacts/protocol_v6_scale_final/` at `a4a06a8`; the complete original result tree is
+also published there as `raw_results.zip`, with its SHA-256 recorded in `docs/protocols.md`.
+
+Under the common IC evaluator, terminal certification averaged 5.58% for fixed IC and 77.32% for
+IC+IWAU at N=800, a paired difference of 71.74 percentage points (paired bootstrap 95% interval
+59.16--79.82; two-sided exact sign-flip p=0.001953125). Both IC arms completed all ten starts at
+every size. The result is a blind extension motivated by prior development observations, not a
+general scaling law. Full four-method results, clean accuracy, failure counts, and charged runtime
+are in the committed reports; this completion record does not amend the earlier gate or hypotheses.
