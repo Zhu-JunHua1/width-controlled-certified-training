@@ -1,0 +1,40 @@
+{
+  "bootstrap_draws": 10000,
+  "bootstrap_percentile_95_ci_percentage_points": [
+    59.160000000000004,
+    79.82000000000001
+  ],
+  "bootstrap_rng_seed": 20261022,
+  "code_commit": "42cb7665dbebfd633f6fd26db8848e1b1cb63fa6",
+  "comparison": "IC+IWAU minus IC-fixed",
+  "exact_two_sided_signflip_p": 0.001953125,
+  "lock_hash": "03c3cf946b02049e51be677ca131c049f41f28cd17cf7da6cd864e9fa2a78745",
+  "mean_difference_percentage_points": 71.74000000000001,
+  "metric": "IC_test_certification_at_T_diverged_as_zero",
+  "paired_differences_percentage_points": [
+    21.0,
+    76.4,
+    85.0,
+    80.2,
+    76.4,
+    80.8,
+    72.0,
+    81.80000000000001,
+    78.4,
+    65.4
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "status": "prespecified_blind_scale_extension",
+  "train_size": 800
+}
