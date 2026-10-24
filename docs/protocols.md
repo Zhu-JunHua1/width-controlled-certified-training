@@ -112,6 +112,13 @@ legacy P5-v2 result, P5-v3 is labelled post-hoc exploratory evidence.
 P4 uses clean test inputs, `T=20`, a different base step, and seed-specific data splits to align with an
 external reporting context. It is not directly comparable with P1-v5.
 
+The compact supplementary PDF retains the core comparisons. Complete
+descriptive aggregate tables removed from that PDF are preserved as
+`artifacts/supplementary_secondary/p3_sensitivity.csv` (TwoMoons width/base-step
+variants) and `artifacts/supplementary_secondary/p4_clean_input.csv` (clean-input
+external context). These files transcribe already reported aggregates; they
+do not change analysis tiers or replace the frozen per-start results.
+
 ## Baseline labels
 
 - `IBP-fixed` is this repository's FullCert-style interval-SGD implementation with auto_LiRPA bounds.

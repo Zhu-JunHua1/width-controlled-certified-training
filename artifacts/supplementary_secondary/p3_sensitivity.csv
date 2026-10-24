@@ -1,0 +1,10 @@
+variant_type,variant_value,epsilon,ibp_test_ibp_fixed_selected_pct,ibp_test_ic_fixed_selected_pct,ic_test_ic_fixed_selected_pct,ic_test_ic_iwau_selected_pct,ic_test_ic_iwau_terminal_pct
+width,10,0.001,78.94,79.22,79.24,79.24,77.74
+width,20,0.001,80.08,80.22,80.24,80.24,78.20
+width,40,0.001,82.46,82.56,82.62,82.52,76.80
+width,80,0.001,81.44,81.84,81.96,82.10,80.54
+base_step,0.05,0.001,77.66,79.42,79.72,79.76,77.46
+base_step,0.10,0.001,77.78,79.54,79.78,79.84,78.08
+base_step,0.20,0.001,78.42,79.80,80.00,80.16,77.66
+base_step,0.50,0.001,79.40,80.54,80.74,81.06,76.46
+base_step,1.00,0.001,79.64,80.22,80.34,80.34,72.62
